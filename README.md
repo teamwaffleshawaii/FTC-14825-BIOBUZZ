@@ -1,5 +1,6 @@
 ## NOTICE
 FTC 14825, Team Waffles, FTC SDK for the BIOBUZZ (2026-2027) competition season.
+Running on FTC SDK Version 12.0 (20260907-090034)
 
 ## Variable Configurations
 **Control Hub:**
