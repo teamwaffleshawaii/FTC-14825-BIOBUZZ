@@ -28,14 +28,14 @@ Motor 3: motorName
 
 **Servo Hub:**
 
-Servo 0: servoName;
+Servo 0: servoName
 
-Servo 1: servoName;
+Servo 1: servoName
 
-Servo 2: servoName;
+Servo 2: servoName
 
-Servo 3: servoName;
+Servo 3: servoName
 
-Servo 4: servoName;
+Servo 4: servoName
 
-Servo 5: servoName;
+Servo 5: servoName
