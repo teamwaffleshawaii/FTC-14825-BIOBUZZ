@@ -30,7 +30,6 @@ public class AutoTemplate extends LinearOpMode {
 
         //TODO: Put your Odometry trajectory paths here!!!
         //Separate your paths by action (linearSlide movements, intake movements, servo movements, etc.)
-        //Work shop it line 35,36
         Action trajectory1 = drive.actionBuilder(new Pose2d(0, 0, Math.toRadians(90) ))
                 .strafeToLinearHeading(new Vector2d( -42, 32), Math.toRadians(-52))
                 .strafeToLinearHeading(new Vector2d( 34, 1), Math.toRadians(93))
@@ -63,7 +62,7 @@ public class AutoTemplate extends LinearOpMode {
 
         if (opModeIsActive() && !isStopRequested()) {
             //Run your trajectory here when the code starts
-          Actions.runBlocking(new SequentialAction(trajectory1));
+            Actions.runBlocking(new SequentialAction(trajectory1));
             //actuator.setServoPosition(0.44); //close servo
             //...
             //...

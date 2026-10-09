@@ -21,7 +21,7 @@ public class Actuators {
     public DcMotor rightBack;
 
     // TODO: If using servos or continuous servos, add them here (up to 10)
-    public Servo servoClaw;
+    //public Servo servoClaw;
     //public CRServo servoContinuous;
 
     public void init(HardwareMap hwMap) {
@@ -44,13 +44,13 @@ public class Actuators {
         rightBack.setDirection(DcMotorSimple.Direction.FORWARD); //or REVERSE
 
         //TODO: Put servo hardware here, don't forget to rename deviceNames to match yours
-        servoClaw = hwMap.get(Servo.class, "servoClaw");
+        //servoClaw = hwMap.get(Servo.class, "servoClaw");
         //servoContinuous = hwMap.get(CRServo.class, "servoContinuous");
         //TODO: If need to change servo direction
-        servoClaw.setDirection(Servo.Direction.FORWARD); //or REVERSE
+        //servoClaw.setDirection(Servo.Direction.FORWARD); //or REVERSE
         //servoContinuous.setDirection(CRServo.Direction.FORWARD); //or REVERSE
         //TODO: If need to set the logical min and max of a servo.
-        servoClaw.scaleRange(0.24, 1);  //Change the 0 and 1 if needed
+        //servoClaw.scaleRange(0.24, 1);  //Change the 0 and 1 if needed
     }
 
     //TODO: Sample classed for turning on motors using power only (Useful for TeleOp)
@@ -72,9 +72,11 @@ public class Actuators {
     }
 
     //TODO: Sample classes for powering a servo
+    /*
     public void setServoPosition(double position) {
         servoClaw.setPosition(position);
     }
+     */
 
     //TODO: Sample classes for powering a continuous servo
     /*
@@ -82,6 +84,5 @@ public class Actuators {
         servoContinuous.setPower(position);
     }
      */
-
 
 }
