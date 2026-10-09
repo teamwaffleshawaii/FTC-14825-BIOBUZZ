@@ -4,28 +4,36 @@ FTC 14825, Team Waffles, FTC SDK for the BIOBUZZ (2026-2027) competition season.
 ## Variable Configurations
 **Control Hub:**
 Motor 0: motorName;
-Motor 1:
+Motor 1: motorName;
+Motor 2: motorName;
+Motor 3: motorName;
 
-Motor 2:
+Servo 0: none;
+Servo 1: none;
+Servo 2: none;
+Servo 3: none;
+Servo 4: none;
+Servo 5: none;
 
-Motor 3:
-
-Servo 0:
-
-I2C 1: goBILDA PinPoint Computer & IMU
-
+I2C 1: goBILDA PinPoint Computer & IMU;
 
 **Expansion Hub:**
-Motor 0:
-Motor 1:
-Motor 2:
-Motor 3:
-Servo 0:
+Motor 0: motorName;
+Motor 1: motorName;
+Motor 2: motorName;
+Motor 3: motorName;
+
+Servo 0: none;
+Servo 1: none;
+Servo 2: none;
+Servo 3: none;
+Servo 4: none;
+Servo 5: none;
 
 **Servo Hub:**
-Servo 0:
-Servo 1:
-Servo 2:
-Servo 3:
-Servo 4:
-Servo 5:
+Servo 0: servoName;
+Servo 1: servoName;
+Servo 2: servoName;
+Servo 3: servoName;
+Servo 4: servoName;
+Servo 5: servoName;
