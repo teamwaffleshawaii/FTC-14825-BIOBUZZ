@@ -43,4 +43,4 @@ Servo 3: intakeServoRight
 
 Servo 4: turretServo
 
-Servo 5: servoName
+Servo 5: Empty
