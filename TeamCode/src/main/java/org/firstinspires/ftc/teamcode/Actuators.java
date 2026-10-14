@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -53,8 +54,8 @@ public class Actuators {
         rightFront.setDirection(DcMotorSimple.Direction.FORWARD); //or REVERSE
         rightBack.setDirection(DcMotorSimple.Direction.FORWARD); //or REVERSE
         intakeMotor.setDirection(DcMotorSimple.Direction.FORWARD); //or REVERSE
-        transferMotor.setDirection(DcMotorSimple.Direction.FORWARD); //or REVERSE
-        launchMotor.setDirection(DcMotorSimple.Direction.FORWARD); //or REVERSE
+        transferMotor.setDirection(DcMotorSimple.Direction.REVERSE); //or FORWARD
+        launchMotor.setDirection(DcMotorSimple.Direction.REVERSE); //or FORWARD
 
         //TODO: Put servo hardware here, don't forget to rename deviceNames to match yours
         kickerServo = hwMap.get(Servo.class, "kickerServo");
@@ -64,8 +65,8 @@ public class Actuators {
         intakeServoLeft = hwMap.get(Servo.class, "intakeServoLeft");
         turretServo = hwMap.get(Servo.class, "turretServo");
         //TODO: If need to change servo direction
-        stepUpLeft.setDirection(CRServo.Direction.FORWARD);
-        stepUpRight.setDirection(CRServo.Direction.REVERSE);
+        stepUpLeft.setDirection(CRServo.Direction.REVERSE);
+        stepUpRight.setDirection(CRServo.Direction.FORWARD);
         intakeServoRight.setDirection(Servo.Direction.FORWARD);
         intakeServoRight.setDirection(Servo.Direction.REVERSE);
         //TODO: If you need to set the logical min and max of a servo.
@@ -101,8 +102,8 @@ public class Actuators {
     }
 
     public void launchMotor(double power) {
-        launchMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        launchMotor.setPower(power);
+        launchMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        ((DcMotorEx) launchMotor).setVelocity(power);
     }
 
     //TODO: Sample classes for powering a servo
