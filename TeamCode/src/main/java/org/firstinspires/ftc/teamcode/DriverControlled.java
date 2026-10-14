@@ -25,7 +25,7 @@ public class DriverControlled extends LinearOpMode {
                 resetAngle();
                 intake();
                 launch();
-                telemetry.update();
+                //telemetry.update();
             }
         }
     }
@@ -133,7 +133,8 @@ public class DriverControlled extends LinearOpMode {
 
     public void launch() {
         if (gamepad1.right_trigger > 0.2) {
-            actuator.launchMotor(850);
+            actuator.launchMotor(850); //adjust this as needed
+            //later on this should probably be auto adjusted via Limelight data
         } else {
             actuator.launchMotor(0);
         }
