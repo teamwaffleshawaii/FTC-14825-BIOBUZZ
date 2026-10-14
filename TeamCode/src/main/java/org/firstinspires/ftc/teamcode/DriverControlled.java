@@ -31,10 +31,10 @@ public class DriverControlled extends LinearOpMode {
     }
 
     public void drive() {
-        double Protate = - gamepad1.left_stick_x;
-        double stick_x = - gamepad1.right_stick_x * Math.sqrt(Math.pow(1-Math.abs(Protate), 2) );
+        double Protate = - gamepad1.right_stick_x;
+        double stick_x = - gamepad1.left_stick_x * Math.sqrt(Math.pow(1-Math.abs(Protate), 2) );
         //Accounts for Protate when limiting magnitude to be less than 1
-        double stick_y = - gamepad1.right_stick_y * Math.sqrt(Math.pow(1-Math.abs(Protate), 2) );
+        double stick_y = - gamepad1.left_stick_y * Math.sqrt(Math.pow(1-Math.abs(Protate), 2) );
         double theta = 0;
         double Px = 0;
         double Py = 0;

@@ -34,6 +34,7 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
@@ -62,28 +63,28 @@ public final class MecanumDrive {
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
 
         // drive model parameters
-        public double inPerTick = 1;
-        public double lateralInPerTick = inPerTick;
-        public double trackWidthTicks = 0;
+        public double inPerTick = 0.00196544;
+        public double lateralInPerTick = 0.0012227945857857607;
+        public double trackWidthTicks = 6685;
 
         // feedforward parameters (in tick units)
-        public double kS = 0;
-        public double kV = 0;
-        public double kA = 0;
+        public double kS = 1.5948924450988953;
+        public double kV = 0.00023503215432372858;
+        public double kA = 0.0001;
 
         // path profile parameters (in inches)
-        public double maxWheelVel = 50;
-        public double minProfileAccel = -30;
-        public double maxProfileAccel = 50;
+        public double maxWheelVel = 70; //default 50
+        public double minProfileAccel = -50; //default -30
+        public double maxProfileAccel = 70; //default 50
 
         // turn profile parameters (in radians)
         public double maxAngVel = Math.PI; // shared with path
         public double maxAngAccel = Math.PI;
 
         // path controller gains
-        public double axialGain = 0.0;
-        public double lateralGain = 0.0;
-        public double headingGain = 0.0; // shared with turn
+        public double axialGain = 12;
+        public double lateralGain = 8;
+        public double headingGain = 8; // shared with turn
 
         public double axialVelGain = 0.0;
         public double lateralVelGain = 0.0;
@@ -235,7 +236,8 @@ public final class MecanumDrive {
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // TODO: reverse motor directions if needed
-        //   leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // TODO: make sure your config has an IMU with this name (can be BNO or BHI)
         //   see https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/configuring/index.html
@@ -244,7 +246,7 @@ public final class MecanumDrive {
 
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
 
-        localizer = new DriveLocalizer(pose);
+        localizer = new PinpointLocalizer(hardwareMap, PARAMS.inPerTick, pose);
 
         FlightRecorder.write("MECANUM_PARAMS", PARAMS);
     }
