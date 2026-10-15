@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
@@ -12,10 +13,24 @@ public class DriverControlled extends LinearOpMode {
     Actuators actuator = new Actuators();
     Sensors sensor = new Sensors();
 
+    //Cases for finite state machine for kicker
+    public enum KickerState {
+        KICKER_RESET,
+        KICKER_UP
+    }
+
+    //kickerState variable is declared
+    KickerState kickerState = KickerState.KICKER_RESET;
+    //timer for kicker FSM
+    public ElapsedTime kickerTimer = new ElapsedTime();
+
     @Override
     public void runOpMode() {
         actuator.init(hardwareMap);
         sensor.init(hardwareMap);
+
+        //reset FSM timer
+        kickerTimer.reset();
 
         waitForStart();
 
@@ -25,7 +40,8 @@ public class DriverControlled extends LinearOpMode {
                 resetAngle();
                 intake();
                 launch();
-                //telemetry.update();
+                kicker(); //kicker is now a FSM
+                telemetry.update();
             }
         }
     }
@@ -71,14 +87,6 @@ public class DriverControlled extends LinearOpMode {
         theta = Math.atan2(stick_y, stick_x) - gyroAngle - (Math.PI / 2);
         Px = Math.sqrt(Math.pow(stick_x, 2) + Math.pow(stick_y, 2)) * (Math.sin(theta + Math.PI / 4));
         Py = Math.sqrt(Math.pow(stick_x, 2) + Math.pow(stick_y, 2)) * (Math.sin(theta - Math.PI / 4));
-
-        telemetry.addData("Stick_X", stick_x);
-        telemetry.addData("Stick_Y", stick_y);
-        telemetry.addData("Magnitude",  Math.sqrt(Math.pow(stick_x, 2) + Math.pow(stick_y, 2)));
-        telemetry.addData("Motor Front Left", Py - Protate);
-        telemetry.addData("Motor Front Right", Px + Protate);
-        telemetry.addData("Motor Back Left", Px - Protate);
-        telemetry.addData("Motor Back Right", Py + Protate);
 
         actuator.leftFront((Py - Protate));
         actuator.leftBack((Px - Protate));
@@ -138,12 +146,23 @@ public class DriverControlled extends LinearOpMode {
         } else {
             actuator.launchMotor(0);
         }
+    }
 
-        //To get rid of the 4th pollen using the kicker servo
-        if (gamepad1.rightBumperWasReleased()) {
-            actuator.kickerServo.setPosition(0);
-            sleep(500);
-            actuator.kickerServo.setPosition(0.5);
+    public void kicker() {
+        //To get rid of the 4th pollen using the kicker servo, running on a FSM
+        switch (kickerState) {
+            case KICKER_RESET:
+                if (gamepad1.rightBumperWasReleased()) {
+                    actuator.kickerServo.setPosition(0.05);
+                    kickerTimer.reset(); //start a timer
+                    kickerState = kickerState.KICKER_UP; //move to the next case
+                }
+                break;
+            case KICKER_UP:
+                if (kickerTimer.seconds() > 0.4) {
+                    actuator.kickerServo.setPosition(0.50);
+                    kickerState = kickerState.KICKER_RESET; //reset back
+                }
         }
     }
 }
