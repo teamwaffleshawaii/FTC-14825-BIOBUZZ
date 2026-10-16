@@ -17,7 +17,7 @@ Servo 0: REV LED Driver
 
 I2C 1: goBILDA PinPoint Computer & IMU
 
-USB: Limelight 3A
+USB/Ethernet: limelight (Limelight 3A)
 
 **Expansion Hub:**
 
