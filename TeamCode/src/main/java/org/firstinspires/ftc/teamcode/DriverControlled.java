@@ -100,6 +100,7 @@ public class DriverControlled extends LinearOpMode {
             reset_angle = getHeading() + reset_angle;
         }
     }
+
     public double getHeading(){
 
         double heading;
@@ -127,13 +128,13 @@ public class DriverControlled extends LinearOpMode {
         }
     }
     public void intake() {
-        if (gamepad1.a) {
+        if (gamepad1.a || gamepad2.a) {
             actuator.intakeMotor.setPower(1);
             actuator.transferMotor.setPower(1);
-        } else if (gamepad1.b) {
+        } else if (gamepad1.b || gamepad2.b) {
             actuator.intakeMotor.setPower(-0.8);
             actuator.transferMotor.setPower(-0.8);
-        } else if (gamepad1.right_bumper) {
+        } else if (gamepad2.right_bumper) {
             actuator.stepUpLeft.setPower(1);
             actuator.stepUpRight.setPower(1);
             actuator.intakeMotor.setPower(1);
@@ -146,8 +147,8 @@ public class DriverControlled extends LinearOpMode {
         }
     }
     public void launch() {
-        if (gamepad1.right_trigger > 0.2) {
-            actuator.launchMotor(850); //adjust this as needed
+        if (gamepad2.right_trigger > 0.2) {
+            actuator.launchMotor(900); //adjust this as needed
             //later on this should probably be auto adjusted via Limelight data
         } else {
             actuator.launchMotor(0);
@@ -157,7 +158,7 @@ public class DriverControlled extends LinearOpMode {
         //To get rid of the 4th pollen using the kicker servo, running on a FSM
         switch (kickerState) {
             case KICKER_RESET:
-                if (gamepad1.rightBumperWasReleased()) {
+                if (gamepad2.rightBumperWasReleased()) {
                     actuator.kickerUp(); //change value in Actuators.java if needed
                     kickerTimer.reset(); //start a timer
                     kickerState = KickerState.KICKER_UP; //move to the next case
