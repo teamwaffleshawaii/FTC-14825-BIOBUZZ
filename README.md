@@ -13,7 +13,9 @@ Motor 2: intakeMotor (Motor Encoder: Same Motor)
 
 Motor 3: launchMotor (Motor Encoder: Same Motor)
 
-Servo 0: REV LED Driver
+Servo 0: LED (goBILDA RGB Indicator)
+
+Servo 1: To be added (REV BlinkIn LED Driver)
 
 I2C 1: goBILDA PinPoint Computer & IMU
 
