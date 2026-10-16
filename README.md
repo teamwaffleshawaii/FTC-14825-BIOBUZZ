@@ -29,8 +29,6 @@ Motor 2: transferMotor (Motor Encoder: Same Motor)
 
 Motor 3: Empty
 
-Servo 0: kickerServo
-
 **Servo Hub:**
 
 Servo 0: stepUpLeft
@@ -43,4 +41,4 @@ Servo 3: intakeServoRight
 
 Servo 4: turretServo
 
-Servo 5: Empty
+Servo 5: intakeServoRight
