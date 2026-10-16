@@ -100,7 +100,6 @@ public class DriverControlled extends LinearOpMode {
             reset_angle = getHeading() + reset_angle;
         }
     }
-
     public double getHeading(){
 
         double heading;
@@ -120,7 +119,6 @@ public class DriverControlled extends LinearOpMode {
         telemetry.addData("Heading (Radians)", heading * 3.1415926535 / 90);
         return heading;
     }
-
     public void flowerRamp(){
         if (gamepad1.left_trigger_pressed || gamepad1.left_bumper){
             actuator.intakeRampDown();
@@ -128,8 +126,6 @@ public class DriverControlled extends LinearOpMode {
             actuator.intakeRampUp();
         }
     }
-
-    /// public void intake() {
     public void intake() {
         if (gamepad1.a) {
             actuator.intakeMotor.setPower(1);
@@ -149,7 +145,6 @@ public class DriverControlled extends LinearOpMode {
             actuator.transferMotor.setPower(0);
         }
     }
-
     public void launch() {
         if (gamepad1.right_trigger > 0.2) {
             actuator.launchMotor(850); //adjust this as needed
@@ -158,7 +153,6 @@ public class DriverControlled extends LinearOpMode {
             actuator.launchMotor(0);
         }
     }
-
     public void kicker() {
         //To get rid of the 4th pollen using the kicker servo, running on a FSM
         switch (kickerState) {
