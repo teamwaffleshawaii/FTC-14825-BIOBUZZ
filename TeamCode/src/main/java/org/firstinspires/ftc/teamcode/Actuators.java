@@ -68,7 +68,7 @@ public class Actuators {
         stepUpLeft.setDirection(CRServo.Direction.REVERSE);
         stepUpRight.setDirection(CRServo.Direction.FORWARD);
         intakeServoRight.setDirection(Servo.Direction.FORWARD);
-        intakeServoRight.setDirection(Servo.Direction.REVERSE);
+        intakeServoLeft.setDirection(Servo.Direction.REVERSE);
         //TODO: If you need to set the logical min and max of a servo.
         //turretServo.scaleRange(0, 1);  //Change the 0 and 1 if needed
     }
