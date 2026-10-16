@@ -8,11 +8,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 @TeleOp
 public class DriverControlled extends LinearOpMode {
-    // idk rn
-    double RIGHT_UP_POSITION = 0.2;
-    double RIGHT_DOWN_POSITION = 0.8;
-    double LEFT_UP_POSITION = 0.8;
-    double LEFT_DOWN_POSITION = 0.2;
 
     double reset_angle = 0;
     Actuators actuator = new Actuators();
@@ -42,10 +37,10 @@ public class DriverControlled extends LinearOpMode {
 
         if (opModeIsActive()) {
             while (opModeIsActive()) {
-                flowerRamp();
                 drive();
                 resetAngle();
                 intake();
+                flowerRamp();
                 launch();
                 kicker(); //kicker is now a FSM
                 telemetry.update();
@@ -128,11 +123,9 @@ public class DriverControlled extends LinearOpMode {
 
     public void flowerRamp(){
         if (gamepad1.left_trigger_pressed || gamepad1.left_bumper){
-            actuator.intakeServoRight.setPosition(RIGHT_DOWN_POSITION);
-            actuator.intakeServoLeft.setPosition(LEFT_DOWN_POSITION);
+            actuator.intakeRampDown();
         } else {
-            actuator.intakeServoRight.setPosition(RIGHT_UP_POSITION);
-            actuator.intakeServoLeft.setPosition(LEFT_UP_POSITION);
+            actuator.intakeRampUp();
         }
     }
 
@@ -157,9 +150,6 @@ public class DriverControlled extends LinearOpMode {
         }
     }
 
-
-
-
     public void launch() {
         if (gamepad1.right_trigger > 0.2) {
             actuator.launchMotor(850); //adjust this as needed
@@ -174,14 +164,14 @@ public class DriverControlled extends LinearOpMode {
         switch (kickerState) {
             case KICKER_RESET:
                 if (gamepad1.rightBumperWasReleased()) {
-                    actuator.kickerServo.setPosition(0.05);
+                    actuator.kickerUp(); //change value in Actuators.java if needed
                     kickerTimer.reset(); //start a timer
                     kickerState = KickerState.KICKER_UP; //move to the next case
                 }
                 break;
             case KICKER_UP:
                 if (kickerTimer.seconds() > 0.4) {
-                    actuator.kickerServo.setPosition(0.50);
+                    actuator.kickerDown(); //change value in Actuators.java if needed
                     kickerState = KickerState.KICKER_RESET; //reset back
                 }
         }

@@ -116,18 +116,22 @@ public class Actuators {
         stepUpRight.setPower(0);
     }
 
-    public void kicker(double position) {
-        kickerServo.setPosition(position);
+    public void kickerUp() {
+        kickerServo.setPosition(0.05);
+    }
+
+    public void kickerDown() {
+        kickerServo.setPosition(0.50);
     }
 
     public void intakeRampDown() {
-        intakeServoLeft.setPosition(0.4);
-        intakeServoRight.setPosition(0.4);
+        intakeServoLeft.setPosition(0.5);
+        intakeServoRight.setPosition(0.5);
     }
 
     public void intakeRampUp() {
-        intakeServoLeft.setPosition(0.6);
-        intakeServoRight.setPosition(0.6);
+        intakeServoLeft.setPosition(0.0);
+        intakeServoRight.setPosition(0.0);
     }
 
 }
