@@ -18,7 +18,7 @@ public class Actuators {
     public DcMotor rightBack;
     public DcMotor intakeMotor;
     public DcMotor transferMotor;
-    public DcMotor launchMotor;
+    public DcMotorEx launchMotor;
 
     // TODO: If using servos or continuous servos, add them here (up to 10)
     public Servo kickerServo;
@@ -28,6 +28,10 @@ public class Actuators {
     public Servo intakeServoRight;
     public Servo turretServo;
 
+    public static double LAUNCH_P = 10.0;
+    public static double LAUNCH_I = 0.0;
+    public static double LAUNCH_D = 0.0;
+    public static double LAUNCH_F = 11.7;
 
     public void init(HardwareMap hwMap) {
         // TODO: Put motor hardware here, don't forget to rename deviceNames to match yours
@@ -37,7 +41,17 @@ public class Actuators {
         rightBack = hwMap.get(DcMotor.class, "rightBack");
         intakeMotor = hwMap.get(DcMotor.class, "intakeMotor");
         transferMotor = hwMap.get(DcMotor.class, "transferMotor");
-        launchMotor = hwMap.get(DcMotor.class, "launchMotor");
+        launchMotor = hwMap.get(DcMotorEx.class, "launchMotor");
+
+        //Configuring the initial test values
+        launchMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        launchMotor.setVelocityPIDFCoefficients(
+                LAUNCH_P,
+                LAUNCH_I,
+                LAUNCH_D,
+                LAUNCH_F
+        );
 
         //TODO: Set motor mode when power is zero
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); //or FLOAT
@@ -102,8 +116,17 @@ public class Actuators {
     }
 
     public void launchMotor(double velocity) {
-        //launchMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        ((DcMotorEx) launchMotor).setVelocity(velocity);
+        launchMotor.setVelocity(velocity);
+    }
+
+    public double getLaunchVelocity() {
+        return launchMotor.getVelocity();
+    }
+
+    public boolean isLaunchReady(double targetVelocity) {
+        double tolerance = 50.0; //ticks per second
+        return targetVelocity > 0 &&
+                Math.abs(getLaunchVelocity() - targetVelocity) <= tolerance;
     }
 
     //TODO: Sample classes for powering a servo

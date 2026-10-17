@@ -15,6 +15,13 @@ public class DriverControlled extends LinearOpMode {
     Actuators actuator = new Actuators();
     Sensors sensor = new Sensors();
 
+    //Set the launch motor velocity
+    double targetVelocity = 1000;
+    //Read the actual velocity
+    double currentVelocity = actuator.getLaunchVelocity();
+    //Check whether launch is ready
+    boolean launcherReady = actuator.isLaunchReady(targetVelocity);
+
     //Cases for finite state machine for kicker
     public enum KickerState {
         KICKER_START,
@@ -105,7 +112,6 @@ public class DriverControlled extends LinearOpMode {
             reset_angle = getHeading() + reset_angle;
         }
     }
-
     public double getHeading(){
 
         double heading;
@@ -150,11 +156,15 @@ public class DriverControlled extends LinearOpMode {
         }
     }
     public void launch() {
-        telemetry.addData("Launch Velocity", ((DcMotorEx)actuator.launchMotor).getVelocity());
-        if (gamepad2.right_trigger > 0.5) {
-            actuator.launchMotor(900); //adjust this as needed
+        telemetry.addData("Target Velocity", targetVelocity);
+        telemetry.addData("Actual Velocity", currentVelocity);
+        telemetry.addData("Launcher Ready", launcherReady);
+        telemetry.update();
+
+        if (gamepad2.x) {
+            actuator.launchMotor(targetVelocity); //adjust this as needed
             //later on this should probably be auto adjusted via Limelight data
-        } else {
+        } else if (gamepad2.y) {
             actuator.launchMotor(0);
         }
     }
