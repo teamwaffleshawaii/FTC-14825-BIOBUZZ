@@ -29,7 +29,7 @@ public class Actuators {
     public Servo turretServo;
     public Servo ledIndicator;
 
-    public static double LAUNCH_P = 26.0;
+    public static double LAUNCH_P = 24.0;
     public static double LAUNCH_I = 0.0;
     public static double LAUNCH_D = 0.0;
     public static double LAUNCH_F = 20;
