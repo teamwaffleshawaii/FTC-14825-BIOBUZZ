@@ -17,12 +17,13 @@ public class DriverControlled extends LinearOpMode {
 
     //Cases for finite state machine for kicker
     public enum KickerState {
+        KICKER_START,
         KICKER_RESET,
         KICKER_UP
     }
 
     //kickerState variable is declared
-    KickerState kickerState = KickerState.KICKER_RESET;
+    KickerState kickerState = KickerState.KICKER_START;
     //timer for kicker FSM
     public ElapsedTime kickerTimer = new ElapsedTime();
 
@@ -144,8 +145,6 @@ public class DriverControlled extends LinearOpMode {
             actuator.intakeMotor.setPower(0.5);
             actuator.transferMotor.setPower(1);
         } else {
-            actuator.stepUpLeft.setPower(0);
-            actuator.stepUpRight.setPower(0);
             actuator.intakeMotor.setPower(0);
             actuator.transferMotor.setPower(0);
         }
@@ -153,7 +152,7 @@ public class DriverControlled extends LinearOpMode {
     public void launch() {
         telemetry.addData("Launch Velocity", ((DcMotorEx)actuator.launchMotor).getVelocity());
         if (gamepad2.right_trigger > 0.5) {
-            actuator.launchMotor(800); //adjust this as needed
+            actuator.launchMotor(900); //adjust this as needed
             //later on this should probably be auto adjusted via Limelight data
         } else {
             actuator.launchMotor(0);
@@ -162,9 +161,11 @@ public class DriverControlled extends LinearOpMode {
     public void kicker() {
         //To get rid of the 4th pollen using the kicker servo, running on a FSM
         switch (kickerState) {
-            case KICKER_RESET:
+            case KICKER_START:
                 if (gamepad2.rightBumperWasReleased()) {
                     actuator.kickerUp(); //change value in Actuators.java if needed
+                    actuator.stepUpLeft.setPower(1);
+                    actuator.stepUpRight.setPower(1);
                     kickerTimer.reset(); //start a timer
                     kickerState = KickerState.KICKER_UP; //move to the next case
                 }
@@ -172,7 +173,15 @@ public class DriverControlled extends LinearOpMode {
             case KICKER_UP:
                 if (kickerTimer.seconds() > 0.4) {
                     actuator.kickerDown(); //change value in Actuators.java if needed
+                    kickerTimer.reset(); //start a timer
                     kickerState = KickerState.KICKER_RESET; //reset back
+                }
+                break;
+            case KICKER_RESET:
+                if (kickerTimer.seconds() > 0.4) {
+                    actuator.stepUpLeft.setPower(0);
+                    actuator.stepUpRight.setPower(0);
+                    kickerState = KickerState.KICKER_START; //reset back
                 }
         }
     }
