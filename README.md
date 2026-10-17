@@ -13,7 +13,7 @@ Motor 2: intakeMotor (Motor Encoder: Same Motor)
 
 Motor 3: launchMotor (Motor Encoder: Same Motor)
 
-Servo 0: LED (goBILDA RGB Indicator)
+Servo 0: indicatorLED (goBILDA RGB Indicator)
 
 Servo 1: To be added (REV BlinkIn LED Driver)
 
