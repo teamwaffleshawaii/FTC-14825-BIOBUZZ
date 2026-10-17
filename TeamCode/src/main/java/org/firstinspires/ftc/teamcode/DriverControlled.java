@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -43,9 +44,11 @@ public class DriverControlled extends LinearOpMode {
                 flowerRamp();
                 launch();
                 kicker(); //kicker is now a FSM
+                limelightTelemetry();
                 telemetry.update();
             }
         }
+        sensor.stopLimelight();
     }
 
     public void drive() {
@@ -169,6 +172,16 @@ public class DriverControlled extends LinearOpMode {
                     actuator.kickerDown(); //change value in Actuators.java if needed
                     kickerState = KickerState.KICKER_RESET; //reset back
                 }
+        }
+    }
+
+    public void limelightTelemetry() {
+        LLResult result = sensor.getLimelightResult();
+        if (result != null && result.isValid()) {
+            telemetry.addData("Limelight Target", "TX: %.2f°, TY: %.2f°, TA: %.2f%%",
+                    result.getTx(), result.getTy(), result.getTa());
+        } else {
+            telemetry.addData("Limelight Target", "No Target");
         }
     }
 }
