@@ -31,7 +31,9 @@ Motor 2: transferMotor (Motor Encoder: Same Motor)
 
 Motor 3: Empty
 
-**Servo Hub:**
+Servo 0: led (REV LED Driver)
+
+**Servo Hub 1 (CAD ID: 3):**
 
 Servo 0: stepUpLeft
 
@@ -44,3 +46,7 @@ Servo 3: intakeServoRight
 Servo 4: turretServo
 
 Servo 5: intakeServoRight
+
+**Servo Hub 2 (CAD ID: 4):**
+
+Nothing yet
