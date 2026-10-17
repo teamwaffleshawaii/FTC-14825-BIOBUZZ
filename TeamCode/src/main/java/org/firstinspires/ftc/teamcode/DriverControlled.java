@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -140,7 +141,7 @@ public class DriverControlled extends LinearOpMode {
         } else if (gamepad2.right_bumper) {
             actuator.stepUpLeft.setPower(1);
             actuator.stepUpRight.setPower(1);
-            actuator.intakeMotor.setPower(1);
+            actuator.intakeMotor.setPower(0.5);
             actuator.transferMotor.setPower(1);
         } else {
             actuator.stepUpLeft.setPower(0);
@@ -150,8 +151,9 @@ public class DriverControlled extends LinearOpMode {
         }
     }
     public void launch() {
-        if (gamepad2.right_trigger > 0.2) {
-            actuator.launchMotor(900); //adjust this as needed
+        telemetry.addData("Launch Velocity", ((DcMotorEx)actuator.launchMotor).getVelocity());
+        if (gamepad2.right_trigger > 0.5) {
+            actuator.launchMotor(800); //adjust this as needed
             //later on this should probably be auto adjusted via Limelight data
         } else {
             actuator.launchMotor(0);

@@ -101,9 +101,9 @@ public class Actuators {
         transferMotor.setPower(power);
     }
 
-    public void launchMotor(double power) {
-        launchMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        ((DcMotorEx) launchMotor).setVelocity(power);
+    public void launchMotor(double velocity) {
+        //launchMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        ((DcMotorEx) launchMotor).setVelocity(velocity);
     }
 
     //TODO: Sample classes for powering a servo
