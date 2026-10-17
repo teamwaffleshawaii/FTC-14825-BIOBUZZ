@@ -27,11 +27,12 @@ public class Actuators {
     public Servo intakeServoLeft;
     public Servo intakeServoRight;
     public Servo turretServo;
+    public Servo ledIndicator;
 
-    public static double LAUNCH_P = 10.0;
+    public static double LAUNCH_P = 26.0;
     public static double LAUNCH_I = 0.0;
     public static double LAUNCH_D = 0.0;
-    public static double LAUNCH_F = 11.7;
+    public static double LAUNCH_F = 20;
 
     public void init(HardwareMap hwMap) {
         // TODO: Put motor hardware here, don't forget to rename deviceNames to match yours
@@ -78,6 +79,7 @@ public class Actuators {
         intakeServoRight = hwMap.get(Servo.class, "intakeServoRight");
         intakeServoLeft = hwMap.get(Servo.class, "intakeServoLeft");
         turretServo = hwMap.get(Servo.class, "turretServo");
+        ledIndicator = hwMap.get(Servo.class, "indicatorLED");
         //TODO: If need to change servo direction
         stepUpLeft.setDirection(CRServo.Direction.REVERSE);
         stepUpRight.setDirection(CRServo.Direction.FORWARD);
@@ -140,11 +142,11 @@ public class Actuators {
     }
 
     public void kickerUp() {
-        kickerServo.setPosition(0.05);
+        kickerServo.setPosition(0.10);
     }
 
     public void kickerDown() {
-        kickerServo.setPosition(0.50);
+        kickerServo.setPosition(0.60);
     }
 
     public void intakeRampDown() {
