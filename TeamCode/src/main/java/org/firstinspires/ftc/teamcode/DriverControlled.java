@@ -37,7 +37,7 @@ public class DriverControlled extends LinearOpMode {
     // Timer for detecting continuously empty storage
     public ElapsedTime distanceTimer = new ElapsedTime();
     // How long distance must remain above 5 cm
-    double emptyDelay = 0.05;
+    double emptyDelay = 0.05; //may need to make this larger
     // Tracks whether the sensor is detecting empty storage
     boolean detectingEmpty = false;
 
