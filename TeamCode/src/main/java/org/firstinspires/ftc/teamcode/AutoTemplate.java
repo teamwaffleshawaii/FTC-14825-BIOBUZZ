@@ -17,16 +17,20 @@ import org.firstinspires.ftc.teamcode.odometry.MecanumDrive;
 public class AutoTemplate extends LinearOpMode {
 
     //Include all of your actuators
-    Actuators actuator = new Actuators();
-    Sensors sensor = new Sensors();
+    Robot robot;
+    Actuators actuator;
+    Sensors sensor;
+    IntakeSubsystem intakeSubsystem;
     LauncherSubsystem launcher;
 
     @Override
     public void runOpMode() throws InterruptedException {
         //Include all of your motors hardware
-        actuator.init(hardwareMap);
-        sensor.init(hardwareMap);
-        launcher = new LauncherSubsystem(actuator, sensor);
+        robot = new Robot(hardwareMap);
+        actuator = robot.actuator;
+        sensor = robot.sensor;
+        intakeSubsystem = robot.intake;
+        launcher = robot.launcher;
 
         //TODO: Set up Robot starting position here!!!
         MecanumDrive drive = new MecanumDrive(hardwareMap,
@@ -76,6 +80,7 @@ public class AutoTemplate extends LinearOpMode {
             //...
             //...
         }
+        robot.shutdown();
     }
 
 }
