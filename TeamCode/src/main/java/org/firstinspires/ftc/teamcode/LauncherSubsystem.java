@@ -12,6 +12,7 @@ public class LauncherSubsystem {
 
     private final Actuators actuator;
     private final Sensors sensor;
+    private final IntakeSubsystem intake;
     private final ElapsedTime distanceTimer = new ElapsedTime();
     private final ElapsedTime kickerTimer = new ElapsedTime();
 
@@ -25,9 +26,10 @@ public class LauncherSubsystem {
     private boolean completed = false;
     private double lastDistanceCm = Double.NaN;
 
-    public LauncherSubsystem(Actuators actuator, Sensors sensor) {
+    public LauncherSubsystem(Actuators actuator, Sensors sensor, IntakeSubsystem intake) {
         this.actuator = actuator;
         this.sensor = sensor;
+        this.intake = intake;
     }
 
     public void start() {
@@ -35,7 +37,7 @@ public class LauncherSubsystem {
         completed = false;
         detectingEmpty = false;
         distanceTimer.reset();
-        setFeedPower(true);
+        intake.feedLauncher();
         state = State.FEEDING;
     }
 
@@ -43,7 +45,7 @@ public class LauncherSubsystem {
         if (!isBusy()) return;
 
         // Continue commanding the feed motors until the sequence finishes.
-        setFeedPower(true);
+        intake.feedLauncher();
         switch (state) {
             case FEEDING:
                 lastDistanceCm = sensor.getDistance(DistanceUnit.CM);
@@ -71,7 +73,7 @@ public class LauncherSubsystem {
                 break;
             case RESETTING:
                 if (kickerTimer.seconds() >= kickerResetDelay) {
-                    setFeedPower(false);
+                    intake.stopFeeding();
                     detectingEmpty = false;
                     completed = true;
                     state = State.IDLE;
@@ -82,15 +84,8 @@ public class LauncherSubsystem {
         }
     }
 
-    private void setFeedPower(boolean enabled) {
-        actuator.stepUpLeft.setPower(enabled ? 1 : 0);
-        actuator.stepUpRight.setPower(enabled ? 1 : 0);
-        actuator.intakeMotor.setPower(enabled ? 0.5 : 0);
-        actuator.transferMotor.setPower(enabled ? 1 : 0);
-    }
-
     public void cancel() {
-        setFeedPower(false);
+        intake.stopFeeding();
         actuator.kickerDown();
         detectingEmpty = false;
         completed = false;
