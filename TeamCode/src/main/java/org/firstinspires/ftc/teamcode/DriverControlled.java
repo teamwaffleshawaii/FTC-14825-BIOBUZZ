@@ -11,8 +11,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 public class DriverControlled extends LinearOpMode {
 
     double reset_angle = 0;
-    Actuators actuator = new Actuators();
-    Sensors sensor = new Sensors();
+    Robot robot;
+    Actuators actuator;
+    Sensors sensor;
+    IntakeSubsystem intakeSubsystem;
 
     //Set the launch motor velocity
     double targetVelocity = 1060;
@@ -26,9 +28,11 @@ public class DriverControlled extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        actuator.init(hardwareMap);
-        sensor.init(hardwareMap);
-        launcher = new LauncherSubsystem(actuator, sensor);
+        robot = new Robot(hardwareMap);
+        actuator = robot.actuator;
+        sensor = robot.sensor;
+        intakeSubsystem = robot.intake;
+        launcher = robot.launcher;
 
         waitForStart();
 
@@ -48,7 +52,7 @@ public class DriverControlled extends LinearOpMode {
                 telemetry.update();
             }
         }
-        sensor.stopLimelight();
+        robot.shutdown();
     }
 
     public void drive() {
@@ -124,24 +128,21 @@ public class DriverControlled extends LinearOpMode {
     }
     public void flowerRamp(){
         if (gamepad1.left_trigger_pressed || gamepad1.left_bumper){
-            actuator.intakeRampDown();
+            intakeSubsystem.rampDown();
         } else {
-            actuator.intakeRampUp();
+            intakeSubsystem.rampUp();
         }
     }
     public void intake() {
-        if (launcher.isBusy()) {
-            return;
-        }
-        else if (gamepad1.a || gamepad2.a) {
-            actuator.intakeMotor.setPower(1);
-            actuator.transferMotor.setPower(1);
+        // Automatic launcher owns the feed motors while active.
+        if (launcher.isBusy()) return;
+
+        if (gamepad1.a || gamepad2.a) {
+            intakeSubsystem.intake(1);
         } else if (gamepad1.b || gamepad2.b) {
-            actuator.intakeMotor.setPower(-0.8);
-            actuator.transferMotor.setPower(-0.8);
+            intakeSubsystem.intake(-0.8);
         } else {
-            actuator.intakeMotor.setPower(0);
-            actuator.transferMotor.setPower(0);
+            intakeSubsystem.stopIntake();
         }
     }
     public void launch() {
