@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @TeleOp
 public class DriverControlled extends LinearOpMode {
@@ -29,8 +30,18 @@ public class DriverControlled extends LinearOpMode {
         KICKER_UP
     }
 
+    //Cases for finite state machine for auto launch
+    public enum LaunchState {
+        LAUNCHER_START,
+        LAUNCHER_LAUNCH,
+        LAUNCHER_KICKER_UP,
+        LAUNCHER_RESET
+    }
+
     //kickerState variable is declared
     KickerState kickerState = KickerState.KICKER_START;
+    LaunchState launchState = LaunchState.LAUNCHER_START;
+
     //timer for kicker FSM
     public ElapsedTime kickerTimer = new ElapsedTime();
 
@@ -52,7 +63,8 @@ public class DriverControlled extends LinearOpMode {
                 intake();
                 flowerRamp();
                 launch();
-                kicker(); //kicker is now a FSM
+                //kicker();
+                autolaunch();
                 limelightTelemetry();
                 telemetry.update();
             }
@@ -178,6 +190,43 @@ public class DriverControlled extends LinearOpMode {
         }
         else {
             actuator.ledIndicator.setPosition(0.28); //red
+        }
+    }
+
+    public void autolaunch() {
+        telemetry.addData("distanceSensor", sensor.getDistance(DistanceUnit.CM));
+        switch (launchState) {
+            case LAUNCHER_START:
+                if (gamepad2.right_bumper) {
+                    actuator.stepUpLeft.setPower(1);
+                    actuator.stepUpRight.setPower(1);
+                    actuator.intakeMotor.setPower(0.5);
+                    actuator.transferMotor.setPower(1);
+                    launchState = launchState.LAUNCHER_LAUNCH;
+                }
+                break;
+            case LAUNCHER_LAUNCH:
+                if (sensor.getDistance(DistanceUnit.CM) < 5) {
+                    actuator.kickerUp(); //change value in Actuators.java if needed
+                    kickerTimer.reset(); //start a timer
+                    launchState = launchState.LAUNCHER_KICKER_UP; //move to the next case
+                }
+                break;
+            case LAUNCHER_KICKER_UP:
+                if (kickerTimer.seconds() > 0.4) {
+                    actuator.kickerDown(); //change value in Actuators.java if needed
+                    kickerTimer.reset(); //start a timer
+                    launchState = launchState.LAUNCHER_RESET; //reset back
+                }
+                break;
+            case LAUNCHER_RESET:
+                if (kickerTimer.seconds() > 0.4) {
+                    actuator.stepUpLeft.setPower(0);
+                    actuator.stepUpRight.setPower(0);
+                    actuator.intakeMotor.setPower(0);
+                    actuator.transferMotor.setPower(0);
+                    launchState = launchState.LAUNCHER_START;
+                }
         }
     }
     public void kicker() {

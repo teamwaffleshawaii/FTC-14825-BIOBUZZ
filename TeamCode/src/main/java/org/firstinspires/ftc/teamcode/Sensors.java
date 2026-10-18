@@ -6,14 +6,22 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class Sensors {
     public IMU imu;
+
+    // TODO: If using a 2M Distance Sensor, add them here
+    public DistanceSensor distanceSensor;
     public Limelight3A limelight;
 
     public void init(HardwareMap hwMap) {
+        //TODO: If using distance sensors
+        distanceSensor = hwMap.get(DistanceSensor.class, "distanceSensor");
+
         // Initialize IMU
         try {
             imu = hwMap.get(IMU.class, "imu");
@@ -41,6 +49,11 @@ public class Sensors {
             return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
         }
         return 0.0;
+    }
+
+    //TODO: Sample class for measuring distance from the distance sensor
+    public double getDistance(DistanceUnit du) {
+        return distanceSensor.getDistance(du);
     }
 
     public LLResult getLimelightResult() {
