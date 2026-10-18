@@ -18,11 +18,15 @@ public class AutoTemplate extends LinearOpMode {
 
     //Include all of your actuators
     Actuators actuator = new Actuators();
+    Sensors sensor = new Sensors();
+    LauncherSubsystem launcher;
 
     @Override
     public void runOpMode() throws InterruptedException {
         //Include all of your motors hardware
         actuator.init(hardwareMap);
+        sensor.init(hardwareMap);
+        launcher = new LauncherSubsystem(actuator, sensor);
 
         //TODO: Set up Robot starting position here!!!
         MecanumDrive drive = new MecanumDrive(hardwareMap,
@@ -53,16 +57,20 @@ public class AutoTemplate extends LinearOpMode {
                 .build();
         //Create more trajectories as needed
 
-        while (!isStarted() && !isStopRequested()) {
-            //include all of your hardware configurations
-            actuator.init(hardwareMap);
-        }
-
         waitForStart();
 
         if (opModeIsActive() && !isStopRequested()) {
             //Run your trajectory here when the code starts
             Actions.runBlocking(new SequentialAction(trajectory1));
+
+            // To launch after driving, first spin up the flywheel and wait
+            // until ready. Then add new LauncherAction(launcher) to a
+            // SequentialAction. Do not run it until the shot is intended.
+            // Example:
+            // launcher.setFlywheelVelocity(launcher.targetVelocity);
+            // Actions.runBlocking(new LauncherAction(launcher));
+            // Note: LauncherAction has a 5-second timeout.
+
             //actuator.setServoPosition(0.44); //close servo
             //...
             //...
