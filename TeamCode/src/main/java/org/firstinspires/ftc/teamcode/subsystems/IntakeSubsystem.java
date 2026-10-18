@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.subsystems;
 
 /** Shared controls for intake, transfer, step-ups and intake ramp. */
 public class IntakeSubsystem {
