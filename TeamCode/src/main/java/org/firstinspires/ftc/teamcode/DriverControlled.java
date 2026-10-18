@@ -23,13 +23,6 @@ public class DriverControlled extends LinearOpMode {
     //Check whether launch is ready
     boolean launcherReady = false;
 
-    //Cases for finite state machine for kicker
-    public enum KickerState {
-        KICKER_START,
-        KICKER_RESET,
-        KICKER_UP
-    }
-
     //Cases for finite state machine for auto launch
     public enum LaunchState {
         LAUNCHER_START,
@@ -37,13 +30,16 @@ public class DriverControlled extends LinearOpMode {
         LAUNCHER_KICKER_UP,
         LAUNCHER_RESET
     }
-
-    //kickerState variable is declared
-    KickerState kickerState = KickerState.KICKER_START;
     LaunchState launchState = LaunchState.LAUNCHER_START;
 
     //timer for kicker FSM
     public ElapsedTime kickerTimer = new ElapsedTime();
+    // Timer for detecting continuously empty storage
+    public ElapsedTime distanceTimer = new ElapsedTime();
+    // How long distance must remain above 5 cm
+    double emptyDelay = 0.05;
+    // Tracks whether the sensor is detecting empty storage
+    boolean detectingEmpty = false;
 
     @Override
     public void runOpMode() {
@@ -63,7 +59,6 @@ public class DriverControlled extends LinearOpMode {
                 intake();
                 flowerRamp();
                 launch();
-                //kicker();
                 autolaunch();
                 limelightTelemetry();
                 telemetry.update();
@@ -151,17 +146,15 @@ public class DriverControlled extends LinearOpMode {
         }
     }
     public void intake() {
-        if (gamepad1.a || gamepad2.a) {
+        if (launchState != LaunchState.LAUNCHER_START) {
+            return;
+        }
+        else if (gamepad1.a || gamepad2.a) {
             actuator.intakeMotor.setPower(1);
             actuator.transferMotor.setPower(1);
         } else if (gamepad1.b || gamepad2.b) {
             actuator.intakeMotor.setPower(-0.8);
             actuator.transferMotor.setPower(-0.8);
-        } else if (gamepad2.right_bumper) {
-            actuator.stepUpLeft.setPower(1);
-            actuator.stepUpRight.setPower(1);
-            actuator.intakeMotor.setPower(0.5);
-            actuator.transferMotor.setPower(1);
         } else {
             actuator.intakeMotor.setPower(0);
             actuator.transferMotor.setPower(0);
@@ -192,69 +185,96 @@ public class DriverControlled extends LinearOpMode {
             actuator.ledIndicator.setPosition(0.28); //red
         }
     }
-
     public void autolaunch() {
-        telemetry.addData("distanceSensor", sensor.getDistance(DistanceUnit.CM));
+
+        double distance = sensor.getDistance(DistanceUnit.CM);
+
+        // Keep motors running while auto launch is active
+        if (launchState != LaunchState.LAUNCHER_START) {
+            actuator.stepUpLeft.setPower(1);
+            actuator.stepUpRight.setPower(1);
+            actuator.intakeMotor.setPower(0.5);
+            actuator.transferMotor.setPower(1);
+        }
+
         switch (launchState) {
+
             case LAUNCHER_START:
                 if (gamepad2.right_bumper) {
+
                     actuator.stepUpLeft.setPower(1);
                     actuator.stepUpRight.setPower(1);
                     actuator.intakeMotor.setPower(0.5);
                     actuator.transferMotor.setPower(1);
-                    launchState = launchState.LAUNCHER_LAUNCH;
+
+                    detectingEmpty = false;
+                    distanceTimer.reset();
+
+                    launchState = LaunchState.LAUNCHER_LAUNCH;
                 }
                 break;
+
             case LAUNCHER_LAUNCH:
-                if (sensor.getDistance(DistanceUnit.CM) < 5) {
-                    actuator.kickerUp(); //change value in Actuators.java if needed
-                    kickerTimer.reset(); //start a timer
-                    launchState = launchState.LAUNCHER_KICKER_UP; //move to the next case
+
+                // Start timing when distance is greater than 5 cm
+                if (Double.isFinite(distance) && distance > 5.0) {
+
+                    if (!detectingEmpty) {
+                        detectingEmpty = true;
+                        distanceTimer.reset();
+                    }
+
+                    // Trigger kicker only after continuous empty detection
+                    if (distanceTimer.seconds() >= emptyDelay) {
+
+                        actuator.kickerUp();
+                        kickerTimer.reset();
+
+                        launchState = LaunchState.LAUNCHER_KICKER_UP;
+                    }
+
+                } else {
+
+                    // Ball detected again, reset timer
+                    detectingEmpty = false;
+                    distanceTimer.reset();
                 }
                 break;
+
             case LAUNCHER_KICKER_UP:
-                if (kickerTimer.seconds() > 0.4) {
-                    actuator.kickerDown(); //change value in Actuators.java if needed
-                    kickerTimer.reset(); //start a timer
-                    launchState = launchState.LAUNCHER_RESET; //reset back
+
+                if (kickerTimer.seconds() >= 0.4) {
+
+                    actuator.kickerDown();
+                    kickerTimer.reset();
+
+                    launchState = LaunchState.LAUNCHER_RESET;
                 }
                 break;
+
             case LAUNCHER_RESET:
-                if (kickerTimer.seconds() > 0.4) {
+
+                if (kickerTimer.seconds() >= 0.4) {
+
+                    // Stop all feeding motors
                     actuator.stepUpLeft.setPower(0);
                     actuator.stepUpRight.setPower(0);
                     actuator.intakeMotor.setPower(0);
                     actuator.transferMotor.setPower(0);
-                    launchState = launchState.LAUNCHER_START;
-                }
-        }
-    }
-    public void kicker() {
-        //To get rid of the 4th pollen using the kicker servo, running on a FSM
-        switch (kickerState) {
-            case KICKER_START:
-                if (gamepad2.rightBumperWasReleased()) {
-                    actuator.kickerUp(); //change value in Actuators.java if needed
-                    actuator.stepUpLeft.setPower(1);
-                    actuator.stepUpRight.setPower(1);
-                    kickerTimer.reset(); //start a timer
-                    kickerState = KickerState.KICKER_UP; //move to the next case
+
+                    detectingEmpty = false;
+
+                    launchState = LaunchState.LAUNCHER_START;
                 }
                 break;
-            case KICKER_UP:
-                if (kickerTimer.seconds() > 0.4) {
-                    actuator.kickerDown(); //change value in Actuators.java if needed
-                    kickerTimer.reset(); //start a timer
-                    kickerState = KickerState.KICKER_RESET; //reset back
-                }
-                break;
-            case KICKER_RESET:
-                if (kickerTimer.seconds() > 0.4) {
-                    actuator.stepUpLeft.setPower(0);
-                    actuator.stepUpRight.setPower(0);
-                    kickerState = KickerState.KICKER_START; //reset back
-                }
         }
+
+        // Telemetry for testing
+        telemetry.addData("Distance (cm)", distance);
+        telemetry.addData("Detecting Empty", detectingEmpty);
+        telemetry.addData("Empty Timer",
+                detectingEmpty ? distanceTimer.seconds() : 0.0);
+        telemetry.addData("Launch State", launchState);
     }
 
     public void limelightTelemetry() {
