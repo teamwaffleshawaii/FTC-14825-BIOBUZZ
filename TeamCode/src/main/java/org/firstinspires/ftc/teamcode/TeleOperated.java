@@ -11,8 +11,8 @@ import org.firstinspires.ftc.teamcode.subsystems.LauncherSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
 import org.firstinspires.ftc.teamcode.subsystems.Sensors;
 
-@TeleOp
-public class DriverControlled extends LinearOpMode {
+@TeleOp (name = "TeleOp", group = "TeleOp")
+public class TeleOperated extends LinearOpMode {
 
     Robot robot;
     Actuators actuator;
