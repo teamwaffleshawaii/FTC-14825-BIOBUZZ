@@ -13,9 +13,16 @@ import org.firstinspires.ftc.teamcode.subsystems.Robot;
 import org.firstinspires.ftc.teamcode.subsystems.Sensors;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+/**
+ * STUDENT GUIDE: Driver-controlled robot program (TeleOp).
+ * Robot owns the shared hardware and subsystems; this class maps gamepad
+ * inputs to commands and displays information on the Driver Station.
+ * The while loop must run repeatedly so driving, timers and sensors update.
+ */
 @TeleOp (name = "TeleOp", group = "TeleOp")
 public class TeleOperated extends LinearOpMode {
 
+    // References to the SAME objects created by Robot; no extra hardware setup.
     Robot robot;
     Actuators actuator;
     Sensors sensor;
@@ -31,8 +38,11 @@ public class TeleOperated extends LinearOpMode {
 
     LauncherSubsystem launcher;
 
+    // ElapsedTime measures real elapsed time without pausing the robot loop.
+    // It is used to blink the indicator LED without sleep().
     private final ElapsedTime ledTimer = new ElapsedTime();
 
+    // FTC SDK calls runOpMode() when the driver selects and starts this OpMode.
     @Override
     public void runOpMode() {
 
@@ -43,9 +53,12 @@ public class TeleOperated extends LinearOpMode {
         drivetrain = robot.drivetrain;
         launcher = robot.launcher;
 
+        // Initialization happens BEFORE the match; wait until PLAY is pressed.
         waitForStart();
 
         if (opModeIsActive()) {
+            // Main loop: read controls, update subsystems, then send telemetry.
+            // Do not insert long sleeps here; they delay every robot control.
             while (opModeIsActive()) {
                 drive();
                 resetAngle();
@@ -53,6 +66,8 @@ public class TeleOperated extends LinearOpMode {
                 flowerRamp();
                 launch();
 
+                // Gamepad 2 right bumper begins the automatic four-ball feed.
+                // launcher.start() ignores new starts while already busy.
                 if (gamepad2.right_bumper) {
                     launcher.start();
                 }
@@ -66,6 +81,7 @@ public class TeleOperated extends LinearOpMode {
         robot.shutdown();
     }
 
+    /** Translate driver joystick/D-pad inputs into mecanum motor commands. */
     public void drive() {
         drivetrain.drive(
                 gamepad1.left_stick_x,
@@ -81,12 +97,14 @@ public class TeleOperated extends LinearOpMode {
         telemetry.addData("Heading (Radians)", Math.toRadians(drivetrain.getHeadingDegrees()));
     }
 
+    /** Re-zero the driver's field-centric heading when START is pressed. */
     public void resetAngle() {
         if (gamepad1.start) {
             drivetrain.resetHeading();
         }
     }
 
+    /** Move the intake ramp with gamepad 1 trigger or bumper. */
     public void flowerRamp(){
         if (gamepad1.left_trigger_pressed || gamepad1.left_bumper){
             intakeSubsystem.rampDown();
@@ -94,6 +112,7 @@ public class TeleOperated extends LinearOpMode {
             intakeSubsystem.rampUp();
         }
     }
+    /** Manual intake is disabled while the automatic launcher controls feeding. */
     public void intake() {
         // Automatic launcher owns the feed motors while active.
         if (launcher.isBusy()) return;
@@ -106,6 +125,11 @@ public class TeleOperated extends LinearOpMode {
             intakeSubsystem.stopIntake();
         }
     }
+    /**
+     * Gamepad 2 X starts the flywheel; Y stops it.
+     * setVelocity() uses encoder ticks/second and the PIDF motor controller.
+     * AprilTag velocity adjustment is not active yet.
+     */
     public void launch() {
         if (gamepad2.x) {
             actuator.launchMotor(targetVelocity); //adjust this as needed
@@ -124,6 +148,8 @@ public class TeleOperated extends LinearOpMode {
         telemetry.addData("Actual Velocity", currentVelocity);
         telemetry.addData("Launcher Ready", launcherReady);
 
+        // Ready means measured speed is within the tolerance in Actuators.
+        // LED position numbers are device-specific PWM commands, not brightness.
         if (launcherReady) {
             // Flash green: 300ms ON, 150ms OFF
             if ((ledTimer.milliseconds() % 300) < 150) {
@@ -135,6 +161,7 @@ public class TeleOperated extends LinearOpMode {
             actuator.ledIndicator.setPosition(0.28); // Solid red
         }
     }
+    /** Display the current state of the non-blocking four-ball sequence. */
     public void launcherTelemetry() {
         telemetry.addData("Distance (cm)", launcher.getLastDistanceCm());
         telemetry.addData("Detecting Empty", launcher.isDetectingEmpty());
@@ -142,6 +169,7 @@ public class TeleOperated extends LinearOpMode {
         telemetry.addData("Launch State", launcher.getState());
     }
 
+    /** Show fresh AprilTag IDs and angles; telemetry does NOT aim the robot. */
     public void limelightTelemetry() {
         LLResult result = sensor.getFreshAprilTagResult();
         if (result != null) {
