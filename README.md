@@ -41,11 +41,11 @@ Servo 1: stepUpRight (Axon Max Servo, Continuous Mode)
 
 Servo 2: intakeServoLeft (Axon Max Servo)
 
-Servo 3: intakeServoRight (Axon Max Servo)
+Servo 3: kickerServo (Axon Max Servo)
 
 Servo 4: turretServo (Axon Max Servo)
 
-Servo 5: kickerServo (Axon Max Servo)
+Servo 5: intakeServoRight (Axon Max Servo)
 
 **Servo Hub 2 (CAN ID: 4):**
 
