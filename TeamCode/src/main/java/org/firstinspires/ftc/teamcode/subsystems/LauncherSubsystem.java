@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
@@ -7,7 +8,18 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
  * Shared, non-blocking four-ball launch sequence for TeleOp and Autonomous.
  * Call update() every loop while a sequence is running.
  */
+@Config
 public class LauncherSubsystem {
+    // Editable in FTC Dashboard. Changes are applied only when values change.
+    public static double LAUNCH_P = 28.0;
+    public static double LAUNCH_I = 0.0;
+    public static double LAUNCH_D = 0.0;
+    public static double LAUNCH_F = 20.0;
+
+    private double appliedP = Double.NaN;
+    private double appliedI = Double.NaN;
+    private double appliedD = Double.NaN;
+    private double appliedF = Double.NaN;
     public enum State { IDLE, FEEDING, KICKER_UP, RESETTING }
 
     private final Actuators actuator;
@@ -30,6 +42,20 @@ public class LauncherSubsystem {
         this.actuator = actuator;
         this.sensor = sensor;
         this.intake = intake;
+        applyPIDF();
+    }
+
+    /** Apply Dashboard edits without rewriting unchanged coefficients every loop. */
+    public void applyPIDF() {
+        if (LAUNCH_P != appliedP || LAUNCH_I != appliedI ||
+                LAUNCH_D != appliedD || LAUNCH_F != appliedF) {
+            actuator.launchMotor.setVelocityPIDFCoefficients(
+                    LAUNCH_P, LAUNCH_I, LAUNCH_D, LAUNCH_F);
+            appliedP = LAUNCH_P;
+            appliedI = LAUNCH_I;
+            appliedD = LAUNCH_D;
+            appliedF = LAUNCH_F;
+        }
     }
 
     public void start() {
@@ -42,6 +68,7 @@ public class LauncherSubsystem {
     }
 
     public void update() {
+        applyPIDF();
         if (!isBusy()) return;
 
         // Continue commanding the feed motors until the sequence finishes.
@@ -101,6 +128,7 @@ public class LauncherSubsystem {
         return detectingEmpty ? distanceTimer.seconds() : 0.0;
     }
     public void setFlywheelVelocity(double velocity) {
+        applyPIDF();
         actuator.launchMotor(velocity);
     }
     public boolean isFlywheelReady() {
