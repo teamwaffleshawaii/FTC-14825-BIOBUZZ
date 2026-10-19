@@ -10,6 +10,7 @@ import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.LauncherSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
 import org.firstinspires.ftc.teamcode.subsystems.Sensors;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp (name = "TeleOp", group = "TeleOp")
 public class TeleOperated extends LinearOpMode {
@@ -28,6 +29,8 @@ public class TeleOperated extends LinearOpMode {
     boolean launcherReady = false;
 
     LauncherSubsystem launcher;
+
+    private final ElapsedTime ledTimer = new ElapsedTime();
 
     @Override
     public void runOpMode() {
@@ -121,10 +124,14 @@ public class TeleOperated extends LinearOpMode {
         telemetry.addData("Launcher Ready", launcherReady);
 
         if (launcherReady) {
-            actuator.ledIndicator.setPosition(0.44); //green
-        }
-        else {
-            actuator.ledIndicator.setPosition(0.28); //red
+            // Flash green: 300ms ON, 150ms OFF
+            if ((ledTimer.milliseconds() % 300) < 150) {
+                actuator.ledIndicator.setPosition(0.50); // Green
+            } else {
+                actuator.ledIndicator.setPosition(0.0);  // OFF
+            }
+        } else {
+            actuator.ledIndicator.setPosition(0.28); // Solid red
         }
     }
     public void launcherTelemetry() {
