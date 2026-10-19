@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
+import java.util.List;
 import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
@@ -54,6 +56,22 @@ public class Sensors {
     //TODO: Sample class for measuring distance from the distance sensor
     public double getDistance(DistanceUnit du) {
         return distanceSensor.getDistance(du);
+    }
+
+    // Reject stale frames and non-AprilTag pipelines before using vision for targeting.
+    public static final long MAX_LIMELIGHT_AGE_MS = 250;
+    public static final int APRILTAG_PIPELINE = 0;
+
+    public LLResult getFreshAprilTagResult() {
+        LLResult result = getLimelightResult();
+        if (result == null || !result.isValid() ||
+                result.getPipelineIndex() != APRILTAG_PIPELINE ||
+                result.getStaleness() < 0 ||
+                result.getStaleness() > MAX_LIMELIGHT_AGE_MS) {
+            return null;
+        }
+        List<LLResultTypes.FiducialResult> tags = result.getFiducialResults();
+        return tags != null && !tags.isEmpty() ? result : null;
     }
 
     public LLResult getLimelightResult() {
