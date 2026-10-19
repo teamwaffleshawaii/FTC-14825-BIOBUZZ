@@ -61,7 +61,7 @@ public class AutoRight extends LinearOpMode {
                         new TranslationalVelConstraint(30), new ProfileAccelConstraint(-10.0, 10.0)) //Do this path slower
                 .build();
 
-        Action movetolaunchPositionLeft = drive.actionBuilder(new Pose2d(25, -50, Math.toRadians(0) ))
+        Action movetolaunchPositionLeft = drive.actionBuilder(new Pose2d(25, -50, Math.toRadians(270) ))
                 .strafeToLinearHeading(new Vector2d(-44,-26), Math.toRadians(90))
                 .build();
 
@@ -76,7 +76,7 @@ public class AutoRight extends LinearOpMode {
         try {
         if (opModeIsActive() && !isStopRequested()) {
             // Spin up while driving to the first launch position.
-            // Reaching target speed can take time; do not feed until ready.
+            // The first volley starts after arriving, regardless of actual speed.
             launcher.setFlywheelVelocity(launcher.targetVelocity);
             Actions.runBlocking(launchPositionRight);
 
@@ -90,24 +90,39 @@ public class AutoRight extends LinearOpMode {
             launcher.setFlywheelVelocity(0);
 
             if (opModeIsActive() && !isStopRequested()) {
-                // Keep intake motors running while Road Runner follows BOTH paths.
-                // The finally block stops the intake even if a trajectory throws.
-                intakeSubsystem.intake(1);
+                // Both intake() motors (intake and transfer) run during collection.
                 intakeSubsystem.rampDown();
-                //turn on transfer motor too
+                intakeSubsystem.intake(1);
                 try {
                     Actions.runBlocking(new SequentialAction(
                             flowerPosition1,
-                            flowerPosition1,
-                            new SleepAction(2.0) // Keep collecting for 2 more seconds.
+                            flowerPosition2,
+                            new SleepAction(2.0)
                     ));
                 } finally {
                     intakeSubsystem.stopIntake();
                 }
             }
+
+            if (opModeIsActive() && !isStopRequested()) {
+                // Move to the left-side staging position with the intake stopped.
+                Actions.runBlocking(movetolaunchPositionLeft);
+                intakeSubsystem.rampUp();
+
+                // Spin up for the second volley on the way to the launch location.
+                launcher.setFlywheelVelocity(launcher.targetVelocity);
+                Actions.runBlocking(launchPositionLeft);
+
+                // Launch regardless of flywheel readiness, as with the first volley.
+                if (opModeIsActive() && !isStopRequested()) {
+                    Actions.runBlocking(new LauncherAction(launcher));
+                }
+                launcher.setFlywheelVelocity(0);
+            }
         }
         } finally {
             launcher.setFlywheelVelocity(0);
+            intakeSubsystem.rampUp();
             robot.shutdown();
         }
     }
