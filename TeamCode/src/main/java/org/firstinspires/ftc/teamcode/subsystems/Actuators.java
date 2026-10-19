@@ -66,7 +66,7 @@ public class Actuators {
         leftBack.setDirection(DcMotorSimple.Direction.REVERSE); //or FORWARD
         rightFront.setDirection(DcMotorSimple.Direction.FORWARD); //or REVERSE
         rightBack.setDirection(DcMotorSimple.Direction.FORWARD); //or REVERSE
-        intakeMotor.setDirection(DcMotorSimple.Direction.FORWARD); //or REVERSE
+        intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE); //or REVERSE
         transferMotor.setDirection(DcMotorSimple.Direction.REVERSE); //or FORWARD
         launchMotor.setDirection(DcMotorSimple.Direction.REVERSE); //or FORWARD
 

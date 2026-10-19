@@ -17,7 +17,7 @@ public class LauncherSubsystem {
     private final ElapsedTime kickerTimer = new ElapsedTime();
 
     public double emptyDelay = 0.05;
-    public double kickerUpDelay = 0.4;
+    public double kickerUpDelay = 0.5;
     public double kickerResetDelay = 0.4;
     public double targetVelocity = 1060;
 

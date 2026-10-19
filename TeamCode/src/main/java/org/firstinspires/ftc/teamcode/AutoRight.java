@@ -69,7 +69,7 @@ public class AutoRight extends LinearOpMode {
                 .build();
 
         Action park = drive.actionBuilder(new Pose2d(-54, -1.5, Math.toRadians(-5) ))
-                .strafeToLinearHeading(new Vector2d(-54,-44), Math.toRadians(90))
+                .strafeToLinearHeading(new Vector2d(-30,-56), Math.toRadians(90))
                 .build();
 
         //Create more trajectories as needed
@@ -96,21 +96,19 @@ public class AutoRight extends LinearOpMode {
                 // Both intake() motors (intake and transfer) run during collection.
                 intakeSubsystem.rampDown();
                 intakeSubsystem.intake(1);
-                try {
                     Actions.runBlocking(new SequentialAction(
                             flowerPosition1,
                             flowerPosition2,
                             new SleepAction(3.5)
                     ));
-                } finally {
-                    intakeSubsystem.stopIntake();
-                }
+
             }
 
             if (opModeIsActive() && !isStopRequested()) {
                 // Move to the left-side staging position with the intake stopped.
                 Actions.runBlocking(movetolaunchPositionLeft);
                 intakeSubsystem.rampUp();
+                intakeSubsystem.stopIntake();
 
                 // Spin up for the second volley on the way to the launch location.
                 launcher.setFlywheelVelocity(launcher.targetVelocity);
