@@ -70,11 +70,12 @@ public class AutoRight extends LinearOpMode {
         if (opModeIsActive() && !isStopRequested()) {
             //Run your trajectory here when the code starts
             Actions.runBlocking(new SequentialAction(launchPositionRight));
-            //Launch
-            //Launch off
+            //Turn the launch motor on
+            //Launch the 4 balls using the Finite State Machine
+            //Turn the launch motor off
             //Intake on
             Actions.runBlocking(new SequentialAction(intakePosition1, intakePosition2));
-            //
+            //Intake off
         }
         robot.shutdown();
     }
