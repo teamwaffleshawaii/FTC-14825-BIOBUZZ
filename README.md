@@ -33,7 +33,7 @@ Motor 3: Empty - to be added later
 
 Servo 0: revLED (REV BlinkIn LED Driver) - to be added later
 
-**Servo Hub 1 (CAN ID: 3):**
+**Servo Hub (CAN ID: 3):**
 
 Servo 0: stepUpLeft (Axon Max Servo, Continuous Mode)
 
@@ -47,6 +47,6 @@ Servo 4: turretServo (Axon Max Servo)
 
 Servo 5: intakeServoRight (Axon Max Servo)
 
-**Servo Hub 2 (CAN ID: 4):**
+**Servo Hub (CAN ID: 4):**
 
 Nothing yet
