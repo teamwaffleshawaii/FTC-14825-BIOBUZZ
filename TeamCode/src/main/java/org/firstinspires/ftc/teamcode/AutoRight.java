@@ -121,6 +121,11 @@ public class AutoRight extends LinearOpMode {
                     Actions.runBlocking(new LauncherAction(launcher));
                 }
                 launcher.setFlywheelVelocity(0);
+
+                // Park after the second launch.
+                if (opModeIsActive() && !isStopRequested()) {
+                    Actions.runBlocking(park);
+                }
             }
         }
         } finally {
