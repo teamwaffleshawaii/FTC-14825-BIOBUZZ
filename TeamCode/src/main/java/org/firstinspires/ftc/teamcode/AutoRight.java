@@ -5,7 +5,9 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.ProfileAccelConstraint;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -18,8 +20,8 @@ import org.firstinspires.ftc.teamcode.subsystems.LauncherSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
 import org.firstinspires.ftc.teamcode.subsystems.Sensors;
 
-@Autonomous
-public class AutoTemplate extends LinearOpMode {
+@Autonomous (name = "AutoRight", group = "Auto")
+public class AutoRight extends LinearOpMode {
 
     //Include all of your actuators
     Robot robot;
@@ -39,25 +41,25 @@ public class AutoTemplate extends LinearOpMode {
 
         //TODO: Set up Robot starting position here!!!
         MecanumDrive drive = new MecanumDrive(hardwareMap,
-                new Pose2d(0, 0, Math.toRadians(90) ) );
+                new Pose2d(60, -11.5, Math.toRadians(180) ) );
 
         //TODO: Put your Odometry trajectory paths here!!!
         //Separate your paths by action (linearSlide movements, intake movements, servo movements, etc.)
-        Action trajectory1 = drive.actionBuilder(new Pose2d(0, 0, Math.toRadians(90) ))
-                .strafeToLinearHeading(new Vector2d( -42, 32), Math.toRadians(-52))
-                .strafeToLinearHeading(new Vector2d( 34, 1), Math.toRadians(93))
-                .strafeToLinearHeading(new Vector2d( 0, 0), Math.toRadians(90))
+        Action launchPositionRight = drive.actionBuilder(new Pose2d(60, -11.5, Math.toRadians(180) ))
+                .strafeToLinearHeading(new Vector2d( 47, -11.5), Math.toRadians(180))
+                .build();
+
+        Action intakePosition1 = drive.actionBuilder(new Pose2d(47, -11.5, Math.toRadians(180) ))
+                .strafeToLinearHeading(new Vector2d(63, -33), Math.toRadians(270))
                 //...
                 .build();
 
-	    //TODO: Your trajectory 2 starting pose must match where the end of your trajectory 1 should be
-        Action trajectory2 = drive.actionBuilder(new Pose2d(-34, -29, Math.toRadians(127) ))
-                .strafeToLinearHeading(new Vector2d(-23, -23), Math.toRadians(90))
-                //...
+        Action intakePosition2 = drive.actionBuilder(new Pose2d(63, -33, Math.toRadians(270) ))
+                .strafeToLinearHeading(new Vector2d(63, -56), Math.toRadians(270),
+                        new TranslationalVelConstraint(30), new ProfileAccelConstraint(-10.0, 10.0)) //Do this path slower
                 .build();
 
-	    //TODO: Your trajectory 3 starting pose must match where the end of your trajectory 2 should be
-        Action trajectory3 = drive.actionBuilder(new Pose2d(0, 0, Math.toRadians(90) ))
+        Action launchPositionLeft = drive.actionBuilder(new Pose2d(63, -56, Math.toRadians(270) ))
                 .strafeToLinearHeading(new Vector2d(-40,-30), Math.toRadians(-180))
                 .build();
 
@@ -70,20 +72,12 @@ public class AutoTemplate extends LinearOpMode {
 
         if (opModeIsActive() && !isStopRequested()) {
             //Run your trajectory here when the code starts
-            Actions.runBlocking(new SequentialAction(trajectory1));
-
-            // To launch after driving, first spin up the flywheel and wait
-            // until ready. Then add new LauncherAction(launcher) to a
-            // SequentialAction. Do not run it until the shot is intended.
-            // Example:
-            // launcher.setFlywheelVelocity(launcher.targetVelocity);
-            // Actions.runBlocking(new LauncherAction(launcher));
-            // Note: LauncherAction has a 5-second timeout.
-
-            //actuator.setServoPosition(0.44); //close servo
-            //...
-            //...
-            //...
+            Actions.runBlocking(new SequentialAction(launchPositionRight));
+            //Launch
+            //Launch off
+            //Intake on
+            Actions.runBlocking(new SequentialAction(intakePosition1, intakePosition2));
+            //
         }
         robot.shutdown();
     }

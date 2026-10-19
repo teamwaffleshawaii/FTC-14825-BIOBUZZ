@@ -23,7 +23,7 @@ public class AutoMap extends LinearOpMode {
 
         MecanumDrive drive = new MecanumDrive(hardwareMap,
                 //TODO: Change robot starting position here as necessary, currently origin
-                new Pose2d(0, 0, Math.toRadians(90)));
+                new Pose2d(60, -11.5, Math.toRadians(180)));
 
         waitForStart();
 

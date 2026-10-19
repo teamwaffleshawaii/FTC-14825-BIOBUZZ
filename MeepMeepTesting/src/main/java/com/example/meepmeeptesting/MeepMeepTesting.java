@@ -15,11 +15,11 @@ public class MeepMeepTesting {
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setConstraints(50, 50, Math.toRadians(180), Math.toRadians(180), 14.5)
                 .build();
-        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(60, -14, Math.toRadians(180)))
+        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(60, -11.5, Math.toRadians(180)))
                 // Run your test paths here
                 //...
                 //Examples below
-                //.strafeTo(new Vector2d(0, 0))
+                .strafeTo(new Vector2d(59.9, -11.5))
                 //.strafeToLinearHeading(new Vector2d(0,0), Math.toRadians(0))
                 //.splineTo(new Vector2d(0, 0), Math.toRadians(0))
                 //.splineToConstantHeading(new Vector2d(0,0), Math.toRadians(0))
