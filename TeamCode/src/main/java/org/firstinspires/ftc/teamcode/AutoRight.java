@@ -60,12 +60,9 @@ public class AutoRight extends LinearOpMode {
                 .build();
 
         Action launchPositionLeft = drive.actionBuilder(new Pose2d(63, -56, Math.toRadians(270) ))
-                .strafeToLinearHeading(new Vector2d(-40,-30), Math.toRadians(-180))
-                .build();
-
-        Action trajectory4 = drive.actionBuilder(new Pose2d(-40, -30, Math.toRadians(-180) ))
                 .strafeToLinearHeading(new Vector2d(0,0), Math.toRadians(90))
                 .build();
+
         //Create more trajectories as needed
 
         waitForStart();
