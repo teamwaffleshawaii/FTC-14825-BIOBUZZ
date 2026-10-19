@@ -3,19 +3,17 @@ FTC 14825, Team Waffles, FTC SDK for the BIOBUZZ (2026-2027) competition season.
 Running on FTC SDK Version 12.0 (20260907-090034)
 
 ## Variable Configurations
-**Control Hub:**
+**Control Hub (CAN ID: 1):**
 
-Motor 0: launchMotor (Motor Encoder: Same Motor)
+Motor 0: launchMotor (goBILDA 6000 RPM, Encoder plugged in)
 
-Motor 1: intakeMotor (Motor Encoder: Same Motor)
+Motor 1: intakeMotor (goBILDA 435 RPM, Encoder plugged in)
 
-Motor 2: rightFront (Motor Encoder: None)
+Motor 2: rightFront (goBILDA 435 RPM, no Encoder)
 
-Motor 3: rightBack (Motor Encoder: None)
+Motor 3: rightBack (goBILDA 435 RPM, no Encoder)
 
 Servo 0: indicatorLED (goBILDA RGB Indicator)
-
-Servo 1: revLED (REV BlinkIn LED Driver) - to be added later
 
 I2C Port 1: pinpoint (goBILDA PinPoint Computer & IMU)
 
@@ -23,32 +21,32 @@ I2C Port 2: distanceSensor (REV 2M distance sensor)
 
 USB/Ethernet: limelight (Limelight 3A)
 
-**Expansion Hub:**
+**Expansion Hub (CAN ID: 2):**
 
-Motor 0: leftFront (Motor Encoder: None)
+Motor 0: leftFront (goBILDA 435 RPM, no Encoder)
 
-Motor 1: leftBack (Motor Encoder: None)
+Motor 1: leftBack (goBILDA 435 RPM, no Encoder)
 
-Motor 2: transferMotor (Motor Encoder: Same Motor)
+Motor 2: transferMotor (goBILDA 1620 RPM, Encoder plugged in)
 
-Motor 3: Empty
+Motor 3: Empty - to be added later
 
-Servo 0: led (REV LED Driver)
+Servo 0: revLED (REV BlinkIn LED Driver) - to be added later
 
-**Servo Hub 1 (CAD ID: 3):**
+**Servo Hub 1 (CAN ID: 3):**
 
-Servo 0: stepUpLeft
+Servo 0: stepUpLeft (Axon Max Servo, Continuous Mode)
 
-Servo 1: stepUpRight
+Servo 1: stepUpRight (Axon Max Servo, Continuous Mode)
 
-Servo 2: intakeServoLeft
+Servo 2: intakeServoLeft (Axon Max Servo)
 
-Servo 3: intakeServoRight
+Servo 3: intakeServoRight (Axon Max Servo)
 
-Servo 4: turretServo
+Servo 4: turretServo (Axon Max Servo)
 
-Servo 5: intakeServoRight
+Servo 5: kickerServo (Axon Max Servo)
 
-**Servo Hub 2 (CAD ID: 4):**
+**Servo Hub 2 (CAN ID: 4):**
 
 Nothing yet
