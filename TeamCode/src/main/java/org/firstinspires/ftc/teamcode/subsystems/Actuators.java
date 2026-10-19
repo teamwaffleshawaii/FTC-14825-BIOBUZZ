@@ -7,6 +7,12 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+/**
+ * STUDENT GUIDE: Hardware access layer for motors and servos.
+ * HardwareMap names MUST match the robot configuration exactly.
+ * Higher-level subsystems decide WHEN and WHY to move each mechanism;
+ * this class exposes the low-level hardware commands.
+ */
 public class Actuators {
 
     // TODO: If using motors, add/edit them here (up to 8)
@@ -16,6 +22,7 @@ public class Actuators {
     public DcMotor rightBack;
     public DcMotor intakeMotor;
     public DcMotor transferMotor;
+    // DcMotorEx adds encoder velocity methods used by flywheel PIDF.
     public DcMotorEx launchMotor;
 
     // TODO: If using servos or continuous servos, add them here (up to 10)
@@ -27,6 +34,7 @@ public class Actuators {
     public Servo turretServo;
     public Servo ledIndicator;
 
+    /** Called once from Robot before any mechanism is used. */
     public void init(HardwareMap hwMap) {
         // TODO: Put motor hardware here, don't forget to rename deviceNames to match yours
         leftFront = hwMap.get(DcMotor.class, "leftFront");
@@ -38,9 +46,11 @@ public class Actuators {
         launchMotor = hwMap.get(DcMotorEx.class, "launchMotor");
 
         // Keep the encoder mode here; LauncherSubsystem owns PIDF tuning.
+        // Encoder feedback enables velocity control; LauncherSubsystem sets PIDF.
         launchMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         //TODO: Set motor mode when power is zero
+        // BRAKE resists motion at zero power; FLOAT allows coasting.
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); //or FLOAT
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); //or FLOAT
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); //or FLOAT
@@ -50,6 +60,8 @@ public class Actuators {
         launchMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT); //or BRAKE
 
         //TODO: If need to change motor direction
+        // Opposite sides of a drivetrain may need reversed directions
+        // so a positive command moves the robot the intended way.
         leftFront.setDirection(DcMotorSimple.Direction.REVERSE); //or FORWARD
         leftBack.setDirection(DcMotorSimple.Direction.REVERSE); //or FORWARD
         rightFront.setDirection(DcMotorSimple.Direction.FORWARD); //or REVERSE
@@ -59,6 +71,7 @@ public class Actuators {
         launchMotor.setDirection(DcMotorSimple.Direction.REVERSE); //or FORWARD
 
         //TODO: Put servo hardware here, don't forget to rename deviceNames to match yours
+        // Standard Servo uses a position (0.0-1.0); CRServo uses motor-like power.
         kickerServo = hwMap.get(Servo.class, "kickerServo");
         stepUpLeft = hwMap.get(CRServo.class, "stepUpLeft");
         stepUpRight = hwMap.get(CRServo.class, "stepUpRight");
@@ -76,6 +89,8 @@ public class Actuators {
     }
 
     //TODO: Sample classes for turning on motors using power only (Useful for TeleOp)
+    // These four methods drive wheels with power rather than encoder velocity.
+    // RUN_WITHOUT_ENCODER does not use built-in velocity PIDF.
     public void leftFront(double power) {
         leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftFront.setPower(power);
@@ -103,14 +118,17 @@ public class Actuators {
         transferMotor.setPower(power);
     }
 
+    /** Command flywheel speed in encoder ticks/second, not RPM. */
     public void launchMotor(double velocity) {
         launchMotor.setVelocity(velocity);
     }
 
+    /** Read actual measured flywheel speed from the motor encoder. */
     public double getLaunchVelocity() {
         return launchMotor.getVelocity();
     }
 
+    /** Only declare ready when the target is positive and error <= 50 ticks/s. */
     public boolean isLaunchReady(double targetVelocity) {
         double tolerance = 50.0; //ticks per second
         return targetVelocity > 0 &&
@@ -127,6 +145,7 @@ public class Actuators {
         stepUpRight.setPower(0);
     }
 
+    // Kicker positions are calibrated servo positions for this robot.
     public void kickerUp() {
         kickerServo.setPosition(0.05);
     }
@@ -135,6 +154,7 @@ public class Actuators {
         kickerServo.setPosition(0.60);
     }
 
+    // The left/right ramp servos move together to open or close the ramp.
     public void intakeRampDown() {
         intakeServoLeft.setPosition(0.5);
         intakeServoRight.setPosition(0.5);
