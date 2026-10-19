@@ -140,7 +140,7 @@ public class Actuators {
     }
 
     public void kickerUp() {
-        kickerServo.setPosition(0.10);
+        kickerServo.setPosition(0.05);
     }
 
     public void kickerDown() {

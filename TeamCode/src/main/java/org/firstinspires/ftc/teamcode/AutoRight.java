@@ -66,7 +66,11 @@ public class AutoRight extends LinearOpMode {
                 .build();
 
         Action launchPositionLeft = drive.actionBuilder(new Pose2d(-47, -31, Math.toRadians(85) ))
-                .strafeToLinearHeading(new Vector2d(-55,-2.5), Math.toRadians(-5))
+                .strafeToLinearHeading(new Vector2d(-54,-1.5), Math.toRadians(-5))
+                .build();
+
+        Action park = drive.actionBuilder(new Pose2d(-54, -1.5, Math.toRadians(-5) ))
+                .strafeToLinearHeading(new Vector2d(-54,-44), Math.toRadians(90))
                 .build();
 
         //Create more trajectories as needed
@@ -99,7 +103,7 @@ public class AutoRight extends LinearOpMode {
                             new SequentialAction(
                                     flowerPosition1,
                                     flowerPosition2,
-                                    new SleepAction(3.0)
+                                    new SleepAction(3.5)
                             ),
                             0.6, 0.2
                     ));
