@@ -17,7 +17,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.odometry.MecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.Actuators;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.PulsedIntakeAction;
 import org.firstinspires.ftc.teamcode.subsystems.LauncherSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.LauncherAction;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
@@ -96,16 +95,12 @@ public class AutoRight extends LinearOpMode {
             if (opModeIsActive() && !isStopRequested()) {
                 // Both intake() motors (intake and transfer) run during collection.
                 intakeSubsystem.rampDown();
+                intakeSubsystem.intake(1);
                 try {
-                    Actions.runBlocking(new PulsedIntakeAction(
-                            intakeSubsystem,
-                            actuator,
-                            new SequentialAction(
-                                    flowerPosition1,
-                                    flowerPosition2,
-                                    new SleepAction(3.5)
-                            ),
-                            0.6, 0.2
+                    Actions.runBlocking(new SequentialAction(
+                            flowerPosition1,
+                            flowerPosition2,
+                            new SleepAction(3.5)
                     ));
                 } finally {
                     intakeSubsystem.stopIntake();
