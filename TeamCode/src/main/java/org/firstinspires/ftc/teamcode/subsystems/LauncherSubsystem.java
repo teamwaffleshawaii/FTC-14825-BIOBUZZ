@@ -5,24 +5,43 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 /**
- * Shared, non-blocking four-ball launch sequence for TeleOp and Autonomous.
- * Call update() every loop while a sequence is running.
+ * STUDENT GUIDE: Controls the four-ball launch sequence in TeleOp and Auto.
+ *
+ * This is a NON-BLOCKING state machine: instead of sleeping for a long time,
+ * update() checks timers each loop so the robot can keep doing other work.
+ * The launcher uses encoder feedback and PIDF to maintain flywheel speed.
+ *
+ * Future plan: select a velocity using a measured AprilTag-to-goal distance.
+ * That feature is NOT implemented or enabled yet.
  */
 @Config
 public class LauncherSubsystem {
-    // Editable in FTC Dashboard. Changes are applied only when values change.
+    // PIDF is the motor controller's velocity feedback tuning:
+    // P = respond to current speed error; I = accumulated error;
+    // D = change in error; F = feedforward estimate of motor effort.
+    // These are the team's current tested values, not universal constants.
+    // @Config exposes them in FTC Dashboard while the OpMode runs.
+    // Dashboard edits are temporary until we save new defaults in Java.
+    // Changes are applied to hardware only when a coefficient changes.
     public static double LAUNCH_P = 28.0;
     public static double LAUNCH_I = 0.0;
     public static double LAUNCH_D = 0.0;
     public static double LAUNCH_F = 20.0;
 
     // Future vision-based velocity control is deliberately disabled until calibrated.
+    // This flag is a PLACEHOLDER, not a working automatic aiming switch.
+    // Even setting it true today will NOT change launcher velocity.
     public static boolean AUTO_VELOCITY_ENABLED = false;
 
+    // Remember the values last sent to the motor controller.
+    // NaN (not-a-number) guarantees the first applyPIDF() writes all values.
     private double appliedP = Double.NaN;
     private double appliedI = Double.NaN;
     private double appliedD = Double.NaN;
     private double appliedF = Double.NaN;
+    // Each state represents one stage of the four-ball feeding sequence.
+    // IDLE: waiting; FEEDING: moving balls; KICKER_UP: activating kicker;
+    // RESETTING: lowering kicker before returning to IDLE.
     public enum State { IDLE, FEEDING, KICKER_UP, RESETTING }
 
     private final Actuators actuator;
@@ -31,9 +50,12 @@ public class LauncherSubsystem {
     private final ElapsedTime distanceTimer = new ElapsedTime();
     private final ElapsedTime kickerTimer = new ElapsedTime();
 
+    // Timing values are in SECONDS. Tune cautiously on the actual robot.
     public double emptyDelay = 0.05;
     public double kickerUpDelay = 0.5;
     public double kickerResetDelay = 0.4;
+    // Flywheel target uses encoder ticks per second, NOT RPM.
+    // TeleOp currently also has its own 1060 target; we'll consolidate later.
     public double targetVelocity = 1060;
 
     private State state = State.IDLE;
@@ -61,6 +83,7 @@ public class LauncherSubsystem {
         }
     }
 
+    /** Begin a feeding sequence; ignore duplicate starts while busy. */
     public void start() {
         if (isBusy()) return;
         completed = false;
@@ -70,6 +93,10 @@ public class LauncherSubsystem {
         state = State.FEEDING;
     }
 
+    /**
+     * Call frequently from the OpMode loop. Also checks FTC Dashboard PIDF
+     * edits when no ball-feeding sequence is active.
+     */
     public void update() {
         applyPIDF();
         if (!isBusy()) return;
@@ -78,6 +105,8 @@ public class LauncherSubsystem {
         intake.feedLauncher();
         switch (state) {
             case FEEDING:
+                // The distance sensor checks whether balls are still present.
+                // Require a brief continuous 'empty' reading before kicking.
                 lastDistanceCm = sensor.getDistance(DistanceUnit.CM);
                 if (Double.isFinite(lastDistanceCm) && lastDistanceCm > 5.0) {
                     if (!detectingEmpty) {
@@ -95,6 +124,7 @@ public class LauncherSubsystem {
                 }
                 break;
             case KICKER_UP:
+                // Hold the kicker up for the configured interval.
                 if (kickerTimer.seconds() >= kickerUpDelay) {
                     actuator.kickerDown();
                     kickerTimer.reset();
@@ -102,6 +132,7 @@ public class LauncherSubsystem {
                 }
                 break;
             case RESETTING:
+                // Return the kicker to its starting position, then stop feed.
                 if (kickerTimer.seconds() >= kickerResetDelay) {
                     intake.stopFeeding();
                     detectingEmpty = false;
@@ -114,6 +145,7 @@ public class LauncherSubsystem {
         }
     }
 
+    /** Safely stop the feeding sequence (does not turn off the flywheel). */
     public void cancel() {
         intake.stopFeeding();
         actuator.kickerDown();
@@ -130,10 +162,12 @@ public class LauncherSubsystem {
     public double getEmptyDuration() {
         return detectingEmpty ? distanceTimer.seconds() : 0.0;
     }
+    /** Request a motor speed in encoder ticks/second using the current PIDF. */
     public void setFlywheelVelocity(double velocity) {
         applyPIDF();
         actuator.launchMotor(velocity);
     }
+    /** True when actual flywheel speed is within the hardware readiness band. */
     public boolean isFlywheelReady() {
         return actuator.isLaunchReady(targetVelocity);
     }
