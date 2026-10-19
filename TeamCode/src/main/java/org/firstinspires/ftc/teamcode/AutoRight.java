@@ -17,6 +17,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.odometry.MecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.Actuators;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.PulsedIntakeAction;
 import org.firstinspires.ftc.teamcode.subsystems.LauncherSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.LauncherAction;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
@@ -60,24 +61,6 @@ public class AutoRight extends LinearOpMode {
                 .strafeTo(new Vector2d(25, -55))
                 .build();
 
-        // More assertive wiggle: 4 inches forward and back, twice.
-        // At heading 270 degrees, decreasing y moves forward.
-        // End at the same pose so the next trajectory remains aligned.
-        Action flowerWiggle = drive.actionBuilder(new Pose2d(25, -55, Math.toRadians(270)))
-                .strafeTo(new Vector2d(25, -59),
-                        new TranslationalVelConstraint(25),
-                        new ProfileAccelConstraint(-30.0, 30.0))
-                .strafeTo(new Vector2d(25, -55),
-                        new TranslationalVelConstraint(25),
-                        new ProfileAccelConstraint(-30.0, 30.0))
-                .strafeTo(new Vector2d(25, -59),
-                        new TranslationalVelConstraint(25),
-                        new ProfileAccelConstraint(-30.0, 30.0))
-                .strafeTo(new Vector2d(25, -55),
-                        new TranslationalVelConstraint(25),
-                        new ProfileAccelConstraint(-30.0, 30.0))
-                .build();
-
         Action movetolaunchPositionLeft = drive.actionBuilder(new Pose2d(25, -55, Math.toRadians(270) ))
                 .strafeToLinearHeading(new Vector2d(-44,-35), Math.toRadians(90))
                 .build();
@@ -111,15 +94,18 @@ public class AutoRight extends LinearOpMode {
             launcher.setFlywheelVelocity(0);
 
             if (opModeIsActive() && !isStopRequested()) {
-                // Both intake and transfer run continuously while the robot wiggles.
+                // Both intake() motors (intake and transfer) run during collection.
                 intakeSubsystem.rampDown();
-                intakeSubsystem.intake(1); // Intake and transfer stay on continuously.
                 try {
-                    Actions.runBlocking(new SequentialAction(
-                            flowerPosition1,
-                            flowerPosition2,
-                            flowerWiggle,
-                            new SleepAction(3.5)
+                    Actions.runBlocking(new PulsedIntakeAction(
+                            intakeSubsystem,
+                            actuator,
+                            new SequentialAction(
+                                    flowerPosition1,
+                                    flowerPosition2,
+                                    new SleepAction(3.5)
+                            ),
+                            0.6, 0.2
                     ));
                 } finally {
                     intakeSubsystem.stopIntake();
