@@ -15,7 +15,7 @@ Motor 3: rightBack (Motor Encoder: None)
 
 Servo 0: indicatorLED (goBILDA RGB Indicator)
 
-Servo 1: To be added (REV BlinkIn LED Driver)
+Servo 1: revLED (REV BlinkIn LED Driver) - to be added later
 
 I2C 1: goBILDA PinPoint Computer & IMU
 
