@@ -5,13 +5,13 @@ Running on FTC SDK Version 12.0 (20260907-090034)
 ## Variable Configurations
 **Control Hub:**
 
-Motor 0: rightFront (Motor Encoder: None)
+Motor 0: launchMotor (Motor Encoder: Same Motor)
 
-Motor 1: rightBack (Motor Encoder: None)
+Motor 1: intakeMotor (Motor Encoder: Same Motor)
 
-Motor 2: intakeMotor (Motor Encoder: Same Motor)
+Motor 2: rightFront (Motor Encoder: None)
 
-Motor 3: launchMotor (Motor Encoder: Same Motor)
+Motor 3: rightBack (Motor Encoder: None)
 
 Servo 0: indicatorLED (goBILDA RGB Indicator)
 
