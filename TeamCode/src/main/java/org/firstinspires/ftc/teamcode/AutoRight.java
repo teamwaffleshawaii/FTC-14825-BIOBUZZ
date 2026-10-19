@@ -17,6 +17,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.odometry.MecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.Actuators;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.PulsedIntakeAction;
 import org.firstinspires.ftc.teamcode.subsystems.LauncherSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.LauncherAction;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
@@ -65,7 +66,11 @@ public class AutoRight extends LinearOpMode {
                 .build();
 
         Action launchPositionLeft = drive.actionBuilder(new Pose2d(-47, -31, Math.toRadians(85) ))
-                .strafeToLinearHeading(new Vector2d(-55,-2.5), Math.toRadians(-5))
+                .strafeToLinearHeading(new Vector2d(-54,-1.5), Math.toRadians(-5))
+                .build();
+
+        Action park = drive.actionBuilder(new Pose2d(-54, -1.5, Math.toRadians(-5) ))
+                .strafeToLinearHeading(new Vector2d(-54,-44), Math.toRadians(90))
                 .build();
 
         //Create more trajectories as needed
@@ -91,12 +96,16 @@ public class AutoRight extends LinearOpMode {
             if (opModeIsActive() && !isStopRequested()) {
                 // Both intake() motors (intake and transfer) run during collection.
                 intakeSubsystem.rampDown();
-                intakeSubsystem.intake(1);
                 try {
-                    Actions.runBlocking(new SequentialAction(
-                            flowerPosition1,
-                            flowerPosition2,
-                            new SleepAction(3.0)
+                    Actions.runBlocking(new PulsedIntakeAction(
+                            intakeSubsystem,
+                            actuator,
+                            new SequentialAction(
+                                    flowerPosition1,
+                                    flowerPosition2,
+                                    new SleepAction(3.5)
+                            ),
+                            0.6, 0.2
                     ));
                 } finally {
                     intakeSubsystem.stopIntake();
