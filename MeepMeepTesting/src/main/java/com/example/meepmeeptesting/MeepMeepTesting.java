@@ -23,8 +23,12 @@ public class MeepMeepTesting {
                 .build();
         myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(60, -11.5, Math.toRadians(180)))
                 .strafeToLinearHeading(new Vector2d( 47, -11.5), Math.toRadians(180))
-                .splineTo(new Vector2d(42, -56), Math.toRadians(0))
-                .strafeTo(new Vector2d(65, -60))
+                .splineTo(new Vector2d(30, -44), Math.toRadians(270))
+                .strafeTo(new Vector2d(25, -55))
+                .strafeToLinearHeading(new Vector2d(-44,-35), Math.toRadians(90))
+                .strafeToLinearHeading(new Vector2d(-54,-1.5), Math.toRadians(-5))
+                .strafeToLinearHeading(new Vector2d(-30,-56), Math.toRadians(90))
+
                 //.strafeToLinearHeading(new Vector2d(63, -56), Math.toRadians(270))
                 // Run your test paths here
                 //...
