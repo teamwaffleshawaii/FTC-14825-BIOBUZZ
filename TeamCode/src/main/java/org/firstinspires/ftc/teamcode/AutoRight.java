@@ -51,18 +51,22 @@ public class AutoRight extends LinearOpMode {
                 .strafeToLinearHeading(new Vector2d( 47, -11.5), Math.toRadians(180))
                 .build();
 
-        Action intakePosition1 = drive.actionBuilder(new Pose2d(47, -11.5, Math.toRadians(180) ))
-                .strafeToLinearHeading(new Vector2d(63, -33), Math.toRadians(270))
+        Action flowerPosition1 = drive.actionBuilder(new Pose2d(47, -11.5, Math.toRadians(180) ))
+                .splineTo(new Vector2d(25, -45), Math.toRadians(270))
                 //...
                 .build();
 
-        Action intakePosition2 = drive.actionBuilder(new Pose2d(63, -33, Math.toRadians(270) ))
-                .strafeToLinearHeading(new Vector2d(63, -56), Math.toRadians(270),
+        Action flowerPosition2 = drive.actionBuilder(new Pose2d(25, -45, Math.toRadians(270) ))
+                .strafeTo(new Vector2d(25, -50),
                         new TranslationalVelConstraint(30), new ProfileAccelConstraint(-10.0, 10.0)) //Do this path slower
                 .build();
 
-        Action launchPositionLeft = drive.actionBuilder(new Pose2d(63, -56, Math.toRadians(270) ))
-                .strafeToLinearHeading(new Vector2d(0,0), Math.toRadians(90))
+        Action movetolaunchPositionLeft = drive.actionBuilder(new Pose2d(25, -50, Math.toRadians(0) ))
+                .strafeToLinearHeading(new Vector2d(-44,-26), Math.toRadians(90))
+                .build();
+
+        Action launchPositionLeft = drive.actionBuilder(new Pose2d(-44, -26, Math.toRadians(90) ))
+                .strafeToLinearHeading(new Vector2d(-53,4), Math.toRadians(0))
                 .build();
 
         //Create more trajectories as needed
@@ -89,10 +93,12 @@ public class AutoRight extends LinearOpMode {
                 // Keep intake motors running while Road Runner follows BOTH paths.
                 // The finally block stops the intake even if a trajectory throws.
                 intakeSubsystem.intake(1);
+                intakeSubsystem.rampDown();
+                //turn on transfer motor too
                 try {
                     Actions.runBlocking(new SequentialAction(
-                            intakePosition1,
-                            intakePosition2,
+                            flowerPosition1,
+                            flowerPosition1,
                             new SleepAction(2.0) // Keep collecting for 2 more seconds.
                     ));
                 } finally {
