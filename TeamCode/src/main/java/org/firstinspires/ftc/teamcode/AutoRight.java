@@ -4,7 +4,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.ProfileAccelConstraint;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -100,12 +99,16 @@ public class AutoRight extends LinearOpMode {
 
             if (opModeIsActive() && !isStopRequested()) {
                 // Keep intake motors running while Road Runner follows BOTH paths.
-                Actions.runBlocking(new SequentialAction(
-                        new InstantAction(() -> intakeSubsystem.intake(1)),
-                        intakePosition1,
-                        intakePosition2,
-                        new InstantAction(() -> intakeSubsystem.stopIntake())
-                ));
+                // The finally block stops the intake even if a trajectory throws.
+                intakeSubsystem.intake(1);
+                try {
+                    Actions.runBlocking(new SequentialAction(
+                            intakePosition1,
+                            intakePosition2
+                    ));
+                } finally {
+                    intakeSubsystem.stopIntake();
+                }
             }
         }
         robot.shutdown();
