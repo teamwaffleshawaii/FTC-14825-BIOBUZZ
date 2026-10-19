@@ -7,6 +7,12 @@ import com.noahbres.meepmeep.MeepMeep;
 import com.noahbres.meepmeep.roadrunner.DefaultBotBuilder;
 import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
+import java.awt.Image;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+
 
 public class MeepMeepTesting {
     public static void main(String[] args) {
@@ -30,10 +36,34 @@ public class MeepMeepTesting {
                 //.splineToLinearHeading(new Pose2d(0,0, Math.toRadians(0)), Math.toRadians(0))
                 //.waitSeconds(0.5)
                 .build());
-        meepMeep.setBackground(MeepMeep.Background.FIELD_DECODE_OFFICIAL)
+
+        Image fieldImage;
+
+        // Look for the image bundled with the simulator.
+        // This works regardless of the student's username or project location.
+        try (java.io.InputStream imageStream =
+                     MeepMeepTesting.class.getResourceAsStream("/biobuzz.png")) {
+
+            if (imageStream == null) {
+                throw new IOException("biobuzz.png is missing from src/main/resources.");
+            }
+
+            fieldImage = ImageIO.read(imageStream);
+
+            if (fieldImage == null) {
+                throw new IOException("biobuzz.png could not be read as an image.");
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Could not load the BIOBUZZ field image.", e);
+        }
+
+        // Display the field and start the simulation.
+        meepMeep.setBackground(fieldImage)
                 .setDarkMode(true)
-                .setBackgroundAlpha(0.95f)
+                .setBackgroundAlpha(1.0f)
                 .addEntity(myBot)
                 .start();
+
+
     }
 }
