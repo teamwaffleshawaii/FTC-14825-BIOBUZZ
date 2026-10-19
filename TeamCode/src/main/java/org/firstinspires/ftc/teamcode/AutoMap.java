@@ -60,7 +60,9 @@ public class AutoMap extends LinearOpMode {
             telemetry.update();
 
             // Draw the estimated pose on Dashboard's virtual field overlay.
-            TelemetryPacket packet = new TelemetryPacket();
+            // Hide Dashboard's built-in season field and draw our shared field image.
+            TelemetryPacket packet = new TelemetryPacket(false);
+            packet.fieldOverlay().drawImage("/images/biobuzz.png", 0, 0, 144, 144);
             packet.fieldOverlay().setStroke("#3F51B5");
             Drawing.drawRobot(packet.fieldOverlay(), pose);
             FtcDashboard.getInstance().sendTelemetryPacket(packet);
