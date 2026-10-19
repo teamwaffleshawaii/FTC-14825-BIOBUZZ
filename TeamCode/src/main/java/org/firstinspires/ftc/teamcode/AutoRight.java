@@ -60,22 +60,22 @@ public class AutoRight extends LinearOpMode {
                 .strafeTo(new Vector2d(25, -55))
                 .build();
 
-        // Small odometry-controlled forward/backward wiggle at the flowers.
-        // Heading is 270 degrees, so moving to y=-56 advances one inch,
-        // then returning to y=-55 backs up one inch.
+        // More assertive wiggle: 4 inches forward and back, twice.
+        // At heading 270 degrees, decreasing y moves forward.
+        // End at the same pose so the next trajectory remains aligned.
         Action flowerWiggle = drive.actionBuilder(new Pose2d(25, -55, Math.toRadians(270)))
-                .strafeTo(new Vector2d(25, -56),
-                        new TranslationalVelConstraint(8),
-                        new ProfileAccelConstraint(-8.0, 8.0))
+                .strafeTo(new Vector2d(25, -59),
+                        new TranslationalVelConstraint(25),
+                        new ProfileAccelConstraint(-30.0, 30.0))
                 .strafeTo(new Vector2d(25, -55),
-                        new TranslationalVelConstraint(8),
-                        new ProfileAccelConstraint(-8.0, 8.0))
-                .strafeTo(new Vector2d(25, -56),
-                        new TranslationalVelConstraint(8),
-                        new ProfileAccelConstraint(-8.0, 8.0))
+                        new TranslationalVelConstraint(25),
+                        new ProfileAccelConstraint(-30.0, 30.0))
+                .strafeTo(new Vector2d(25, -59),
+                        new TranslationalVelConstraint(25),
+                        new ProfileAccelConstraint(-30.0, 30.0))
                 .strafeTo(new Vector2d(25, -55),
-                        new TranslationalVelConstraint(8),
-                        new ProfileAccelConstraint(-8.0, 8.0))
+                        new TranslationalVelConstraint(25),
+                        new ProfileAccelConstraint(-30.0, 30.0))
                 .build();
 
         Action movetolaunchPositionLeft = drive.actionBuilder(new Pose2d(25, -55, Math.toRadians(270) ))
