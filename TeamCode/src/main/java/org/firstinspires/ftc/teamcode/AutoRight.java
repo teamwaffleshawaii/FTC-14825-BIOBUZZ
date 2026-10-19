@@ -68,6 +68,7 @@ public class AutoRight extends LinearOpMode {
 
         waitForStart();
 
+        try {
         if (opModeIsActive() && !isStopRequested()) {
             // Spin up while driving to the first launch position.
             // Reaching target speed can take time; do not feed until ready.
