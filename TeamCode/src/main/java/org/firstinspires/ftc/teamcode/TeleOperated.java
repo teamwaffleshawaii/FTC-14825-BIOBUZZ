@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -45,6 +47,14 @@ public class TeleOperated extends LinearOpMode {
     // FTC SDK calls runOpMode() when the driver selects and starts this OpMode.
     @Override
     public void runOpMode() {
+        // Send the same telemetry to Driver Station and FTC Dashboard.
+        // Dashboard can graph Target Velocity and Actual Velocity together
+        // while students adjust launcher PIDF values live.
+        telemetry = new MultipleTelemetry(
+                telemetry,
+                FtcDashboard.getInstance().getTelemetry()
+        );
+
 
         robot = new Robot(hardwareMap);
         actuator = robot.actuator;
