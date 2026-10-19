@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -142,12 +143,17 @@ public class TeleOperated extends LinearOpMode {
     }
 
     public void limelightTelemetry() {
-        LLResult result = sensor.getLimelightResult();
-        if (result != null && result.isValid()) {
-            telemetry.addData("Limelight Target", "TX: %.2f°, TY: %.2f°, TA: %.2f%%",
-                    result.getTx(), result.getTy(), result.getTa());
+        LLResult result = sensor.getFreshAprilTagResult();
+        if (result != null) {
+            telemetry.addData("Limelight Age (ms)", result.getStaleness());
+            telemetry.addData("AprilTags Seen", result.getFiducialResults().size());
+            for (LLResultTypes.FiducialResult tag : result.getFiducialResults()) {
+                telemetry.addData("AprilTag " + tag.getFiducialId(),
+                        "TX: %.2f deg, TY: %.2f deg",
+                        tag.getTargetXDegrees(), tag.getTargetYDegrees());
+            }
         } else {
-            telemetry.addData("Limelight Target", "No Target");
+            telemetry.addData("Limelight AprilTags", "No fresh AprilTag detection");
         }
     }
 }
