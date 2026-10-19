@@ -4,6 +4,8 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.InstantAction;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.ProfileAccelConstraint;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -17,6 +19,7 @@ import org.firstinspires.ftc.teamcode.odometry.MecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.Actuators;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.LauncherSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.LauncherAction;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
 import org.firstinspires.ftc.teamcode.subsystems.Sensors;
 
@@ -68,14 +71,45 @@ public class AutoRight extends LinearOpMode {
         waitForStart();
 
         if (opModeIsActive() && !isStopRequested()) {
-            //Run your trajectory here when the code starts
-            Actions.runBlocking(new SequentialAction(launchPositionRight));
-            //Turn the launch motor on
-            //Launch the 4 balls using the Finite State Machine
-            //Turn the launch motor off
-            //Intake on
-            Actions.runBlocking(new SequentialAction(intakePosition1, intakePosition2));
-            //Intake off
+            // Spin up while driving to the first launch position.
+            // Reaching target speed can take time; do not feed until ready.
+            Actions.runBlocking(new ParallelAction(
+                    launchPositionRight,
+                    new InstantAction(() -> launcher.setFlywheelVelocity(launcher.targetVelocity))
+            ));
+
+            // Wait up to 3 seconds for the flywheel to reach its target speed.
+            // An unsafe/failed spin-up will skip the shot rather than feed slowly.
+            com.qualcomm.robotcore.util.ElapsedTime readyTimer =
+                    new com.qualcomm.robotcore.util.ElapsedTime();
+            while (opModeIsActive() && !isStopRequested()
+                    && !launcher.isFlywheelReady() && readyTimer.seconds() < 3.0) {
+                telemetry.addData("Launch velocity", actuator.getLaunchVelocity());
+                telemetry.addData("Launcher ready", false);
+                telemetry.update();
+                idle();
+            }
+
+            if (opModeIsActive() && !isStopRequested() && launcher.isFlywheelReady()) {
+                // Reuse TeleOp's non-blocking four-ball finite state machine.
+                Actions.runBlocking(new LauncherAction(launcher));
+            } else {
+                telemetry.addLine("Launcher not ready: skipping four-ball launch");
+                telemetry.update();
+            }
+
+            // Stop the flywheel regardless of whether the first shot succeeded.
+            launcher.setFlywheelVelocity(0);
+
+            if (opModeIsActive() && !isStopRequested()) {
+                // Keep intake motors running while Road Runner follows BOTH paths.
+                Actions.runBlocking(new SequentialAction(
+                        new InstantAction(() -> intakeSubsystem.intake(1)),
+                        intakePosition1,
+                        intakePosition2,
+                        new InstantAction(() -> intakeSubsystem.stopIntake())
+                ));
+            }
         }
         robot.shutdown();
     }
