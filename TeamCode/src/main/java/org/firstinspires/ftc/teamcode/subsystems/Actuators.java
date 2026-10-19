@@ -27,11 +27,6 @@ public class Actuators {
     public Servo turretServo;
     public Servo ledIndicator;
 
-    public static double LAUNCH_P = 28.0;
-    public static double LAUNCH_I = 0.0;
-    public static double LAUNCH_D = 0;
-    public static double LAUNCH_F = 20;
-
     public void init(HardwareMap hwMap) {
         // TODO: Put motor hardware here, don't forget to rename deviceNames to match yours
         leftFront = hwMap.get(DcMotor.class, "leftFront");
@@ -42,15 +37,8 @@ public class Actuators {
         transferMotor = hwMap.get(DcMotor.class, "transferMotor");
         launchMotor = hwMap.get(DcMotorEx.class, "launchMotor");
 
-        //Configuring the initial test values
+        // Keep the encoder mode here; LauncherSubsystem owns PIDF tuning.
         launchMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        launchMotor.setVelocityPIDFCoefficients(
-                LAUNCH_P,
-                LAUNCH_I,
-                LAUNCH_D,
-                LAUNCH_F
-        );
 
         //TODO: Set motor mode when power is zero
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); //or FLOAT
