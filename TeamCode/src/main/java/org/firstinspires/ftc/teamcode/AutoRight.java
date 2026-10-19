@@ -7,6 +7,7 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.ProfileAccelConstraint;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
@@ -75,24 +76,10 @@ public class AutoRight extends LinearOpMode {
             launcher.setFlywheelVelocity(launcher.targetVelocity);
             Actions.runBlocking(launchPositionRight);
 
-            // Wait up to 3 seconds for the flywheel to reach its target speed.
-            // An unsafe/failed spin-up will skip the shot rather than feed slowly.
-            com.qualcomm.robotcore.util.ElapsedTime readyTimer =
-                    new com.qualcomm.robotcore.util.ElapsedTime();
-            while (opModeIsActive() && !isStopRequested()
-                    && !launcher.isFlywheelReady() && readyTimer.seconds() < 3.0) {
-                telemetry.addData("Launch velocity", actuator.getLaunchVelocity());
-                telemetry.addData("Launcher ready", false);
-                telemetry.update();
-                idle();
-            }
-
-            if (opModeIsActive() && !isStopRequested() && launcher.isFlywheelReady()) {
-                // Reuse TeleOp's non-blocking four-ball finite state machine.
+            // Launch regardless of flywheel readiness so the preload balls
+            // are cleared before collecting the next four.
+            if (opModeIsActive() && !isStopRequested()) {
                 Actions.runBlocking(new LauncherAction(launcher));
-            } else {
-                telemetry.addLine("Launcher not ready: skipping four-ball launch");
-                telemetry.update();
             }
 
             // Stop the flywheel regardless of whether the first shot succeeded.
@@ -105,7 +92,8 @@ public class AutoRight extends LinearOpMode {
                 try {
                     Actions.runBlocking(new SequentialAction(
                             intakePosition1,
-                            intakePosition2
+                            intakePosition2,
+                            new SleepAction(2.0) // Keep collecting for 2 more seconds.
                     ));
                 } finally {
                     intakeSubsystem.stopIntake();
