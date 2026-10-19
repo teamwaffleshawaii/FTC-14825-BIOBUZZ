@@ -16,6 +16,9 @@ public class LauncherSubsystem {
     public static double LAUNCH_D = 0.0;
     public static double LAUNCH_F = 20.0;
 
+    // Future vision-based velocity control is deliberately disabled until calibrated.
+    public static boolean AUTO_VELOCITY_ENABLED = false;
+
     private double appliedP = Double.NaN;
     private double appliedI = Double.NaN;
     private double appliedD = Double.NaN;
