@@ -111,7 +111,10 @@ public class AutoRight extends LinearOpMode {
                 }
             }
         }
-        robot.shutdown();
+        } finally {
+            launcher.setFlywheelVelocity(0);
+            robot.shutdown();
+        }
     }
 
 }
