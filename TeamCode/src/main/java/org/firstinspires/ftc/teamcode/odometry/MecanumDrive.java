@@ -346,7 +346,10 @@ public final class MecanumDrive {
             p.put("headingError (deg)", Math.toDegrees(error.heading.toDouble()));
 
             // only draw when active; only one drive action should be active at a time
+            // Draw our shared field image before the Road Runner trajectory and robot overlays.
+            // Road Runner owns this packet, so the opaque PNG covers the default field.
             Canvas c = p.fieldOverlay();
+            c.drawImage("/images/biobuzz.png", 0, 0, 144, 144);
             drawPoseHistory(c);
 
             c.setStroke("#4CAF50");
@@ -427,7 +430,10 @@ public final class MecanumDrive {
             rightBack.setPower(feedforward.compute(wheelVels.rightBack) / voltage);
             rightFront.setPower(feedforward.compute(wheelVels.rightFront) / voltage);
 
+            // Draw our shared field image before the Road Runner trajectory and robot overlays.
+            // Road Runner owns this packet, so the opaque PNG covers the default field.
             Canvas c = p.fieldOverlay();
+            c.drawImage("/images/biobuzz.png", 0, 0, 144, 144);
             drawPoseHistory(c);
 
             c.setStroke("#4CAF50");
