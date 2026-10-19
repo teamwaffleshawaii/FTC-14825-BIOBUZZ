@@ -39,7 +39,7 @@ public class Sensors {
         // Initialize Limelight 3A (Hardware config name: "limelight")
         try {
             limelight = hwMap.get(Limelight3A.class, "limelight");
-            limelight.pipelineSwitch(0);
+            limelight.pipelineSwitch(APRILTAG_PIPELINE);
             limelight.start();
         } catch (Exception e) {
             // Limelight not found/configured
@@ -48,7 +48,7 @@ public class Sensors {
 
     public double getHeading(AngleUnit angleUnit) {
         if (imu != null) {
-            return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+            return imu.getRobotYawPitchRollAngles().getYaw(angleUnit);
         }
         return 0.0;
     }
