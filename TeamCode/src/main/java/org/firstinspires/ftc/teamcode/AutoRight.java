@@ -5,7 +5,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
-import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.ProfileAccelConstraint;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -73,10 +72,8 @@ public class AutoRight extends LinearOpMode {
         if (opModeIsActive() && !isStopRequested()) {
             // Spin up while driving to the first launch position.
             // Reaching target speed can take time; do not feed until ready.
-            Actions.runBlocking(new ParallelAction(
-                    launchPositionRight,
-                    new InstantAction(() -> launcher.setFlywheelVelocity(launcher.targetVelocity))
-            ));
+            launcher.setFlywheelVelocity(launcher.targetVelocity);
+            Actions.runBlocking(launchPositionRight);
 
             // Wait up to 3 seconds for the flywheel to reach its target speed.
             // An unsafe/failed spin-up will skip the shot rather than feed slowly.
