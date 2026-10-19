@@ -52,21 +52,20 @@ public class AutoRight extends LinearOpMode {
                 .build();
 
         Action flowerPosition1 = drive.actionBuilder(new Pose2d(47, -11.5, Math.toRadians(180) ))
-                .splineTo(new Vector2d(25, -45), Math.toRadians(270))
+                .splineTo(new Vector2d(30, -44), Math.toRadians(270))
                 //...
                 .build();
 
-        Action flowerPosition2 = drive.actionBuilder(new Pose2d(25, -45, Math.toRadians(270) ))
-                .strafeTo(new Vector2d(25, -50),
-                        new TranslationalVelConstraint(30), new ProfileAccelConstraint(-10.0, 10.0)) //Do this path slower
+        Action flowerPosition2 = drive.actionBuilder(new Pose2d(30, -44, Math.toRadians(270) ))
+                .strafeTo(new Vector2d(25, -55))
                 .build();
 
-        Action movetolaunchPositionLeft = drive.actionBuilder(new Pose2d(25, -50, Math.toRadians(270) ))
-                .strafeToLinearHeading(new Vector2d(-44,-26), Math.toRadians(90))
+        Action movetolaunchPositionLeft = drive.actionBuilder(new Pose2d(25, -55, Math.toRadians(270) ))
+                .strafeToLinearHeading(new Vector2d(-44,-35), Math.toRadians(90))
                 .build();
 
-        Action launchPositionLeft = drive.actionBuilder(new Pose2d(-44, -26, Math.toRadians(90) ))
-                .strafeToLinearHeading(new Vector2d(-53,4), Math.toRadians(0))
+        Action launchPositionLeft = drive.actionBuilder(new Pose2d(-47, -31, Math.toRadians(85) ))
+                .strafeToLinearHeading(new Vector2d(-55,-2.5), Math.toRadians(-5))
                 .build();
 
         //Create more trajectories as needed
@@ -97,7 +96,7 @@ public class AutoRight extends LinearOpMode {
                     Actions.runBlocking(new SequentialAction(
                             flowerPosition1,
                             flowerPosition2,
-                            new SleepAction(2.0)
+                            new SleepAction(3.0)
                     ));
                 } finally {
                     intakeSubsystem.stopIntake();
