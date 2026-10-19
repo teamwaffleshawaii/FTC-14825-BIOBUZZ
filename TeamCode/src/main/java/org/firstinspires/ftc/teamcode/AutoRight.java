@@ -22,6 +22,12 @@ import org.firstinspires.ftc.teamcode.subsystems.LauncherAction;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
 import org.firstinspires.ftc.teamcode.subsystems.Sensors;
 
+/**
+ * STUDENT GUIDE: Right-side autonomous route using Road Runner odometry.
+ * A Pose2d contains field X, Y and robot heading (in radians).
+ * Trajectories below are built BEFORE PLAY and run in a planned sequence.
+ * Verify all coordinates against the actual field before a match.
+ */
 @Autonomous (name = "AutoRight", group = "Auto")
 public class AutoRight extends LinearOpMode {
 
@@ -42,32 +48,41 @@ public class AutoRight extends LinearOpMode {
         launcher = robot.launcher;
 
         //TODO: Set up Robot starting position here!!!
+        // Starting pose is our best estimate of the robot's field position.
+        // Road Runner uses it as the reference for subsequent trajectories.
         MecanumDrive drive = new MecanumDrive(hardwareMap,
                 new Pose2d(60, -11.5, Math.toRadians(180) ) );
 
         //TODO: Put your Odometry trajectory paths here!!!
         //Separate your paths by action (linearSlide movements, intake movements, servo movements, etc.)
+        // Action builders describe a path; .build() creates an executable action.
+        // Road Runner does not move the robot until Actions.runBlocking() runs.
         Action launchPositionRight = drive.actionBuilder(new Pose2d(60, -11.5, Math.toRadians(180) ))
                 .strafeToLinearHeading(new Vector2d( 47, -11.5), Math.toRadians(180))
                 .build();
 
+        // Collection path: travel from the first shooting area toward flowers.
         Action flowerPosition1 = drive.actionBuilder(new Pose2d(47, -11.5, Math.toRadians(180) ))
                 .splineTo(new Vector2d(30, -44), Math.toRadians(270))
                 //...
                 .build();
 
+        // Continue through the collection area before the timed pause.
         Action flowerPosition2 = drive.actionBuilder(new Pose2d(30, -44, Math.toRadians(270) ))
                 .strafeTo(new Vector2d(25, -55))
                 .build();
 
+        // Reposition to the left side for the second launch.
         Action movetolaunchPositionLeft = drive.actionBuilder(new Pose2d(25, -55, Math.toRadians(270) ))
                 .strafeToLinearHeading(new Vector2d(-44,-35), Math.toRadians(90))
                 .build();
 
+        // Final approach to the second shooting pose.
         Action launchPositionLeft = drive.actionBuilder(new Pose2d(-47, -31, Math.toRadians(85) ))
                 .strafeToLinearHeading(new Vector2d(-54,-1.5), Math.toRadians(-5))
                 .build();
 
+        // Parking is a separate trajectory executed after the second volley.
         Action park = drive.actionBuilder(new Pose2d(-54, -1.5, Math.toRadians(-5) ))
                 .strafeToLinearHeading(new Vector2d(-30,-56), Math.toRadians(90))
                 .build();
@@ -76,16 +91,21 @@ public class AutoRight extends LinearOpMode {
 
         waitForStart();
 
+        // try/finally ensures motors are commanded safe values on exit,
+        // including when STOP is pressed or an exception occurs.
         try {
         if (opModeIsActive() && !isStopRequested()) {
             // Spin up while driving to the first launch position.
             // The first volley starts after arriving, regardless of actual speed.
             launcher.setFlywheelVelocity(launcher.targetVelocity);
+            // runBlocking executes a Road Runner action until it finishes.
+            // Do not use a long Thread.sleep() during trajectory following.
             Actions.runBlocking(launchPositionRight);
 
             // Launch regardless of flywheel readiness so the preload balls
             // are cleared before collecting the next four.
             if (opModeIsActive() && !isStopRequested()) {
+                // LauncherAction runs the timed feed state machine, not a drive path.
                 Actions.runBlocking(new LauncherAction(launcher));
             }
 
@@ -99,6 +119,8 @@ public class AutoRight extends LinearOpMode {
                     Actions.runBlocking(new SequentialAction(
                             flowerPosition1,
                             flowerPosition2,
+                            // Road Runner timed pause to allow collection.
+                            // Unlike Thread.sleep(), this is part of the action sequence.
                             new SleepAction(3.5)
                     ));
 
@@ -126,6 +148,7 @@ public class AutoRight extends LinearOpMode {
                 }
             }
         }
+        // Cleanup executes whether autonomous finishes normally or stops early.
         } finally {
             launcher.setFlywheelVelocity(0);
             intakeSubsystem.rampUp();
