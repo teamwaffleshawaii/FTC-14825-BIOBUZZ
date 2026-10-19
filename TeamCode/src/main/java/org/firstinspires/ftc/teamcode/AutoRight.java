@@ -95,6 +95,7 @@ public class AutoRight extends LinearOpMode {
                 try {
                     Actions.runBlocking(new PulsedIntakeAction(
                             intakeSubsystem,
+                            actuator,
                             new SequentialAction(
                                     flowerPosition1,
                                     flowerPosition2,
