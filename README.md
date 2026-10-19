@@ -17,7 +17,9 @@ Servo 0: indicatorLED (goBILDA RGB Indicator)
 
 Servo 1: revLED (REV BlinkIn LED Driver) - to be added later
 
-I2C 1: goBILDA PinPoint Computer & IMU
+I2C Port 1: pinpoint (goBILDA PinPoint Computer & IMU)
+
+I2C Port 2: distanceSensor (REV 2M distance sensor) 
 
 USB/Ethernet: limelight (Limelight 3A)
 
