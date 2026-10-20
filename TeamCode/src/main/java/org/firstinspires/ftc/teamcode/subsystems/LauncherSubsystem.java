@@ -23,7 +23,7 @@ public class LauncherSubsystem {
     // @Config exposes them in FTC Dashboard while the OpMode runs.
     // Dashboard edits are temporary until we save new defaults in Java.
     // Changes are applied to hardware only when a coefficient changes.
-    public static double LAUNCH_P = 28.0;
+    public static double LAUNCH_P = 50.0; //was 28
     public static double LAUNCH_I = 0.0;
     public static double LAUNCH_D = 0.0;
     public static double LAUNCH_F = 20.0;
