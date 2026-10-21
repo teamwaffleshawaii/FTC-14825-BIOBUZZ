@@ -51,7 +51,7 @@ public class LauncherSubsystem {
     private final ElapsedTime kickerTimer = new ElapsedTime();
 
     // Timing values are in SECONDS. Tune cautiously on the actual robot.
-    public double emptyDelay = 0.05;
+    public double emptyDelay = 0.015; //0.02 is definitely good
     public double kickerUpDelay = 0.5;
     public double kickerResetDelay = 0.4;
     // Flywheel target uses encoder ticks per second, NOT RPM.

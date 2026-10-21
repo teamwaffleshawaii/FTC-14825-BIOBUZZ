@@ -131,6 +131,7 @@ public class TeleOperated extends LinearOpMode {
             intakeSubsystem.intake(1);
         } else if (gamepad1.b || gamepad2.b) {
             intakeSubsystem.intake(-0.8);
+
         } else {
             intakeSubsystem.stopIntake();
         }
