@@ -7,7 +7,7 @@ Running on FTC SDK Version 12.0 (20260907-090034)
 
 Motor 0: launchMotor (goBILDA 6000 RPM, Encoder plugged in)
 
-Motor 1: intakeMotor (goBILDA 435 RPM, Encoder plugged in)
+Motor 1: intakeMotor (goBILDA 1150 RPM, Encoder plugged in)
 
 Motor 2: rightFront (goBILDA 435 RPM, no Encoder)
 
