@@ -131,11 +131,16 @@ public class TeleOperated extends LinearOpMode {
 
         if (gamepad1.a || gamepad2.a) {
             intakeSubsystem.intake(1);
+            // Step-ups are only needed for reverse clearing in manual mode.
+            actuator.stepUpOff();
         } else if (gamepad1.b || gamepad2.b) {
             intakeSubsystem.intake(-0.8);
-
+            // Reverse both continuous-rotation step-up servos with the intake.
+            actuator.stepUpLeft.setPower(-1);
+            actuator.stepUpRight.setPower(-1);
         } else {
             intakeSubsystem.stopIntake();
+            actuator.stepUpOff();
         }
     }
     /**
