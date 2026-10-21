@@ -28,6 +28,10 @@ public class LauncherSubsystem {
     public static double LAUNCH_D = 0.0;
     public static double LAUNCH_F = 20.0;
 
+    // TeleOp shooting speed, in encoder ticks/second. Change live in Dashboard.
+    // Autonomous keeps its existing independent targetVelocity setting.
+    public static double TELEOP_TARGET_VELOCITY = 1060.0;
+
     // Future vision-based velocity control is deliberately disabled until calibrated.
     // This flag is a PLACEHOLDER, not a working automatic aiming switch.
     // Even setting it true today will NOT change launcher velocity.
