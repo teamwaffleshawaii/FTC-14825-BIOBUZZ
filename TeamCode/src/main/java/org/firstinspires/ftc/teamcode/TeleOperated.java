@@ -35,6 +35,8 @@ public class TeleOperated extends LinearOpMode {
     // adjust shooting speed live in FTC Dashboard without redeploying.
     // Remember whether X started the flywheel so changes apply while spinning.
     boolean flywheelEnabled = false;
+    // Rumble only once each time X starts the flywheel; Y rearms it.
+    private boolean flywheelReadyRumbled = false;
     //Read the actual velocity
     double currentVelocity = 0;
     //Check whether launch is ready
@@ -141,9 +143,11 @@ public class TeleOperated extends LinearOpMode {
     public void launch() {
         double targetVelocity = LauncherSubsystem.TELEOP_TARGET_VELOCITY;
         if (gamepad2.x) {
+            if (!flywheelEnabled) flywheelReadyRumbled = false;
             flywheelEnabled = true;
         } else if (gamepad2.y) {
             flywheelEnabled = false;
+            flywheelReadyRumbled = false;
         }
         // Reissue the commanded speed while enabled so Dashboard changes
         // take effect immediately; Y still stops the motor as before.
@@ -157,6 +161,12 @@ public class TeleOperated extends LinearOpMode {
         currentVelocity = actuator.getLaunchVelocity();
         //Check whether launcher is ready
         launcherReady = actuator.isLaunchReady(targetVelocity);
+
+        // A short one-time signal when the flywheel first reaches target speed.
+        if (flywheelEnabled && launcherReady && !flywheelReadyRumbled) {
+            gamepad2.rumble(300);
+            flywheelReadyRumbled = true;
+        }
 
         //Display launcher telemetry
         telemetry.addData("Target Velocity", targetVelocity);
