@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
@@ -21,6 +22,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * inputs to commands and displays information on the Driver Station.
  * The while loop must run repeatedly so driving, timers and sensors update.
  */
+@Config
 @TeleOp (name = "TeleOp", group = "TeleOp")
 public class TeleOperated extends LinearOpMode {
 
@@ -41,6 +43,14 @@ public class TeleOperated extends LinearOpMode {
     boolean launcherReady = false;
 
     LauncherSubsystem launcher;
+
+    // Briefly pull the leading ball away from the flywheel after manual intake.
+    // Tune these in FTC Dashboard; 0 seconds disables the automatic pulse.
+    public static double STEPUP_RELEASE_REVERSE_SECONDS = 0.12;
+    public static double STEPUP_RELEASE_REVERSE_POWER = 0.4;
+    private final ElapsedTime stepUpReverseTimer = new ElapsedTime();
+    private boolean wasIntaking = false;
+    private boolean stepUpReverseActive = false;
 
     // ElapsedTime measures real elapsed time without pausing the robot loop.
     // It is used to blink the indicator LED without sleep().
@@ -124,24 +134,47 @@ public class TeleOperated extends LinearOpMode {
             intakeSubsystem.rampUp();
         }
     }
-    /** Manual intake is disabled while the automatic launcher controls feeding. */
+    /** Manual intake and a short nonblocking step-up reverse on A release. */
     public void intake() {
-        // Automatic launcher owns the feed motors while active.
-        if (launcher.isBusy()) return;
+        boolean intakeHeld = gamepad1.a || gamepad2.a;
+        boolean reverseHeld = gamepad1.b || gamepad2.b;
 
-        if (gamepad1.a || gamepad2.a) {
+        // A release is when neither driver is holding A anymore.
+        if (wasIntaking && !intakeHeld && !reverseHeld && !launcher.isBusy()) {
+            stepUpReverseTimer.reset();
+            stepUpReverseActive = true;
+        }
+        wasIntaking = intakeHeld;
+
+        // The automatic four-ball launcher always owns feeding while active.
+        if (launcher.isBusy()) {
+            stepUpReverseActive = false;
+            return;
+        }
+
+        if (intakeHeld) {
+            stepUpReverseActive = false;
             intakeSubsystem.intake(1);
-            // Step-ups are only needed for reverse clearing in manual mode.
             actuator.stepUpOff();
-        } else if (gamepad1.b || gamepad2.b) {
+        } else if (reverseHeld) {
+            // Manual B reverse takes priority over the automatic pulse.
+            stepUpReverseActive = false;
             intakeSubsystem.intake(-0.8);
-            // Reverse both continuous-rotation step-up servos with the intake.
             actuator.stepUpLeft.setPower(-1);
             actuator.stepUpRight.setPower(-1);
         } else {
             intakeSubsystem.stopIntake();
-            actuator.stepUpOff();
+            if (stepUpReverseActive
+                    && stepUpReverseTimer.seconds() < Math.max(0, STEPUP_RELEASE_REVERSE_SECONDS)) {
+                double power = Math.max(0, Math.min(1, STEPUP_RELEASE_REVERSE_POWER));
+                actuator.stepUpLeft.setPower(-power);
+                actuator.stepUpRight.setPower(-power);
+            } else {
+                stepUpReverseActive = false;
+                actuator.stepUpOff();
+            }
         }
+        telemetry.addData("Step-up Release Reverse", stepUpReverseActive);
     }
     /**
      * Gamepad 2 X starts the flywheel; Y stops it.
