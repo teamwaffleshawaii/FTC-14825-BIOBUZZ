@@ -14,6 +14,7 @@ public class IntakeSubsystem {
     // Dashboard-adjustable pulse after the last A button is released.
     public static double STEPUP_RELEASE_REVERSE_SECONDS = 0.12;
     public static double STEPUP_RELEASE_REVERSE_POWER = 0.4;
+    public static double TRANSFER_RELEASE_REVERSE_POWER = 0.2;
     private final ElapsedTime stepUpReverseTimer = new ElapsedTime();
     private boolean wasIntaking = false;
     private boolean stepUpReverseActive = false;
@@ -62,7 +63,7 @@ public class IntakeSubsystem {
         }
     }
 
-    /** Start a timed reverse of only the step-up servos. */
+    /** Start a timed reverse of the step-ups and transfer motor. */
     public void startStepUpReversePulse() {
         stepUpReverseTimer.reset();
         stepUpReverseActive = true;
@@ -80,6 +81,9 @@ public class IntakeSubsystem {
             double power = Math.max(0, Math.min(1, STEPUP_RELEASE_REVERSE_POWER));
             actuator.stepUpLeft.setPower(-power);
             actuator.stepUpRight.setPower(-power);
+            // Intake stays stopped; transfer gently backs the leading ball down.
+            double transferPower = Math.max(0, Math.min(1, TRANSFER_RELEASE_REVERSE_POWER));
+            actuator.transferMotor.setPower(-transferPower);
         } else {
             stepUpReverseActive = false;
             actuator.stepUpOff();
