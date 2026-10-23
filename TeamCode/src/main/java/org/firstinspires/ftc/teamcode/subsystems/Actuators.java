@@ -21,7 +21,7 @@ public class Actuators {
     public DcMotor leftBack;
     public DcMotor rightBack;
     public DcMotor intakeMotor;
-    public DcMotor transferMotor;
+    public DcMotorEx transferMotor;
     // DcMotorEx adds encoder velocity methods used by flywheel PIDF.
     public DcMotorEx launchMotor;
 
@@ -42,7 +42,7 @@ public class Actuators {
         leftBack = hwMap.get(DcMotor.class, "leftBack");
         rightBack = hwMap.get(DcMotor.class, "rightBack");
         intakeMotor = hwMap.get(DcMotor.class, "intakeMotor");
-        transferMotor = hwMap.get(DcMotor.class, "transferMotor");
+        transferMotor = hwMap.get(DcMotorEx.class, "transferMotor");
         launchMotor = hwMap.get(DcMotorEx.class, "launchMotor");
 
         // Keep the encoder mode here; LauncherSubsystem owns PIDF tuning.
