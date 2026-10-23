@@ -145,21 +145,24 @@ public class BlueLeft extends LinearOpMode {
                 // Stop transfer and step-ups after the pulse.
                 intakeSubsystem.stopFeeding();
 
-                // Return to the second launch position with feeding motors stopped.
-                Actions.runBlocking(new SequentialAction(
-                        moveBack,
-                        movetolaunchPositionAgain ));
+                // Return from collection with all feeding motors stopped.
+                // As in Blue Right, spin up the flywheel during the final approach,
+                // not immediately before the second feeding sequence.
+                Actions.runBlocking(moveBack);
+                if (opModeIsActive() && !isStopRequested()) {
+                    launcher.setFlywheelVelocity(launcher.targetVelocity);
+                    Actions.runBlocking(movetolaunchPositionAgain);
+                }
 
-                // Existing one-second pause, now after the return drive.
-                Actions.runBlocking(new SequentialAction(new SleepAction(1)));
+                // Give the flywheel an additional second to recover before feeding.
+                // Retract is already complete; this delay does not move the balls.
+                if (opModeIsActive() && !isStopRequested()) {
+                    Actions.runBlocking(new SleepAction(1));
+                }
 
-                // Second flywheel starts only here, immediately before feeding.
-                // Unlike the first volley, there is no drive or warm-up delay.
-                // Check measured flywheel speed if the second volley is inconsistent.
-                launcher.setFlywheelVelocity(launcher.targetVelocity);
-
-                // LauncherAction uses the autonomous-only 0.04 s empty delay.
-                // Launch regardless of flywheel readiness, as with the first volley.
+                // LauncherAction feeds the second four balls only after the return
+                // drive and spin-up delay. Uses the autonomous-only 0.04 s empty delay.
+                // Like Blue Right, this does not gate on measured flywheel readiness.
                 if (opModeIsActive() && !isStopRequested()) {
                     Actions.runBlocking(new LauncherAction(launcher));
                 }
