@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
@@ -22,6 +23,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
  * inputs to commands and displays information on the Driver Station.
  * The while loop must run repeatedly so driving, timers and sensors update.
  */
+@Config
 @TeleOp (name = "TeleOp", group = "TeleOp")
 public class TeleOperated extends LinearOpMode {
 
@@ -45,6 +47,18 @@ public class TeleOperated extends LinearOpMode {
     private boolean wasFeeding = false;
     //Check whether launch is ready
     boolean launcherReady = false;
+
+    // Count each ball once as it passes the intake-to-transfer color sensor.
+    public static double BALL_ALPHA_ON = 0.40;
+    public static double BALL_ALPHA_OFF = 0.15;
+    public static double BALL_DEBOUNCE_SECONDS = 0.06;
+    private int ballsCounted = 0;
+    private boolean ballAtSensor = false;
+    private boolean resetCountWasPressed = false;
+    private final ElapsedTime ballTransitionTimer = new ElapsedTime();
+    private final ElapsedTime fullAlertTimer = new ElapsedTime();
+    private boolean fullAlertActive = false;
+    private double lastBallAlpha = Double.NaN;
 
     LauncherSubsystem launcher;
 
@@ -83,6 +97,8 @@ public class TeleOperated extends LinearOpMode {
                 intake();
                 flowerRamp();
                 launch();
+                updateBallCounter();
+                updateFullAlertLed();
 
                 // Gamepad 2 right bumper begins the automatic four-ball feed.
                 // launcher.start() ignores new starts while already busy.
@@ -194,6 +210,53 @@ public class TeleOperated extends LinearOpMode {
             actuator.ledIndicator.setPosition(0.28); // Solid red
         }
     }
+    /** Count rising ball detections, not every loop while a ball is present. */
+    private void updateBallCounter() {
+        // Gamepad 2 D-pad DOWN manually clears the count after unloading.
+        boolean resetPressed = gamepad2.dpad_down;
+        if (resetPressed && !resetCountWasPressed) {
+            ballsCounted = 0;
+            ballAtSensor = false;
+            fullAlertActive = false;
+            ballTransitionTimer.reset();
+        }
+        resetCountWasPressed = resetPressed;
+
+        lastBallAlpha = sensor.getIntakeColorAlpha();
+        if (Double.isFinite(lastBallAlpha) &&
+                ballTransitionTimer.seconds() >= BALL_DEBOUNCE_SECONDS) {
+            if (!ballAtSensor && lastBallAlpha >= BALL_ALPHA_ON) {
+                ballAtSensor = true;
+                ballsCounted++;
+                ballTransitionTimer.reset();
+                if (ballsCounted == 4) {
+                    fullAlertActive = true;
+                    fullAlertTimer.reset();
+                }
+            } else if (ballAtSensor && lastBallAlpha <= BALL_ALPHA_OFF) {
+                ballAtSensor = false;
+                ballTransitionTimer.reset();
+            }
+        }
+        telemetry.addData("Balls Counted", ballsCounted);
+        telemetry.addData("Intake Color Alpha", lastBallAlpha);
+        telemetry.addData("Ball At Color Sensor", ballAtSensor);
+        telemetry.addData("Ball Counter Reset", "Gamepad 2 D-pad DOWN");
+    }
+
+    /** Temporarily override the usual red/green LED with three yellow flashes. */
+    private void updateFullAlertLed() {
+        if (!fullAlertActive) return;
+        double elapsed = fullAlertTimer.seconds();
+        if (elapsed >= 1.8) {
+            fullAlertActive = false;
+            return;
+        }
+        // Three flashes: 300 ms yellow, 300 ms off each.
+        actuator.ledIndicator.setPosition(((int) (elapsed / 0.3)) % 2 == 0
+                ? 0.388 : 0.0);
+    }
+
     /** Track the minimum flywheel velocity during each feed sequence. */
     private void recordFeedVelocity() {
         boolean feeding = launcher.isBusy();
