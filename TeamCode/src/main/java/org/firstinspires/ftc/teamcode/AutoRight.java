@@ -78,16 +78,20 @@ public class AutoRight extends LinearOpMode {
 
         // Reposition to the left side for the second launch.
         Action movetolaunchPositionLeft = drive.actionBuilder(new Pose2d(25, -44, Math.toRadians(270) ))
-                .strafeToLinearHeading(new Vector2d(-25,-58), Math.toRadians(90))
+                .strafeToLinearHeading(new Vector2d(-30,-58), Math.toRadians(90))
                 .build();
 
         // Final approach to the second shooting pose.
-        Action launchPositionLeft = drive.actionBuilder(new Pose2d(-25, -58, Math.toRadians(85) ))
+        Action launchPositionLeft = drive.actionBuilder(new Pose2d(-30, -58, Math.toRadians(85) ))
                 .strafeToLinearHeading(new Vector2d(-54,-1.5), Math.toRadians(-5))
                 .build();
 
         // Parking is a separate trajectory executed after the second volley.
-        Action park = drive.actionBuilder(new Pose2d(-54, -1.5, Math.toRadians(-5) ))
+        Action park1 = drive.actionBuilder(new Pose2d(-54, -1.5, Math.toRadians(-5) ))
+                .strafeToLinearHeading(new Vector2d(-30,-46), Math.toRadians(90))
+                .build();
+
+        Action park2 = drive.actionBuilder(new Pose2d(-30, -46, Math.toRadians(90) ))
                 .strafeToLinearHeading(new Vector2d(-30,-56), Math.toRadians(90))
                 .build();
 
@@ -104,7 +108,10 @@ public class AutoRight extends LinearOpMode {
             launcher.setFlywheelVelocity(launcher.targetVelocity);
             // runBlocking executes a Road Runner action until it finishes.
             // Do not use a long Thread.sleep() during trajectory following.
-            Actions.runBlocking(launchPositionRight);
+            Actions.runBlocking(new SequentialAction(
+                    launchPositionRight,
+                    new SleepAction(1)
+            ));
 
             // Launch regardless of flywheel readiness so the preload balls
             // are cleared before collecting the next four.
@@ -160,7 +167,9 @@ public class AutoRight extends LinearOpMode {
 
                 // Park after the second launch.
                 if (opModeIsActive() && !isStopRequested()) {
-                    Actions.runBlocking(park);
+                    Actions.runBlocking(new SequentialAction(
+                            park1,
+                            park2 ));
                 }
             }
         }
