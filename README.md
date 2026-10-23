@@ -33,6 +33,8 @@ Motor 3: Empty - to be added later
 
 Servo 0: revLED (REV BlinkIn LED Driver) - to be added later
 
+I2C Port 1: colorSensor (REV Color Sensor v3)
+
 **Servo Hub (CAN ID: 3):**
 
 Servo 0: stepUpLeft (Axon Max Servo, Continuous Mode)
