@@ -157,13 +157,14 @@ public class BlueLeft extends LinearOpMode {
                     Actions.runBlocking(new SleepAction(1));
                 }
 
-                // Blue Left second volley only: confirm the sensor is continuously
-                // empty for 150 ms instead of 40 ms before raising the kicker.
-                // This helps reject brief gaps between balls; tune on the robot.
-                launcher.emptyDelayAutoOnly = 0.15;
+                // Blue Right's tested 40 ms empty delay remains unchanged.
+                // Unlike Blue Right, this second volley must first detect a ball
+                // before an empty sensor reading is allowed to raise the kicker.
+                // This prevents an initially empty sensor from ending the volley.
+                launcher.requireBallBeforeKicker = true;
 
                 // LauncherAction feeds the second four balls only after the return
-                // drive and spin-up delay. Uses the Blue Left second-volley 0.15 s delay.
+                // drive and spin-up delay. Uses the same 0.04 s delay as Blue Right.
                 // Like Blue Right, this does not gate on measured flywheel readiness.
                 if (opModeIsActive() && !isStopRequested()) {
                     Actions.runBlocking(new LauncherAction(launcher));
