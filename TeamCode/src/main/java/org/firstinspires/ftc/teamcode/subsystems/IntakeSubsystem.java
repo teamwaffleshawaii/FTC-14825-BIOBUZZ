@@ -15,6 +15,10 @@ public class IntakeSubsystem {
     public static double STEPUP_RELEASE_REVERSE_SECONDS = 0.20;
     public static double STEPUP_RELEASE_REVERSE_POWER = 0.4;
     public static double TRANSFER_RELEASE_REVERSE_POWER = 0.4;
+    // Velocity mode applies ONLY while feeding the launcher. Default remains power.
+    public static boolean TRANSFER_VELOCITY_ENABLED = false;
+    public static double TRANSFER_TARGET_VELOCITY = 1000.0;
+    private boolean transferVelocityModeActive = false;
     private final ElapsedTime stepUpReverseTimer = new ElapsedTime();
     private boolean wasIntaking = false;
     private boolean stepUpReverseActive = false;
@@ -24,9 +28,22 @@ public class IntakeSubsystem {
         this.actuator = actuator;
     }
 
+    /** Restore power mode before manual/reverse commands. */
+    private void restoreTransferPowerMode() {
+        if (transferVelocityModeActive) {
+            actuator.transferMotor.setMode(com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            transferVelocityModeActive = false;
+        }
+    }
+
+    public double getTransferVelocity() {
+        return actuator.transferMotor.getVelocity();
+    }
+
     /** Run intake and transfer together; negative power reverses both. */
     public void intake(double power) {
         actuator.intakeMotor.setPower(power);
+        restoreTransferPowerMode();
         actuator.transferMotor.setPower(power);
     }
 
@@ -83,6 +100,7 @@ public class IntakeSubsystem {
             actuator.stepUpRight.setPower(-power);
             // Intake stays stopped; transfer gently backs the leading ball down.
             double transferPower = Math.max(0, Math.min(1, TRANSFER_RELEASE_REVERSE_POWER));
+            restoreTransferPowerMode();
             actuator.transferMotor.setPower(-transferPower);
         } else {
             stepUpReverseActive = false;
@@ -100,7 +118,16 @@ public class IntakeSubsystem {
         actuator.stepUpLeft.setPower(1);
         actuator.stepUpRight.setPower(1);
         actuator.intakeMotor.setPower(0.5);
-        actuator.transferMotor.setPower(1);
+        if (TRANSFER_VELOCITY_ENABLED) {
+            if (!transferVelocityModeActive) {
+                actuator.transferMotor.setMode(com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER);
+                transferVelocityModeActive = true;
+            }
+            actuator.transferMotor.setVelocity(TRANSFER_TARGET_VELOCITY);
+        } else {
+            restoreTransferPowerMode();
+            actuator.transferMotor.setPower(1);
+        }
     }
 
     /** Stop all feeding motors, including the step-up continuous servos. */
