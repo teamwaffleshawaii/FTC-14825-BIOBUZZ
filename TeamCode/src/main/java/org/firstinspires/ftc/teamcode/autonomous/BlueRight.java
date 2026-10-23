@@ -107,7 +107,7 @@ public class BlueRight extends LinearOpMode {
         if (opModeIsActive() && !isStopRequested()) {
             // Spin up while driving to the first launch position.
             // The first volley starts after arriving, regardless of actual speed.
-            launcher.setFlywheelVelocity(launcher.targetVelocity);
+            launcher.setFlywheelVelocity(LauncherSubsystem.TARGET_VELOCITY);
             // runBlocking executes a Road Runner action until it finishes.
             // Do not use a long Thread.sleep() during trajectory following.
             Actions.runBlocking(new SequentialAction(
@@ -159,7 +159,7 @@ public class BlueRight extends LinearOpMode {
                 intakeSubsystem.stopFeeding();
 
                 // Spin up for the second volley on the way to the launch location.
-                launcher.setFlywheelVelocity(launcher.targetVelocity);
+                launcher.setFlywheelVelocity(LauncherSubsystem.TARGET_VELOCITY);
                 Actions.runBlocking(launchPositionLeft);
 
                 // Launch regardless of flywheel readiness, as with the first volley.
