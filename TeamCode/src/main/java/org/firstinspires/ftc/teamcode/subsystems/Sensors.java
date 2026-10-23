@@ -7,6 +7,7 @@ import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -77,6 +78,15 @@ public class Sensors {
     public int getAmountRed() {return colorSensor.red();}
     public int getAmountGreen() {return colorSensor.green();}
     public int getAmountBlue() {return colorSensor.blue();}
+
+    /** Normalized alpha is near 0.89 for a yellow ball and 0.039 for empty. */
+    public double getIntakeColorAlpha() {
+        if (colorSensor instanceof NormalizedColorSensor) {
+            return ((NormalizedColorSensor) colorSensor).getNormalizedColors().alpha;
+        }
+        // If a non-normalized color sensor is installed, disable counting safely.
+        return Double.NaN;
+    }
 
     //TODO: Sample class for measuring distance from the distance sensor
     public double getDistance(DistanceUnit du) {
