@@ -15,7 +15,7 @@ import com.qualcomm.robotcore.hardware.Servo;
  */
 public class Actuators {
 
-    // TODO: If using motors, add/edit them here (up to 8)
+    // Motors configured on this robot.
     public DcMotor leftFront;
     public DcMotor rightFront;
     public DcMotor leftBack;
@@ -25,7 +25,7 @@ public class Actuators {
     // DcMotorEx adds encoder velocity methods used by flywheel PIDF.
     public DcMotorEx launchMotor;
 
-    // TODO: If using servos or continuous servos, add them here (up to 10)
+    // Servos and continuous-rotation servos configured on this robot.
     public Servo kickerServo;
     public CRServo stepUpRight;
     public CRServo stepUpLeft;
@@ -49,7 +49,7 @@ public class Actuators {
         // Encoder feedback enables velocity control; LauncherSubsystem sets PIDF.
         launchMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        //TODO: Set motor mode when power is zero
+        // Zero-power behavior for each motor.
         // BRAKE resists motion at zero power; FLOAT allows coasting.
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); //or FLOAT
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); //or FLOAT
@@ -59,7 +59,7 @@ public class Actuators {
         transferMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); //or FLOAT
         launchMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT); //or BRAKE
 
-        //TODO: If need to change motor direction
+        // Calibrated motor directions.
         // Opposite sides of a drivetrain may need reversed directions
         // so a positive command moves the robot the intended way.
         leftFront.setDirection(DcMotorSimple.Direction.REVERSE); //or FORWARD
@@ -70,7 +70,7 @@ public class Actuators {
         transferMotor.setDirection(DcMotorSimple.Direction.REVERSE); //or FORWARD
         launchMotor.setDirection(DcMotorSimple.Direction.REVERSE); //or FORWARD
 
-        //TODO: Put servo hardware here, don't forget to rename deviceNames to match yours
+        // Servo hardware names must match the robot configuration.
         // Standard Servo uses a position (0.0-1.0); CRServo uses motor-like power.
         kickerServo = hwMap.get(Servo.class, "kickerServo");
         stepUpLeft = hwMap.get(CRServo.class, "stepUpLeft");
@@ -81,16 +81,14 @@ public class Actuators {
         // Center the turret at initialization for TeleOp and all Robot-based autos.
         turretServo.setPosition(0.46);
         ledIndicator = hwMap.get(Servo.class, "indicatorLED");
-        //TODO: If need to change servo direction
+        // Calibrated servo directions.
         stepUpLeft.setDirection(CRServo.Direction.REVERSE);
         stepUpRight.setDirection(CRServo.Direction.FORWARD);
         intakeServoRight.setDirection(Servo.Direction.FORWARD);
         intakeServoLeft.setDirection(Servo.Direction.REVERSE);
-        //TODO: If you need to set the logical min and max of a servo.
-        //turretServo.scaleRange(0, 1);  //Change the 0 and 1 if needed
     }
 
-    //TODO: Sample classes for turning on motors using power only (Useful for TeleOp)
+    // Power-based wheel controls.
     // These four methods drive wheels with power rather than encoder velocity.
     // RUN_WITHOUT_ENCODER does not use built-in velocity PIDF.
     public void leftFront(double power) {
@@ -130,14 +128,14 @@ public class Actuators {
         return launchMotor.getVelocity();
     }
 
-    /** Only declare ready when the target is positive and error <= 50 ticks/s. */
+    /** Ready means positive target and measured speed within 30 encoder ticks/s. */
     public boolean isLaunchReady(double targetVelocity) {
         double tolerance = 30.0; //ticks per second
         return targetVelocity > 0 &&
                 Math.abs(getLaunchVelocity() - targetVelocity) <= tolerance;
     }
 
-    //TODO: Sample classes for powering a servo
+    // Continuous-rotation step-up controls.
     public void stepUpOn() {
         stepUpLeft.setPower(1);
         stepUpRight.setPower(1);
