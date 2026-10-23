@@ -79,7 +79,7 @@ public class Actuators {
         intakeServoLeft = hwMap.get(Servo.class, "intakeServoLeft");
         turretServo = hwMap.get(Servo.class, "turretServo");
         // Center the turret at initialization for TeleOp and all Robot-based autos.
-        turretServo.setPosition(0.5);
+        turretServo.setPosition(0.46);
         ledIndicator = hwMap.get(Servo.class, "indicatorLED");
         //TODO: If need to change servo direction
         stepUpLeft.setDirection(CRServo.Direction.REVERSE);
