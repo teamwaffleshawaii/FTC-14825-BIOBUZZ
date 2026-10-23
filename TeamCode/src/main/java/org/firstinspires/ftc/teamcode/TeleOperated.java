@@ -40,6 +40,9 @@ public class TeleOperated extends LinearOpMode {
     private boolean flywheelReadyRumbled = false;
     //Read the actual velocity
     double currentVelocity = 0;
+    // Lowest measured velocity while a four-ball feed is active.
+    private double feedMinimumVelocity = Double.NaN;
+    private boolean wasFeeding = false;
     //Check whether launch is ready
     boolean launcherReady = false;
 
@@ -88,6 +91,8 @@ public class TeleOperated extends LinearOpMode {
                 }
                 launcher.update();
 
+                // Capture velocity after launcher update for live graphing.
+                recordFeedVelocity();
                 launcherTelemetry();
                 limelightTelemetry();
                 telemetry.update();
@@ -172,6 +177,8 @@ public class TeleOperated extends LinearOpMode {
         //Display launcher telemetry
         telemetry.addData("Target Velocity", targetVelocity);
         telemetry.addData("Actual Velocity", currentVelocity);
+        telemetry.addData("Velocity Error", flywheelEnabled ? targetVelocity - currentVelocity : 0);
+        telemetry.addData("Commanded Velocity", flywheelEnabled ? targetVelocity : 0);
         telemetry.addData("Launcher Ready", launcherReady);
 
         // Ready means measured speed is within the tolerance in Actuators.
@@ -187,6 +194,18 @@ public class TeleOperated extends LinearOpMode {
             actuator.ledIndicator.setPosition(0.28); // Solid red
         }
     }
+    /** Track the minimum flywheel velocity during each feed sequence. */
+    private void recordFeedVelocity() {
+        boolean feeding = launcher.isBusy();
+        double measured = actuator.getLaunchVelocity();
+        if (feeding && !wasFeeding) {
+            feedMinimumVelocity = measured;
+        } else if (feeding) {
+            feedMinimumVelocity = Math.min(feedMinimumVelocity, measured);
+        }
+        wasFeeding = feeding;
+    }
+
     /** Display the current state of the non-blocking four-ball sequence. */
     public void launcherTelemetry() {
         // Read the sensor every TeleOp loop, even when the launcher is idle.
@@ -195,6 +214,9 @@ public class TeleOperated extends LinearOpMode {
         telemetry.addData("Detecting Empty", launcher.isDetectingEmpty());
         telemetry.addData("Empty Timer", launcher.getEmptyDuration());
         telemetry.addData("Launch State", launcher.getState());
+        telemetry.addData("Feed Minimum Velocity", feedMinimumVelocity);
+        telemetry.addData("Feed Velocity Drop", Double.isNaN(feedMinimumVelocity) ? 0 :
+                Math.max(0, LauncherSubsystem.TELEOP_TARGET_VELOCITY - feedMinimumVelocity));
     }
 
     /** Show fresh AprilTag IDs and angles; telemetry does NOT aim the robot. */
