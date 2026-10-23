@@ -36,7 +36,7 @@ public class Actuators {
 
     /** Called once from Robot before any mechanism is used. */
     public void init(HardwareMap hwMap) {
-        // TODO: Put motor hardware here, don't forget to rename deviceNames to match yours
+        // HardwareMap strings must exactly match the Driver Station configuration.
         leftFront = hwMap.get(DcMotor.class, "leftFront");
         rightFront = hwMap.get(DcMotor.class, "rightFront");
         leftBack = hwMap.get(DcMotor.class, "leftBack");
@@ -130,7 +130,7 @@ public class Actuators {
 
     /** Ready means positive target and measured speed within 30 encoder ticks/s. */
     public boolean isLaunchReady(double targetVelocity) {
-        double tolerance = 30.0; //ticks per second
+        final double tolerance = 30.0; // Encoder ticks per second, not RPM
         return targetVelocity > 0 &&
                 Math.abs(getLaunchVelocity() - targetVelocity) <= tolerance;
     }
