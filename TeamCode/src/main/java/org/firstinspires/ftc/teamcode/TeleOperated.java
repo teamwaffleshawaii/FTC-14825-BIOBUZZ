@@ -34,7 +34,7 @@ public class TeleOperated extends LinearOpMode {
     IntakeSubsystem intakeSubsystem;
     DrivetrainSubsystem drivetrain;
 
-    // TeleOp uses LauncherSubsystem.TELEOP_TARGET_VELOCITY so students can
+    // Both TeleOp and Auto use LauncherSubsystem.TARGET_VELOCITY so students can
     // adjust shooting speed live in FTC Dashboard without redeploying.
     // Remember whether X started the flywheel so changes apply while spinning.
     boolean flywheelEnabled = false;
@@ -160,7 +160,7 @@ public class TeleOperated extends LinearOpMode {
      * AprilTag velocity adjustment is not active yet.
      */
     public void launch() {
-        double targetVelocity = LauncherSubsystem.TELEOP_TARGET_VELOCITY;
+        double targetVelocity = LauncherSubsystem.TARGET_VELOCITY;
         if (gamepad2.x) {
             if (!flywheelEnabled) flywheelReadyRumbled = false;
             flywheelEnabled = true;
