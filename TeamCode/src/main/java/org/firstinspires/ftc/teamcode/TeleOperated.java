@@ -214,6 +214,9 @@ public class TeleOperated extends LinearOpMode {
         telemetry.addData("Detecting Empty", launcher.isDetectingEmpty());
         telemetry.addData("Empty Timer", launcher.getEmptyDuration());
         telemetry.addData("Launch State", launcher.getState());
+        telemetry.addData("Transfer Actual Velocity", intakeSubsystem.getTransferVelocity());
+        telemetry.addData("Transfer Velocity Mode", IntakeSubsystem.TRANSFER_VELOCITY_ENABLED);
+        telemetry.addData("Transfer Target Velocity", IntakeSubsystem.TRANSFER_TARGET_VELOCITY);
         telemetry.addData("Feed Minimum Velocity", feedMinimumVelocity);
         telemetry.addData("Feed Velocity Drop", Double.isNaN(feedMinimumVelocity) ? 0 :
                 Math.max(0, LauncherSubsystem.TELEOP_TARGET_VELOCITY - feedMinimumVelocity));
