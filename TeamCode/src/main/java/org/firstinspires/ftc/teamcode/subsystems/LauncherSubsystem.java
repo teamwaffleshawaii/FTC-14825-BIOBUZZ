@@ -28,9 +28,9 @@ public class LauncherSubsystem {
     public static double LAUNCH_D = 0.03;
     public static double LAUNCH_F = 20;
 
-    // TeleOp shooting speed, in encoder ticks/second. Change live in Dashboard.
-    // Autonomous keeps its existing independent targetVelocity setting.
-    public static double TELEOP_TARGET_VELOCITY = 1020.0;
+    // Shared TeleOp and Autonomous flywheel target, in encoder ticks/second.
+    // Dashboard edits apply to both; save tested values here for future runs.
+    public static double TARGET_VELOCITY = 1030.0;
 
     // Remember the values last sent to the motor controller.
     // NaN (not-a-number) guarantees the first applyPIDF() writes all values.
@@ -54,11 +54,6 @@ public class LauncherSubsystem {
     public double emptyDelayAutoOnly = 0.05; // Autonomous: 50 ms
     public double kickerUpDelay = 0.7;
     public double kickerResetDelay = 0.3;
-    // Flywheel target uses encoder ticks per second, NOT RPM.
-    // Used by callers that rely on this instance's target (including isFlywheelReady).
-    // TeleOp commands TELEOP_TARGET_VELOCITY separately; keep them in sync if used together.
-    public double targetVelocity = 1030;
-
     private State state = State.IDLE;
     private boolean detectingEmpty = false;
     // Optional protection for a volley that starts with an empty sensor view.
@@ -195,6 +190,6 @@ public class LauncherSubsystem {
     }
     /** True when actual flywheel speed is within the hardware readiness band. */
     public boolean isFlywheelReady() {
-        return actuator.isLaunchReady(targetVelocity);
+        return actuator.isLaunchReady(TARGET_VELOCITY);
     }
 }
