@@ -46,15 +46,18 @@ public class AprilTagVelocityController {
 
     /** Returns the smoothed target or baseline when no recent calibrated tag exists. */
     public double update(LLResult frame, double baseline, boolean freeze) {
+        // Freeze the target during a volley so the flywheel does not chase
+        // changing camera measurements while balls are entering it.
         if (freeze) return Double.isFinite(filteredVelocity) ? filteredVelocity : baseline;
-        double[] estimates = new double[4];
+        // Two scoring areas per alliance may both appear in one frame (up to 8 tags).
+        double[] estimates = new double[8];
         int count = 0;
         if (frame != null) {
             for (LLResultTypes.FiducialResult tag : frame.getFiducialResults()) {
                 int id = tag.getFiducialId();
                 double ty = tag.getTargetYDegrees();
                 if (acceptsTag(id) && Double.isFinite(ty) && count < estimates.length) {
-                    // Every block of four IDs shares the same positional calibration.
+                    // Each group of four IDs shares the same left-to-right calibration.
                     int tagPosition = (id - 30) % 4;
                     estimates[count++] = interpolate(TAG_POSITION_TY[tagPosition], ty);
                 }
