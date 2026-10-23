@@ -32,7 +32,7 @@ public class AutoMap extends LinearOpMode {
         // Otherwise every reported coordinate will be offset.
         MecanumDrive drive = new MecanumDrive(hardwareMap,
                 //TODO: Change robot starting position here as necessary, currently origin
-                new Pose2d(-60, 11.5, Math.toRadians(0) ) );
+                new Pose2d(60, 11.5, Math.toRadians(180) ) );
 
         waitForStart();
 
