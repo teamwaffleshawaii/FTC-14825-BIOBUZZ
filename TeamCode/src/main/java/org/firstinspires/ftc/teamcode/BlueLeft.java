@@ -1,5 +1,5 @@
-//Auto Template that you can use to program your auto
-// NOTE: THIS CODE RUNS ON ODOMETRY, you must have your odometry tuned
+// Blue Left autonomous using Road Runner odometry.
+// Verify starting pose, headings, and ball-feed timing on the real field.
 
 package org.firstinspires.ftc.teamcode;
 
@@ -29,7 +29,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Sensors;
 @Autonomous (name = "Blue Left", group = "Auto")
 public class BlueLeft extends LinearOpMode {
 
-    //Include all of your actuators
+    // References to shared Robot subsystems (not duplicate hardware).
     Robot robot;
     Actuators actuator;
     Sensors sensor;
@@ -38,21 +38,20 @@ public class BlueLeft extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        //Include all of your motors hardware
+        // Robot initializes all shared hardware and subsystems.
         robot = new Robot(hardwareMap);
         actuator = robot.actuator;
         sensor = robot.sensor;
         intakeSubsystem = robot.intake;
         launcher = robot.launcher;
 
-        //TODO: Set up Robot starting position here!!!
+        // Starting pose must match the robot's real position and heading.
         // Starting pose is our best estimate of the robot's field position.
         // Road Runner uses it as the reference for subsequent trajectories.
         MecanumDrive drive = new MecanumDrive(hardwareMap,
                 new Pose2d(60, 11.5, Math.toRadians(180) ) );
 
-        //TODO: Put your Odometry trajectory paths here!!!
-        //Separate your paths by action (linearSlide movements, intake movements, servo movements, etc.)
+        // Each action begins at the previous action's expected ending pose.
         // Action builders describe a path; .build() creates an executable action.
         // Road Runner does not move the robot until Actions.runBlocking() runs.
         Action launchPositionRight = drive.actionBuilder(new Pose2d(60, 11.5, Math.toRadians(180) ))
@@ -74,7 +73,7 @@ public class BlueLeft extends LinearOpMode {
                 .strafeToLinearHeading(new Vector2d(40,33), Math.toRadians(0))
                 .build();
 
-        // Reposition to the left side for the second launch.
+        // Return to the second shooting position (same side of field).
         Action movetolaunchPositionAgain = drive.actionBuilder(new Pose2d(40, 33, Math.toRadians(0) ))
                 .strafeToLinearHeading(new Vector2d(47,12), Math.toRadians(175))
                 .build();
@@ -93,8 +92,8 @@ public class BlueLeft extends LinearOpMode {
         try {
         if (opModeIsActive() && !isStopRequested()) {
 
-            //wait 8 seconds first
-            //Actions.runBlocking(new SequentialAction(new SleepAction(8)));
+            // Optional start delay for strategy (currently disabled).
+            // Actions.runBlocking(new SleepAction(8));
 
             // Spin up while driving to the first launch position.
             // The first volley starts after arriving, regardless of actual speed.
@@ -131,7 +130,8 @@ public class BlueLeft extends LinearOpMode {
             }
 
             if (opModeIsActive() && !isStopRequested()) {
-                // Move to the left-side staging position with the intake stopped.
+                // CAUTION: intake is still running during both return paths.
+                // If balls creep toward the launcher, stop and retract earlier.
                 Actions.runBlocking(new SequentialAction(
                         moveBack,
                         movetolaunchPositionAgain ));
@@ -148,12 +148,16 @@ public class BlueLeft extends LinearOpMode {
                 // update() stops the step-ups; also stop the transfer motor.
                 intakeSubsystem.stopFeeding();
 
-                //Give the retract enough time to work
+                // This is a post-retract wait, not additional retract time:
+                // the reverse pulse has already ended and all feed motors are stopped.
                 Actions.runBlocking(new SequentialAction(new SleepAction(1)));
 
-                // Spin up for the second volley on the way to the launch location.
+                // Second flywheel starts only here, immediately before feeding.
+                // Unlike the first volley, there is no drive or warm-up delay.
+                // Check measured flywheel speed if the second volley is inconsistent.
                 launcher.setFlywheelVelocity(launcher.targetVelocity);
 
+                // LauncherAction uses the autonomous-only 0.04 s empty delay.
                 // Launch regardless of flywheel readiness, as with the first volley.
                 if (opModeIsActive() && !isStopRequested()) {
                     Actions.runBlocking(new LauncherAction(launcher));
