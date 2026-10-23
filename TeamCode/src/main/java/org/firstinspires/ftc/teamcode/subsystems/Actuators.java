@@ -132,7 +132,7 @@ public class Actuators {
 
     /** Only declare ready when the target is positive and error <= 50 ticks/s. */
     public boolean isLaunchReady(double targetVelocity) {
-        double tolerance = 50.0; //ticks per second
+        double tolerance = 30.0; //ticks per second
         return targetVelocity > 0 &&
                 Math.abs(getLaunchVelocity() - targetVelocity) <= tolerance;
     }
