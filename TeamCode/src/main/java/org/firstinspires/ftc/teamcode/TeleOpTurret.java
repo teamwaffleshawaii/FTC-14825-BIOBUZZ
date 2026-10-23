@@ -9,13 +9,13 @@ import java.util.Arrays;
 /**
  * Experimental copy of TeleOp RED with AprilTag-assisted turret aiming.
  * Driving, intake, launcher velocity and ball feeding remain unchanged.
- * Starts in TELEMETRY ONLY mode for safe testing.
+ * Starts with automatic aiming enabled; test with balls removed.
  */
 @Config
 @TeleOp(name = "TeleOpTurret", group = "TeleOp")
 public class TeleOpTurret extends TeleOperated {
-    // Leave false until direction, offsets, and mechanical clearance are tested.
-    public static boolean AUTO_AIM_ENABLED = false;
+    // Automatic aiming is enabled for this experimental OpMode.\n    // Set false in Dashboard to return to telemetry-only testing.
+    public static boolean AUTO_AIM_ENABLED = true;
 
     public static double SERVO_CENTER = 0.46;
     // Increasing servo position turns LEFT. Positive TX points RIGHT.
