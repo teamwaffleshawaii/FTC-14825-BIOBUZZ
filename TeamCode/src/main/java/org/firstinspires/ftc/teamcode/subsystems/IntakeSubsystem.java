@@ -3,10 +3,9 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-/** Shared controls for intake, transfer, step-ups and intake ramp. */
 /**
  * STUDENT GUIDE: Higher-level controls for intake and ball transfer.
- * Several motors must cooperate to move flowers toward the launcher.
+ * Several motors must cooperate to move game pieces toward the launcher.
  * Keeping these commands together avoids repeating them in every OpMode.
  */
 @Config
@@ -107,7 +106,7 @@ public class IntakeSubsystem {
         return stepUpReverseActive;
     }
 
-    /** During launching, run step-ups and feed motors at their tuned powers. */
+    /** During launching, use encoder velocity for transfer and power for other feeders. */
     public void feedLauncher() {
         cancelStepUpReversePulse();
         actuator.stepUpLeft.setPower(1);
