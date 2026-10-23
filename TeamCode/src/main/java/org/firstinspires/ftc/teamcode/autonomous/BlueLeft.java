@@ -136,7 +136,7 @@ public class BlueLeft extends LinearOpMode {
                 // machine is not started during either return trajectory.
                 Actions.runBlocking(moveBack);
                 if (opModeIsActive() && !isStopRequested()) {
-                    // Spin up the flywheel during the final approach, like Blue Right.
+                    // Spin up the flywheel during the final approach.
                     launcher.setFlywheelVelocity(launcher.targetVelocity);
                     Actions.runBlocking(movetolaunchPositionAgain);
                 }
@@ -145,6 +145,7 @@ public class BlueLeft extends LinearOpMode {
                 intakeSubsystem.stopIntake();
                 intakeSubsystem.rampUp();
                 if (opModeIsActive() && !isStopRequested()) {
+                    // Uses the shared retract default; adjust duration only after testing.
                     intakeSubsystem.startStepUpReversePulse();
                     Actions.runBlocking((packet) -> {
                         intakeSubsystem.update();
@@ -158,8 +159,8 @@ public class BlueLeft extends LinearOpMode {
                     Actions.runBlocking(new SleepAction(1));
                 }
 
-                // Blue Right's tested 40 ms empty delay remains unchanged.
-                // Unlike Blue Right, this second volley must first detect a ball
+                // Uses the shared autonomous 40 ms empty delay.
+                // This second volley must first detect a ball
                 // before an empty sensor reading is allowed to raise the kicker.
                 // This prevents an initially empty sensor from ending the volley.
                 launcher.requireBallBeforeKicker = true;
