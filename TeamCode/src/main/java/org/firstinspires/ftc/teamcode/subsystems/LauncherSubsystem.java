@@ -182,6 +182,8 @@ public class LauncherSubsystem {
         state = State.IDLE;
     }
 
+    /** Encoder-measured velocity in ticks/second for Dashboard telemetry. */
+    public double getActualFlywheelVelocity() { return actuator.getLaunchVelocity(); }
     public boolean isBusy() { return state != State.IDLE; }
     public boolean isComplete() { return completed; }
     public State getState() { return state; }
