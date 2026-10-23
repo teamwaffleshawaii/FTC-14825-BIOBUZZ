@@ -11,15 +11,16 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
  * update() checks timers each loop so the robot can keep doing other work.
  * The launcher uses encoder feedback and PIDF to maintain flywheel speed.
  *
- * Future plan: select a velocity using a measured AprilTag-to-goal distance.
- * That feature is NOT implemented or enabled yet.
+ * TeleOp can request a calibrated AprilTag-based target velocity; autonomous
+ * currently uses the shared fixed TARGET_VELOCITY. This class controls PIDF
+ * and ball feeding, not camera target selection.
  */
 @Config
 public class LauncherSubsystem {
     // PIDF is the motor controller's velocity feedback tuning:
     // P = respond to current speed error; I = accumulated error;
     // D = change in error; F = feedforward estimate of motor effort.
-    // These are saved Java defaults; FTC Dashboard may have newer tested values.
+    // Saved Java defaults; Dashboard edits are temporary and may differ from testing.
     // @Config exposes them in FTC Dashboard while the OpMode runs.
     // Dashboard edits are temporary until we save new defaults in Java.
     // Changes are applied to hardware only when a coefficient changes.
