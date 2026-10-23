@@ -38,9 +38,9 @@ public class LauncherAction implements Action {
         // Dashboard action telemetry: graph actual velocity against the
         // autonomous target while the four-ball feeding sequence runs.
         double actualVelocity = launcher.getActualFlywheelVelocity();
-        packet.put("Target Velocity", launcher.targetVelocity);
+        packet.put("Target Velocity", LauncherSubsystem.TARGET_VELOCITY);
         packet.put("Actual Velocity", actualVelocity);
-        packet.put("Velocity Error", launcher.targetVelocity - actualVelocity);
+        packet.put("Velocity Error", LauncherSubsystem.TARGET_VELOCITY - actualVelocity);
         // Fail-safe: cancel a jammed or stalled sequence after five seconds.
         if (launcher.isBusy() && timeout.seconds() >= 5.0) {
             launcher.cancel();
