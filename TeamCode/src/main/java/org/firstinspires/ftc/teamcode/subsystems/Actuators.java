@@ -147,7 +147,7 @@ public class Actuators {
 
     // Kicker positions are calibrated servo positions for this robot.
     public void kickerUp() {
-        kickerServo.setPosition(0.05);
+        kickerServo.setPosition(0.03);
     }
 
     public void kickerDown() {

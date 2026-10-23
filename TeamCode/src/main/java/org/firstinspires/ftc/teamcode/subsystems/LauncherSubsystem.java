@@ -55,7 +55,7 @@ public class LauncherSubsystem {
     private final ElapsedTime kickerTimer = new ElapsedTime();
 
     // Timing values are in SECONDS. Tune cautiously on the actual robot.
-    public double emptyDelay = 0.04; //0.02 is definitely good
+    public double emptyDelay = 0.02; //0.02 is definitely good
     public double kickerUpDelay = 0.7;
     public double kickerResetDelay = 0.4;
     // Flywheel target uses encoder ticks per second, NOT RPM.
@@ -112,7 +112,7 @@ public class LauncherSubsystem {
                 // The distance sensor checks whether balls are still present.
                 // Require a brief continuous 'empty' reading before kicking.
                 lastDistanceCm = sensor.getDistance(DistanceUnit.CM);
-                if (Double.isFinite(lastDistanceCm) && lastDistanceCm > 5.0) {
+                if (Double.isFinite(lastDistanceCm) && lastDistanceCm > 10.0) {
                     if (!detectingEmpty) {
                         detectingEmpty = true;
                         distanceTimer.reset();
