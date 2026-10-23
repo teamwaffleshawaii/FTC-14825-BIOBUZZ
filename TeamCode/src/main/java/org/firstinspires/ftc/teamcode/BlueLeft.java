@@ -130,26 +130,27 @@ public class BlueLeft extends LinearOpMode {
             }
 
             if (opModeIsActive() && !isStopRequested()) {
-                // CAUTION: intake is still running during both return paths.
-                // If balls creep toward the launcher, stop and retract earlier.
-                Actions.runBlocking(new SequentialAction(
-                        moveBack,
-                        movetolaunchPositionAgain ));
-                intakeSubsystem.rampUp();
+                // Stop feeding as soon as collection finishes, BEFORE driving back.
+                // Otherwise the transfer keeps pushing balls toward the launcher.
                 intakeSubsystem.stopIntake();
+                intakeSubsystem.rampUp();
 
-                // Same short retract pulse used when releasing intake in TeleOp.
-                // Back the leading balls away from the launcher before the next volley.
+                // Reuse the TeleOp retract pulse (currently 0.20 s at 0.4 power).
+                // Back the leading balls away from the launcher before the return drive.
                 intakeSubsystem.startStepUpReversePulse();
                 Actions.runBlocking((packet) -> {
                     intakeSubsystem.update();
                     return intakeSubsystem.isStepUpReverseActive();
                 });
-                // update() stops the step-ups; also stop the transfer motor.
+                // Stop transfer and step-ups after the pulse.
                 intakeSubsystem.stopFeeding();
 
-                // This is a post-retract wait, not additional retract time:
-                // the reverse pulse has already ended and all feed motors are stopped.
+                // Return to the second launch position with feeding motors stopped.
+                Actions.runBlocking(new SequentialAction(
+                        moveBack,
+                        movetolaunchPositionAgain ));
+
+                // Existing one-second pause, now after the return drive.
                 Actions.runBlocking(new SequentialAction(new SleepAction(1)));
 
                 // Second flywheel starts only here, immediately before feeding.
