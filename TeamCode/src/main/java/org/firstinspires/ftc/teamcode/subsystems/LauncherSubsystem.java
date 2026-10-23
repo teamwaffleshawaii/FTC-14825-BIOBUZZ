@@ -19,7 +19,7 @@ public class LauncherSubsystem {
     // PIDF is the motor controller's velocity feedback tuning:
     // P = respond to current speed error; I = accumulated error;
     // D = change in error; F = feedforward estimate of motor effort.
-    // These are the team's current tested values, not universal constants.
+    // These are saved Java defaults; FTC Dashboard may have newer tested values.
     // @Config exposes them in FTC Dashboard while the OpMode runs.
     // Dashboard edits are temporary until we save new defaults in Java.
     // Changes are applied to hardware only when a coefficient changes.
@@ -31,11 +31,6 @@ public class LauncherSubsystem {
     // TeleOp shooting speed, in encoder ticks/second. Change live in Dashboard.
     // Autonomous keeps its existing independent targetVelocity setting.
     public static double TELEOP_TARGET_VELOCITY = 1020.0;
-
-    // Future vision-based velocity control is deliberately disabled until calibrated.
-    // This flag is a PLACEHOLDER, not a working automatic aiming switch.
-    // Even setting it true today will NOT change launcher velocity.
-    public static boolean AUTO_VELOCITY_ENABLED = false;
 
     // Remember the values last sent to the motor controller.
     // NaN (not-a-number) guarantees the first applyPIDF() writes all values.
@@ -60,7 +55,8 @@ public class LauncherSubsystem {
     public double kickerUpDelay = 0.7;
     public double kickerResetDelay = 0.3;
     // Flywheel target uses encoder ticks per second, NOT RPM.
-    // TeleOp currently also has its own 1030 target; we'll consolidate later.
+    // Used by callers that rely on this instance's target (including isFlywheelReady).
+    // TeleOp commands TELEOP_TARGET_VELOCITY separately; keep them in sync if used together.
     public double targetVelocity = 1030;
 
     private State state = State.IDLE;
