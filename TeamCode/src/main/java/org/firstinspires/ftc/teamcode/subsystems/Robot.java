@@ -8,7 +8,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
  * Both TeleOp and Autonomous can use the same subsystems and settings.
  * Calling shutdown() provides a common cleanup path when an OpMode ends.
  */
-/** One-time shared robot initialization for TeleOp and Autonomous. */
 public class Robot {
     public final Actuators actuator = new Actuators();
     public final Sensors sensor = new Sensors();
