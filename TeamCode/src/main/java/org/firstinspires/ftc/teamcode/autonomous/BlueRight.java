@@ -59,6 +59,8 @@ public class BlueRight extends LinearOpMode {
                 .strafeToLinearHeading(new Vector2d( -47, 11.5), Math.toRadians(0))
                 .build();
 
+        // CHECK: previous action ends heading 0 deg, but this starts at 90 deg.
+        // Road Runner will assume the new heading; verify physical alignment.
         // Collection path: travel from the first shooting area toward flowers.
         Action flowerPosition1 = drive.actionBuilder(new Pose2d(-47, 11.5, Math.toRadians(90) ))
                 .splineTo(new Vector2d(-28, 38), Math.toRadians(90))
@@ -84,6 +86,8 @@ public class BlueRight extends LinearOpMode {
                 .strafeToLinearHeading(new Vector2d(54,2), Math.toRadians(175))
                 .build();
 
+        // CHECK: previous launch path ends at (54, 2), but park starts (52, 2).
+        // Verify this 2-inch difference against the tuned field route.
         // Parking is a separate trajectory executed after the second volley.
         Action park1 = drive.actionBuilder(new Pose2d(52, 2, Math.toRadians(175) ))
                 .strafeToLinearHeading(new Vector2d(37,34), Math.toRadians(270))
@@ -136,7 +140,8 @@ public class BlueRight extends LinearOpMode {
             }
 
             if (opModeIsActive() && !isStopRequested()) {
-                // Move to the left-side staging position with the intake stopped.
+                // Intake is STILL RUNNING during these two staging paths.
+                // It stops only after both paths complete.
                 Actions.runBlocking(new SequentialAction(
                         moveBack,
                         movetolaunchPositionLeft ));
