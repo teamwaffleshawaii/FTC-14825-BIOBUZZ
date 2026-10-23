@@ -5,10 +5,8 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.ProfileAccelConstraint;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
-import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -28,8 +26,8 @@ import org.firstinspires.ftc.teamcode.subsystems.Sensors;
  * Trajectories below are built BEFORE PLAY and run in a planned sequence.
  * Verify all coordinates against the actual field before a match.
  */
-@Autonomous (name = "AutoRight", group = "Auto")
-public class AutoRight extends LinearOpMode {
+@Autonomous (name = "Red Right", group = "Auto")
+public class RedRight extends LinearOpMode {
 
     //Include all of your actuators
     Robot robot;
