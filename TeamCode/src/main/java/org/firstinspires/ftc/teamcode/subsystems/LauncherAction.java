@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * STUDENT GUIDE: Adapts LauncherSubsystem to a Road Runner Action.
  * Road Runner repeatedly calls run(packet) while it returns true.
  * The flywheel is spun up separately; this Action only handles feeding.
+ * Autonomous feeding uses LauncherSubsystem.emptyDelayAutoOnly.
  * IMPORTANT: The current AutoRight intentionally starts volleys without
  * checking readiness. The launcher itself does not wait for target speed.
  * Road Runner adapter for the shared launcher. Start the flywheel separately
@@ -27,7 +28,7 @@ public class LauncherAction implements Action {
     /** One step of the action. Return true to continue, false to finish. */
     public boolean run(TelemetryPacket packet) {
         if (!started) {
-            launcher.start();
+            launcher.startAuto();
             started = true;
             timeout.reset();
         }
