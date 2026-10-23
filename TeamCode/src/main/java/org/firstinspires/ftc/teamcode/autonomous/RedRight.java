@@ -74,11 +74,15 @@ public class RedRight extends LinearOpMode {
                 .strafeToLinearHeading(new Vector2d(25,-44), Math.toRadians(270))
                 .build();
 
-        // Reposition to the left side for the second launch.
+        // CHECK: moveBack ends at (25,-44), but this builder starts (28,-44).
+        // Confirm whether the 3-inch discrepancy is intentional.
+        // Reposition for the second launch.
         Action movetolaunchPositionLeft = drive.actionBuilder(new Pose2d(28, -44, Math.toRadians(270) ))
                 .strafeToLinearHeading(new Vector2d(-30,-58), Math.toRadians(90))
                 .build();
 
+        // CHECK: previous path ends heading 90 deg; this starts at 85 deg.
+        // Confirm heading continuity before running on the field.
         // Final approach to the second shooting pose.
         Action launchPositionLeft = drive.actionBuilder(new Pose2d(-30, -58, Math.toRadians(85) ))
                 .strafeToLinearHeading(new Vector2d(-54,-1.5), Math.toRadians(-5))
@@ -136,7 +140,7 @@ public class RedRight extends LinearOpMode {
             }
 
             if (opModeIsActive() && !isStopRequested()) {
-                // Move to the left-side staging position with the intake stopped.
+                // Intake remains running during staging and stops afterward.
                 Actions.runBlocking(new SequentialAction(
                         moveBack,
                         movetolaunchPositionLeft ));
