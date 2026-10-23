@@ -1,11 +1,10 @@
-// Blue Left autonomous using Road Runner odometry.
-// Verify starting pose, headings, and ball-feed timing on the real field.
+// Backup autonomous: drive 15 field-X units (inches) with Road Runner.
+// Confirm this direction is forward for the robot's actual starting orientation.
 
 package org.firstinspires.ftc.teamcode.autonomous;
 
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -43,17 +42,23 @@ public class ParkOnly extends LinearOpMode {
         MecanumDrive drive = new MecanumDrive(hardwareMap,
                 new Pose2d(0, 0, Math.toRadians(0) ) );
 
-        // Parking is a separate trajectory executed after the second volley.
+        // This backup has no launcher or collection sequence.
+        // Starting at (0,0) is a relative reference, not a measured field location.
+        // Positive field X must match the desired parking direction.
         Action park = drive.actionBuilder(new Pose2d(0, 0, Math.toRadians(0) ))
                 .strafeToLinearHeading(new Vector2d(15,0), Math.toRadians(0))
                 .build();
 
         waitForStart();
 
-                // Park only
-                if (opModeIsActive() && !isStopRequested()) {
-                    Actions.runBlocking(new SequentialAction(
-                            park ));
-                }
+        try {
+            // Only drive when PLAY is active; no shots or intake actions.
+            if (opModeIsActive() && !isStopRequested()) {
+                Actions.runBlocking(park);
+            }
+        } finally {
+            // Stop hardware safely even if the driver presses STOP.
+            robot.shutdown();
+        }
     }
 }
