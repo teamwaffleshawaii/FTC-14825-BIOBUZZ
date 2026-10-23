@@ -43,7 +43,7 @@ public class LauncherSubsystem {
     private double appliedI = Double.NaN;
     private double appliedD = Double.NaN;
     private double appliedF = Double.NaN;
-    // Each state represents one stage of the four-ball feeding sequence.
+    //  Each state represents one stage of the four-ball feeding sequence.
     // IDLE: waiting; FEEDING: moving balls; KICKER_UP: activating kicker;
     // RESETTING: lowering kicker before returning to IDLE.
     public enum State { IDLE, FEEDING, KICKER_UP, RESETTING }
