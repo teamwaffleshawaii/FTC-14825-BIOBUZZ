@@ -43,7 +43,7 @@ public class LauncherSubsystem {
     private double appliedI = Double.NaN;
     private double appliedD = Double.NaN;
     private double appliedF = Double.NaN;
-    //  Each state represents one stage of the four-ball feeding sequence.
+    // Each state represents one stage of the four-ball feeding sequence.
     // IDLE: waiting; FEEDING: moving balls; KICKER_UP: activating kicker;
     // RESETTING: lowering kicker before returning to IDLE.
     public enum State { IDLE, FEEDING, KICKER_UP, RESETTING }
@@ -55,7 +55,7 @@ public class LauncherSubsystem {
     private final ElapsedTime kickerTimer = new ElapsedTime();
 
     // Timing values are in SECONDS. Tune cautiously on the actual robot.
-    public double emptyDelay = 0.02; //0.02 is definitely good
+    public double emptyDelay = 0.04; //0.02 is definitely good
     public double kickerUpDelay = 0.7;
     public double kickerResetDelay = 0.4;
     // Flywheel target uses encoder ticks per second, NOT RPM.
