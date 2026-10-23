@@ -23,8 +23,8 @@ public class TeleOpTurret extends TeleOperated {
     public static double SERVO_PER_DEGREE = 0.016;
     public static double TX_DEADBAND_DEGREES = 0.5;
     // Initial experimental range; these are NOT verified mechanical limits.
-    public static double SERVO_MIN = 0.40;
-    public static double SERVO_MAX = 0.52;
+    public static double SERVO_MIN = 0.00;
+    public static double SERVO_MAX = 1.00;
     // Compensate if camera optical center is not turret-forward.
     public static double TX_CENTER_OFFSET_DEGREES = 0.0;
 
