@@ -1,7 +1,7 @@
 //This code can be used to drive or push the robot around to determine x,y coordinates and headings
 //You can use either MeepMeep, or this test code physically
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.autonomous;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -32,7 +32,7 @@ public class AutoMap extends LinearOpMode {
         // Otherwise every reported coordinate will be offset.
         MecanumDrive drive = new MecanumDrive(hardwareMap,
                 //TODO: Change robot starting position here as necessary, currently origin
-                new Pose2d(60, 11.5, Math.toRadians(180) ) );
+                new Pose2d(-60, -11.5, Math.toRadians(0) ) );
 
         waitForStart();
 
