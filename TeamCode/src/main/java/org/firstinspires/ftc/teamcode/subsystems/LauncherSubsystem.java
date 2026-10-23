@@ -55,7 +55,8 @@ public class LauncherSubsystem {
     private final ElapsedTime kickerTimer = new ElapsedTime();
 
     // Timing values are in SECONDS. Tune cautiously on the actual robot.
-    public double emptyDelay = 0.02; //0.02 is definitely good
+    public double emptyDelay = 0.02; // TeleOp: 20 ms
+    public double emptyDelayAutoOnly = 0.04; // Autonomous: 40 ms
     public double kickerUpDelay = 0.7;
     public double kickerResetDelay = 0.4;
     // Flywheel target uses encoder ticks per second, NOT RPM.
@@ -64,6 +65,7 @@ public class LauncherSubsystem {
 
     private State state = State.IDLE;
     private boolean detectingEmpty = false;
+    private double activeEmptyDelay = emptyDelay;
     private boolean completed = false;
     private double lastDistanceCm = Double.NaN;
 
@@ -89,7 +91,17 @@ public class LauncherSubsystem {
 
     /** Begin a feeding sequence; ignore duplicate starts while busy. */
     public void start() {
+        startWithEmptyDelay(emptyDelay);
+    }
+
+    /** Autonomous uses the same feed sequence with a longer empty confirmation. */
+    public void startAuto() {
+        startWithEmptyDelay(emptyDelayAutoOnly);
+    }
+
+    private void startWithEmptyDelay(double delaySeconds) {
         if (isBusy()) return;
+        activeEmptyDelay = Math.max(0, delaySeconds);
         completed = false;
         detectingEmpty = false;
         distanceTimer.reset();
@@ -117,7 +129,7 @@ public class LauncherSubsystem {
                         detectingEmpty = true;
                         distanceTimer.reset();
                     }
-                    if (distanceTimer.seconds() >= emptyDelay) {
+                    if (distanceTimer.seconds() >= activeEmptyDelay) {
                         actuator.kickerUp();
                         kickerTimer.reset();
                         state = State.KICKER_UP;
