@@ -6,9 +6,10 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.subsystems.Actuators;
+import org.firstinspires.ftc.teamcode.subsystems.AprilTagVelocityController;
 import org.firstinspires.ftc.teamcode.subsystems.DrivetrainSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.LauncherSubsystem;
@@ -24,7 +25,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
  * The while loop must run repeatedly so driving, timers and sensors update.
  */
 @Config
-@TeleOp (name = "TeleOp", group = "TeleOp")
+@Disabled // Shared implementation; choose TeleOp RED or TeleOp BLUE.
 public class TeleOperated extends LinearOpMode {
 
     // References to the SAME objects created by Robot; no extra hardware setup.
@@ -58,6 +59,12 @@ public class TeleOperated extends LinearOpMode {
     private double lastBallAlpha = Double.NaN;
 
     LauncherSubsystem launcher;
+    private AprilTagVelocityController visionVelocity;
+    private LLResult currentAprilTagFrame;
+    private double commandedTarget = LauncherSubsystem.TARGET_VELOCITY;
+
+    /** Overridden by the RED and BLUE OpMode entry points. */
+    protected boolean isRedAlliance() { return true; }
 
     // ElapsedTime measures real elapsed time without pausing the robot loop.
     // It is used to blink the indicator LED without sleep().
@@ -81,6 +88,7 @@ public class TeleOperated extends LinearOpMode {
         intakeSubsystem = robot.intake;
         drivetrain = robot.drivetrain;
         launcher = robot.launcher;
+        visionVelocity = new AprilTagVelocityController(isRedAlliance());
 
         // Initialization happens BEFORE the match; wait until PLAY is pressed.
         waitForStart();
@@ -93,6 +101,8 @@ public class TeleOperated extends LinearOpMode {
                 resetAngle();
                 intake();
                 flowerRamp();
+                // Read Limelight once per loop for both velocity and telemetry.
+                currentAprilTagFrame = sensor.getFreshAprilTagResult();
                 launch();
                 updateBallCounter();
                 updateFullAlertLed();
@@ -157,10 +167,15 @@ public class TeleOperated extends LinearOpMode {
     /**
      * Gamepad 2 X starts the flywheel; Y stops it.
      * setVelocity() uses encoder ticks/second and the PIDF motor controller.
-     * AprilTag velocity adjustment is not active yet.
+     * Only alliance-matching, calibrated tags can adjust the target.
      */
     public void launch() {
         double targetVelocity = LauncherSubsystem.TARGET_VELOCITY;
+        if (AprilTagVelocityController.ENABLED) {
+            targetVelocity = visionVelocity.update(currentAprilTagFrame,
+                    targetVelocity, launcher.isBusy());
+        }
+        commandedTarget = targetVelocity;
         if (gamepad2.x) {
             if (!flywheelEnabled) flywheelReadyRumbled = false;
             flywheelEnabled = true;
@@ -192,6 +207,9 @@ public class TeleOperated extends LinearOpMode {
         telemetry.addData("Actual Velocity", currentVelocity);
         telemetry.addData("Velocity Error", flywheelEnabled ? targetVelocity - currentVelocity : 0);
         telemetry.addData("Launcher Ready", launcherReady);
+        telemetry.addData("Vision Velocity", AprilTagVelocityController.ENABLED
+                && visionVelocity.hasRecentCalibration() ? "Calibrated" : "Baseline / hold");
+        telemetry.addData("Calibrated Tags", visionVelocity.getCalibratedTagsSeen());
 
         // Ready means measured speed is within the tolerance in Actuators.
         // LED position numbers are device-specific PWM commands, not brightness.
@@ -260,11 +278,16 @@ public class TeleOperated extends LinearOpMode {
 
     /** Show fresh AprilTag IDs and angles; telemetry does NOT aim the robot. */
     public void limelightTelemetry() {
-        LLResult result = sensor.getFreshAprilTagResult();
+        LLResult result = currentAprilTagFrame;
         if (result != null) {
             telemetry.addData("Limelight Age (ms)", result.getStaleness());
-            telemetry.addData("AprilTags Seen", result.getFiducialResults().size());
+            int allianceTags = 0;
             for (LLResultTypes.FiducialResult tag : result.getFiducialResults()) {
+                if (visionVelocity.acceptsTag(tag.getFiducialId())) allianceTags++;
+            }
+            telemetry.addData("Alliance AprilTags Seen", allianceTags);
+            for (LLResultTypes.FiducialResult tag : result.getFiducialResults()) {
+                if (!visionVelocity.acceptsTag(tag.getFiducialId())) continue;
                 telemetry.addData("AprilTag " + tag.getFiducialId(),
                         "TX: %.2f deg, TY: %.2f deg",
                         tag.getTargetXDegrees(), tag.getTargetYDegrees());
