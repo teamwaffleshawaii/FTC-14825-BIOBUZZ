@@ -30,7 +30,7 @@ public class LauncherSubsystem {
 
     // Shared TeleOp and Autonomous flywheel target, in encoder ticks/second.
     // Dashboard edits apply to both; save tested values here for future runs.
-    public static double TARGET_VELOCITY = 1030.0;
+    public static double TARGET_VELOCITY = 1020.0;
 
     // Remember the values last sent to the motor controller.
     // NaN (not-a-number) guarantees the first applyPIDF() writes all values.
