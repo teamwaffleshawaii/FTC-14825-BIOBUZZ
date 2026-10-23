@@ -6,6 +6,7 @@ import java.util.List;
 import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -25,6 +26,7 @@ public class Sensors {
 
     // TODO: If using a 2M Distance Sensor, add them here
     public DistanceSensor distanceSensor;
+    public ColorSensor colorSensor;
     public Limelight3A limelight;
 
     /**
@@ -34,6 +36,8 @@ public class Sensors {
     public void init(HardwareMap hwMap) {
         //TODO: If using distance sensors
         distanceSensor = hwMap.get(DistanceSensor.class, "distanceSensor");
+        //TODO: If using color sensors
+        colorSensor = hwMap.get(ColorSensor.class, "colorSensor");
 
         // Initialize IMU
         try {
@@ -68,6 +72,11 @@ public class Sensors {
         }
         return 0.0;
     }
+
+    //TODO: Sample classes for checking the color Red from the color sensor
+    public int getAmountRed() {return colorSensor.red();}
+    public int getAmountGreen() {return colorSensor.green();}
+    public int getAmountBlue() {return colorSensor.blue();}
 
     //TODO: Sample class for measuring distance from the distance sensor
     public double getDistance(DistanceUnit du) {
