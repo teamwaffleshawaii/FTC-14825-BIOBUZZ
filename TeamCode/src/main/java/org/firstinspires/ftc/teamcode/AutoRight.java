@@ -138,6 +138,16 @@ public class AutoRight extends LinearOpMode {
                 intakeSubsystem.rampUp();
                 intakeSubsystem.stopIntake();
 
+                // Same short retract pulse used when releasing intake in TeleOp.
+                // Back the leading balls away from the launcher before the next volley.
+                intakeSubsystem.startStepUpReversePulse();
+                Actions.runBlocking((packet) -> {
+                    intakeSubsystem.update();
+                    return intakeSubsystem.isStepUpReverseActive();
+                });
+                // update() stops the step-ups; also stop the transfer motor.
+                intakeSubsystem.stopFeeding();
+
                 // Spin up for the second volley on the way to the launch location.
                 launcher.setFlywheelVelocity(launcher.targetVelocity);
                 Actions.runBlocking(launchPositionLeft);
