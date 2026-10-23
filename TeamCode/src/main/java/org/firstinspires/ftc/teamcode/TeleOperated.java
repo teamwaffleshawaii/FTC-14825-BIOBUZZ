@@ -274,6 +274,9 @@ public class TeleOperated extends LinearOpMode {
         telemetry.addData("Launch State", launcher.getState());
     }
 
+    /** Let experimental child OpModes reuse the already-validated camera frame. */
+    protected LLResult getTurretAprilTagFrame() { return currentAprilTagFrame; }
+
     /** Show only this alliance's fresh AprilTags; the velocity estimator runs separately. */
     public void limelightTelemetry() {
         LLResult result = currentAprilTagFrame;
