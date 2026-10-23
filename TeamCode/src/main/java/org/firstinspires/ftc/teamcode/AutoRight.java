@@ -69,15 +69,15 @@ public class AutoRight extends LinearOpMode {
 
         // Continue through the collection area before the timed pause.
         Action flowerPosition2 = drive.actionBuilder(new Pose2d(30, -44, Math.toRadians(270) ))
-                .strafeTo(new Vector2d(25, -55))
+                .strafeTo(new Vector2d(28, -55))
                 .build();
 
-        Action moveBack = drive.actionBuilder(new Pose2d(25, -55, Math.toRadians(270) ))
+        Action moveBack = drive.actionBuilder(new Pose2d(28, -55, Math.toRadians(270) ))
                 .strafeToLinearHeading(new Vector2d(25,-44), Math.toRadians(270))
                 .build();
 
         // Reposition to the left side for the second launch.
-        Action movetolaunchPositionLeft = drive.actionBuilder(new Pose2d(25, -44, Math.toRadians(270) ))
+        Action movetolaunchPositionLeft = drive.actionBuilder(new Pose2d(28, -44, Math.toRadians(270) ))
                 .strafeToLinearHeading(new Vector2d(-30,-58), Math.toRadians(90))
                 .build();
 
