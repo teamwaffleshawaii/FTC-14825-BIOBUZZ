@@ -35,15 +35,15 @@ public class TeleOperated extends LinearOpMode {
     IntakeSubsystem intakeSubsystem;
     DrivetrainSubsystem drivetrain;
 
-    // Both TeleOp and Auto use LauncherSubsystem.TARGET_VELOCITY so students can
-    // adjust shooting speed live in FTC Dashboard without redeploying.
+    // Shared baseline for TeleOp and Auto. TeleOp may override it temporarily
+    // using calibrated alliance AprilTags; Auto still uses the baseline.
     // Remember whether X started the flywheel so changes apply while spinning.
     boolean flywheelEnabled = false;
     // Rumble only once each time X starts the flywheel; Y rearms it.
     private boolean flywheelReadyRumbled = false;
-    //Read the actual velocity
+    // Actual encoder velocity (ticks/second), refreshed every loop.
     double currentVelocity = 0;
-    //Check whether launch is ready
+    // Readiness is based on the currently commanded target, not the baseline.
     boolean launcherReady = false;
 
     // Count each ball once as it passes the intake-to-transfer color sensor.
@@ -222,7 +222,7 @@ public class TeleOperated extends LinearOpMode {
             actuator.ledIndicator.setPosition(0.28); // Solid red
         }
     }
-    /** Clear the intake passage count when a new volley begins or on manual reset. */
+    /** Clear the intake passage count when a new volley begins. */
     private void resetBallCounter() {
         ballsCounted = 0;
         ballAtSensor = false;
@@ -274,7 +274,7 @@ public class TeleOperated extends LinearOpMode {
         telemetry.addData("Launch State", launcher.getState());
     }
 
-    /** Show fresh AprilTag IDs and angles; telemetry does NOT aim the robot. */
+    /** Show only this alliance's fresh AprilTags; the velocity estimator runs separately. */
     public void limelightTelemetry() {
         LLResult result = currentAprilTagFrame;
         if (result != null) {
