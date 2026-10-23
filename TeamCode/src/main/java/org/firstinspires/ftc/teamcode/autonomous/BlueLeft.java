@@ -14,6 +14,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.odometry.MecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.Actuators;
+import org.firstinspires.ftc.teamcode.subsystems.AutoVisionLaunchAction;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.LauncherAction;
 import org.firstinspires.ftc.teamcode.subsystems.LauncherSubsystem;
@@ -110,7 +111,9 @@ public class BlueLeft extends LinearOpMode {
             // are cleared before collecting the next four.
             if (opModeIsActive() && !isStopRequested()) {
                 // LauncherAction runs the timed feed state machine, not a drive path.
-                Actions.runBlocking(new LauncherAction(launcher));
+                // Sample the local alliance tags, lock the speed, then feed balls.
+                    Actions.runBlocking(new AutoVisionLaunchAction(sensor, launcher, false));
+                    Actions.runBlocking(new LauncherAction(launcher));
             }
 
             // Stop the flywheel regardless of whether the first shot succeeded.
@@ -169,6 +172,8 @@ public class BlueLeft extends LinearOpMode {
                 // drive and spin-up delay. Uses the same 0.04 s delay as Blue Right.
                 // Like Blue Right, this does not gate on measured flywheel readiness.
                 if (opModeIsActive() && !isStopRequested()) {
+                    // Sample the local alliance tags, lock the speed, then feed balls.
+                    Actions.runBlocking(new AutoVisionLaunchAction(sensor, launcher, false));
                     Actions.runBlocking(new LauncherAction(launcher));
                 }
                 launcher.setFlywheelVelocity(0);
