@@ -61,7 +61,6 @@ public class TeleOperated extends LinearOpMode {
     LauncherSubsystem launcher;
     private AprilTagVelocityController visionVelocity;
     private LLResult currentAprilTagFrame;
-    private double commandedTarget = LauncherSubsystem.TARGET_VELOCITY;
 
     /** Overridden by the RED and BLUE OpMode entry points. */
     protected boolean isRedAlliance() { return true; }
@@ -175,7 +174,6 @@ public class TeleOperated extends LinearOpMode {
             targetVelocity = visionVelocity.update(currentAprilTagFrame,
                     targetVelocity, launcher.isBusy());
         }
-        commandedTarget = targetVelocity;
         if (gamepad2.x) {
             if (!flywheelEnabled) flywheelReadyRumbled = false;
             flywheelEnabled = true;
