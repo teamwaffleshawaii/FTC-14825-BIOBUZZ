@@ -1,4 +1,4 @@
-//This code can be used to drive or push the robot around to determine x,y coordinates and headings
+// Manual odometry mapping tool (TeleOp), kept here with autonomous helpers.
 //You can use either MeepMeep, or this test code physically
 
 package org.firstinspires.ftc.teamcode.autonomous;
