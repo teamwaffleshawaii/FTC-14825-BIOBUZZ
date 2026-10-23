@@ -19,13 +19,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
  * STUDENT GUIDE: Hardware sensors and camera access live in this class.
  *
  * This class reads measurements; it does NOT decide how fast to launch.
- * LauncherSubsystem will eventually use validated vision measurements to
- * choose a flywheel velocity after we calibrate the robot.
+ * TeleOp's AprilTagVelocityController uses validated frames to estimate
+ * flywheel velocity; this class only checks sensor/frame validity.
  */
 public class Sensors {
     public IMU imu;
 
-    // TODO: If using a 2M Distance Sensor, add them here
+    // Sensor names must match the robot's hardware configuration.
     public DistanceSensor distanceSensor;
     public ColorSensor colorSensor;
     public Limelight3A limelight;
@@ -35,9 +35,7 @@ public class Sensors {
      * the REV Driver Station hardware configuration exactly.
      */
     public void init(HardwareMap hwMap) {
-        //TODO: If using distance sensors
         distanceSensor = hwMap.get(DistanceSensor.class, "distanceSensor");
-        //TODO: If using color sensors
         colorSensor = hwMap.get(ColorSensor.class, "colorSensor");
 
         // Initialize IMU
@@ -74,7 +72,7 @@ public class Sensors {
         return 0.0;
     }
 
-    //TODO: Sample classes for checking the color Red from the color sensor
+    // Raw color channels are available for future diagnostics.
     public int getAmountRed() {return colorSensor.red();}
     public int getAmountGreen() {return colorSensor.green();}
     public int getAmountBlue() {return colorSensor.blue();}
@@ -88,7 +86,7 @@ public class Sensors {
         return Double.NaN;
     }
 
-    //TODO: Sample class for measuring distance from the distance sensor
+    // Distance reading used to determine when the launcher feed is empty.
     public double getDistance(DistanceUnit du) {
         return distanceSensor.getDistance(du);
     }
