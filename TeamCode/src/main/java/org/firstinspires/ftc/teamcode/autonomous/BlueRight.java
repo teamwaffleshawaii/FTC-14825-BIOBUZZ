@@ -1,5 +1,5 @@
-//Auto Template that you can use to program your auto
-// NOTE: THIS CODE RUNS ON ODOMETRY, you must have your odometry tuned
+// Blue Right autonomous: Road Runner odometry paths and shared launcher.
+// Verify the starting pose and timed feeding on the physical field.
 
 package org.firstinspires.ftc.teamcode.autonomous;
 
