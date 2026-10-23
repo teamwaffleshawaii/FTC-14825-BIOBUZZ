@@ -65,6 +65,10 @@ public class LauncherSubsystem {
 
     private State state = State.IDLE;
     private boolean detectingEmpty = false;
+    // Optional protection for a volley that starts with an empty sensor view.
+    // Disabled by default so Blue Right and TeleOp keep their tested behavior.
+    public boolean requireBallBeforeKicker = false;
+    private boolean sawBallThisVolley = false;
     private double activeEmptyDelay = emptyDelay;
     private boolean completed = false;
     private double lastDistanceCm = Double.NaN;
@@ -104,6 +108,7 @@ public class LauncherSubsystem {
         activeEmptyDelay = Math.max(0, delaySeconds);
         completed = false;
         detectingEmpty = false;
+        sawBallThisVolley = false;
         distanceTimer.reset();
         intake.feedLauncher();
         state = State.FEEDING;
@@ -124,7 +129,14 @@ public class LauncherSubsystem {
                 // The distance sensor checks whether balls are still present.
                 // Require a brief continuous 'empty' reading before kicking.
                 lastDistanceCm = sensor.getDistance(DistanceUnit.CM);
-                if (Double.isFinite(lastDistanceCm) && lastDistanceCm > 10.0) {
+                // A ball must first be observed when this optional guard is on.
+                // Otherwise an empty reading at launch start can raise the kicker
+                // before any collected ball reaches the sensor.
+                if (Double.isFinite(lastDistanceCm) && lastDistanceCm <= 10.0) {
+                    sawBallThisVolley = true;
+                }
+                if (Double.isFinite(lastDistanceCm) && lastDistanceCm > 10.0
+                        && (!requireBallBeforeKicker || sawBallThisVolley)) {
                     if (!detectingEmpty) {
                         detectingEmpty = true;
                         distanceTimer.reset();
