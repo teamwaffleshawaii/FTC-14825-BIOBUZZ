@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.subsystems.LauncherSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
 import org.firstinspires.ftc.teamcode.subsystems.Sensors;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 /**
  * STUDENT GUIDE: Driver-controlled robot program (TeleOp).
@@ -188,7 +189,9 @@ public class TeleOperated extends LinearOpMode {
     }
     /** Display the current state of the non-blocking four-ball sequence. */
     public void launcherTelemetry() {
-        telemetry.addData("Distance (cm)", launcher.getLastDistanceCm());
+        // Read the sensor every TeleOp loop, even when the launcher is idle.
+        // This is telemetry-only; the launcher state machine still controls the kicker.
+        telemetry.addData("Distance (cm)", sensor.getDistance(DistanceUnit.CM));
         telemetry.addData("Detecting Empty", launcher.isDetectingEmpty());
         telemetry.addData("Empty Timer", launcher.getEmptyDuration());
         telemetry.addData("Launch State", launcher.getState());
