@@ -8,9 +8,10 @@ import java.util.Arrays;
 
 /**
  * TeleOp flywheel target from fresh alliance-specific AprilTags.
- * Calibration is currently available ONLY for red tags 30-33.
- * Other accepted alliance tags are shown in telemetry but cannot change velocity
- * until their own TY calibration is measured. Never extrapolate outside measured TY.
+ * The four scoring areas reuse the same left-to-right tag-position calibration:
+ * RED 30-33 / 34-37 and BLUE 38-41 / 42-45.
+ * This assumes the camera mounting and tag geometry are equivalent at each area.
+ * Never extrapolate outside the measured TY range.
  */
 @Config
 public class AprilTagVelocityController {
@@ -18,15 +19,16 @@ public class AprilTagVelocityController {
     public static double SMOOTHING = 0.25; // 0..1, larger responds faster
     public static double LOST_TARGET_HOLD_SECONDS = 0.5;
 
-    // Rows: red tag 30, 31, 32, 33; columns: position 1, 2, 3.
+    // Rows: tag position left-to-right (0..3); columns: measured positions 1, 2, 3.
+    // Reused for each group of four tags, as requested.
     // Calibration velocities: 1020, 1040, 1000 ticks/s respectively.
-    private static final double[][] RED_TY = {
+    private static final double[][] TAG_POSITION_TY = {
             {0.58, -5.01, 6.56},
             {0.58, -5.00, 6.47},
             {0.58, -4.98, 6.32},
             {0.56, -4.96, 6.21}
     };
-    private static final double[] RED_SPEEDS = {1020, 1040, 1000};
+    private static final double[] CALIBRATED_SPEEDS = {1020, 1040, 1000};
 
     private final boolean redAlliance;
     private final ElapsedTime sinceValid = new ElapsedTime();
@@ -47,12 +49,14 @@ public class AprilTagVelocityController {
         if (freeze) return Double.isFinite(filteredVelocity) ? filteredVelocity : baseline;
         double[] estimates = new double[4];
         int count = 0;
-        if (frame != null && redAlliance) {
+        if (frame != null) {
             for (LLResultTypes.FiducialResult tag : frame.getFiducialResults()) {
                 int id = tag.getFiducialId();
                 double ty = tag.getTargetYDegrees();
-                if (id >= 30 && id <= 33 && Double.isFinite(ty)) {
-                    estimates[count++] = interpolate(RED_TY[id - 30], ty);
+                if (acceptsTag(id) && Double.isFinite(ty) && count < estimates.length) {
+                    // Every block of four IDs shares the same positional calibration.
+                    int tagPosition = (id - 30) % 4;
+                    estimates[count++] = interpolate(TAG_POSITION_TY[tagPosition], ty);
                 }
             }
         }
@@ -78,14 +82,14 @@ public class AprilTagVelocityController {
     /** Piecewise linear TY interpolation, clamped to the calibrated endpoints. */
     private static double interpolate(double[] ty, double observed) {
         // Measured TY decreases as required velocity increases.
-        if (observed <= ty[1]) return RED_SPEEDS[1];
-        if (observed >= ty[2]) return RED_SPEEDS[2];
+        if (observed <= ty[1]) return CALIBRATED_SPEEDS[1];
+        if (observed >= ty[2]) return CALIBRATED_SPEEDS[2];
         if (observed <= ty[0]) {
             double t = (observed - ty[1]) / (ty[0] - ty[1]);
-            return RED_SPEEDS[1] + t * (RED_SPEEDS[0] - RED_SPEEDS[1]);
+            return CALIBRATED_SPEEDS[1] + t * (CALIBRATED_SPEEDS[0] - CALIBRATED_SPEEDS[1]);
         }
         double t = (observed - ty[0]) / (ty[2] - ty[0]);
-        return RED_SPEEDS[0] + t * (RED_SPEEDS[2] - RED_SPEEDS[0]);
+        return CALIBRATED_SPEEDS[0] + t * (CALIBRATED_SPEEDS[2] - CALIBRATED_SPEEDS[0]);
     }
 
     public int getCalibratedTagsSeen() { return calibratedTagsSeen; }
