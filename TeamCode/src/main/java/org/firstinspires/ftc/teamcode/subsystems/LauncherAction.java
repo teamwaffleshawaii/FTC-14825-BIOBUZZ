@@ -35,6 +35,12 @@ public class LauncherAction implements Action {
         launcher.update();
         packet.put("Launch State", launcher.getState().name());
         packet.put("Distance (cm)", launcher.getLastDistanceCm());
+        // Dashboard action telemetry: graph actual velocity against the
+        // autonomous target while the four-ball feeding sequence runs.
+        double actualVelocity = launcher.getActualFlywheelVelocity();
+        packet.put("Target Velocity", launcher.targetVelocity);
+        packet.put("Actual Velocity", actualVelocity);
+        packet.put("Velocity Error", launcher.targetVelocity - actualVelocity);
         // Fail-safe: cancel a jammed or stalled sequence after five seconds.
         if (launcher.isBusy() && timeout.seconds() >= 5.0) {
             launcher.cancel();
