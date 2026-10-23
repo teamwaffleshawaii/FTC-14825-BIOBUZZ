@@ -55,6 +55,7 @@ public class TeleOperated extends LinearOpMode {
     private int ballsCounted = 0;
     private boolean ballAtSensor = false;
     private boolean resetCountWasPressed = false;
+    private boolean launchBumperWasPressed = false;
     private final ElapsedTime ballTransitionTimer = new ElapsedTime();
     private final ElapsedTime fullAlertTimer = new ElapsedTime();
     private boolean fullAlertActive = false;
@@ -103,8 +104,12 @@ public class TeleOperated extends LinearOpMode {
                 // Gamepad 2 right bumper begins the automatic four-ball feed.
                 // launcher.start() ignores new starts while already busy.
                 if (gamepad2.right_bumper) {
+                    if (!launchBumperWasPressed && !launcher.isBusy()) {
+                        resetBallCounter();
+                    }
                     launcher.start();
                 }
+                launchBumperWasPressed = gamepad2.right_bumper;
                 launcher.update();
 
                 // Capture velocity after launcher update for live graphing.
@@ -210,15 +215,20 @@ public class TeleOperated extends LinearOpMode {
             actuator.ledIndicator.setPosition(0.28); // Solid red
         }
     }
+    /** Clear the intake passage count when a new volley begins or on manual reset. */
+    private void resetBallCounter() {
+        ballsCounted = 0;
+        ballAtSensor = false;
+        fullAlertActive = false;
+        ballTransitionTimer.reset();
+    }
+
     /** Count rising ball detections, not every loop while a ball is present. */
     private void updateBallCounter() {
         // Gamepad 2 D-pad DOWN manually clears the count after unloading.
         boolean resetPressed = gamepad2.dpad_down;
         if (resetPressed && !resetCountWasPressed) {
-            ballsCounted = 0;
-            ballAtSensor = false;
-            fullAlertActive = false;
-            ballTransitionTimer.reset();
+            resetBallCounter();
         }
         resetCountWasPressed = resetPressed;
 
@@ -248,12 +258,12 @@ public class TeleOperated extends LinearOpMode {
     private void updateFullAlertLed() {
         if (!fullAlertActive) return;
         double elapsed = fullAlertTimer.seconds();
-        if (elapsed >= 1.8) {
+        if (elapsed >= 0.6) {
             fullAlertActive = false;
             return;
         }
-        // Three flashes: 300 ms yellow, 300 ms off each.
-        actuator.ledIndicator.setPosition(((int) (elapsed / 0.3)) % 2 == 0
+        // Three quick flashes: 100 ms yellow, 100 ms off each.
+        actuator.ledIndicator.setPosition(((int) (elapsed / 0.1)) % 2 == 0
                 ? 0.388 : 0.0);
     }
 
