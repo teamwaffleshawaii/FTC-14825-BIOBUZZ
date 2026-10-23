@@ -72,13 +72,17 @@ public class AutoRight extends LinearOpMode {
                 .strafeTo(new Vector2d(25, -55))
                 .build();
 
+        Action moveBack = drive.actionBuilder(new Pose2d(25, -55, Math.toRadians(270) ))
+                .strafeToLinearHeading(new Vector2d(25,-44), Math.toRadians(270))
+                .build();
+
         // Reposition to the left side for the second launch.
-        Action movetolaunchPositionLeft = drive.actionBuilder(new Pose2d(25, -55, Math.toRadians(270) ))
-                .strafeToLinearHeading(new Vector2d(-44,-35), Math.toRadians(90))
+        Action movetolaunchPositionLeft = drive.actionBuilder(new Pose2d(25, -44, Math.toRadians(270) ))
+                .strafeToLinearHeading(new Vector2d(-25,-58), Math.toRadians(90))
                 .build();
 
         // Final approach to the second shooting pose.
-        Action launchPositionLeft = drive.actionBuilder(new Pose2d(-47, -31, Math.toRadians(85) ))
+        Action launchPositionLeft = drive.actionBuilder(new Pose2d(-25, -58, Math.toRadians(85) ))
                 .strafeToLinearHeading(new Vector2d(-54,-1.5), Math.toRadians(-5))
                 .build();
 
@@ -128,7 +132,9 @@ public class AutoRight extends LinearOpMode {
 
             if (opModeIsActive() && !isStopRequested()) {
                 // Move to the left-side staging position with the intake stopped.
-                Actions.runBlocking(movetolaunchPositionLeft);
+                Actions.runBlocking(new SequentialAction(
+                        moveBack,
+                        movetolaunchPositionLeft ));
                 intakeSubsystem.rampUp();
                 intakeSubsystem.stopIntake();
 
