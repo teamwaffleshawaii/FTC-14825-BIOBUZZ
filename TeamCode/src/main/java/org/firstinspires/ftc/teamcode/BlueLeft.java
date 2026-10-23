@@ -130,38 +130,40 @@ public class BlueLeft extends LinearOpMode {
             }
 
             if (opModeIsActive() && !isStopRequested()) {
-                // Stop feeding as soon as collection finishes, BEFORE driving back.
-                // Otherwise the transfer keeps pushing balls toward the launcher.
-                intakeSubsystem.stopIntake();
-                intakeSubsystem.rampUp();
-
-                // Reuse the TeleOp retract pulse (currently 0.20 s at 0.4 power).
-                // Back the leading balls away from the launcher before the return drive.
-                intakeSubsystem.startStepUpReversePulse();
-                Actions.runBlocking((packet) -> {
-                    intakeSubsystem.update();
-                    return intakeSubsystem.isStepUpReverseActive();
-                });
-                // Stop transfer and step-ups after the pulse.
-                intakeSubsystem.stopFeeding();
-
-                // Return from collection with all feeding motors stopped.
-                // As in Blue Right, spin up the flywheel during the final approach,
-                // not immediately before the second feeding sequence.
+                // Keep intake AND transfer running until the robot reaches the
+                // second launch position, as requested. The launcher feed state
+                // machine is not started during either return trajectory.
                 Actions.runBlocking(moveBack);
                 if (opModeIsActive() && !isStopRequested()) {
+                    // Spin up the flywheel during the final approach, like Blue Right.
                     launcher.setFlywheelVelocity(launcher.targetVelocity);
                     Actions.runBlocking(movetolaunchPositionAgain);
                 }
 
-                // Give the flywheel an additional second to recover before feeding.
-                // Retract is already complete; this delay does not move the balls.
+                // Now stop intake/transfer and back balls away from the launcher.
+                intakeSubsystem.stopIntake();
+                intakeSubsystem.rampUp();
+                if (opModeIsActive() && !isStopRequested()) {
+                    intakeSubsystem.startStepUpReversePulse();
+                    Actions.runBlocking((packet) -> {
+                        intakeSubsystem.update();
+                        return intakeSubsystem.isStepUpReverseActive();
+                    });
+                }
+                intakeSubsystem.stopFeeding();
+
+                // Allow the flywheel to settle after retract, before feeding.
                 if (opModeIsActive() && !isStopRequested()) {
                     Actions.runBlocking(new SleepAction(1));
                 }
 
+                // Blue Left second volley only: confirm the sensor is continuously
+                // empty for 150 ms instead of 40 ms before raising the kicker.
+                // This helps reject brief gaps between balls; tune on the robot.
+                launcher.emptyDelayAutoOnly = 0.15;
+
                 // LauncherAction feeds the second four balls only after the return
-                // drive and spin-up delay. Uses the autonomous-only 0.04 s empty delay.
+                // drive and spin-up delay. Uses the Blue Left second-volley 0.15 s delay.
                 // Like Blue Right, this does not gate on measured flywheel readiness.
                 if (opModeIsActive() && !isStopRequested()) {
                     Actions.runBlocking(new LauncherAction(launcher));
