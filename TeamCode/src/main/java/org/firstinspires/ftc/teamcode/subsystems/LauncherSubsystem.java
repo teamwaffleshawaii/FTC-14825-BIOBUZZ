@@ -23,14 +23,14 @@ public class LauncherSubsystem {
     // @Config exposes them in FTC Dashboard while the OpMode runs.
     // Dashboard edits are temporary until we save new defaults in Java.
     // Changes are applied to hardware only when a coefficient changes.
-    public static double LAUNCH_P = 80.0;
+    public static double LAUNCH_P = 70.0;
     public static double LAUNCH_I = 0.0;
-    public static double LAUNCH_D = 0.15;
+    public static double LAUNCH_D = 0.03;
     public static double LAUNCH_F = 20;
 
     // TeleOp shooting speed, in encoder ticks/second. Change live in Dashboard.
     // Autonomous keeps its existing independent targetVelocity setting.
-    public static double TELEOP_TARGET_VELOCITY = 1030.0;
+    public static double TELEOP_TARGET_VELOCITY = 1020.0;
 
     // Future vision-based velocity control is deliberately disabled until calibrated.
     // This flag is a PLACEHOLDER, not a working automatic aiming switch.
@@ -56,12 +56,12 @@ public class LauncherSubsystem {
 
     // Timing values are in SECONDS. Tune cautiously on the actual robot.
     public double emptyDelay = 0.02; // TeleOp: 20 ms
-    public double emptyDelayAutoOnly = 0.04; // Autonomous: 40 ms
+    public double emptyDelayAutoOnly = 0.05; // Autonomous: 50 ms
     public double kickerUpDelay = 0.7;
-    public double kickerResetDelay = 0.4;
+    public double kickerResetDelay = 0.3;
     // Flywheel target uses encoder ticks per second, NOT RPM.
-    // TeleOp currently also has its own 1060 target; we'll consolidate later.
-    public double targetVelocity = 1060;
+    // TeleOp currently also has its own 1030 target; we'll consolidate later.
+    public double targetVelocity = 1030;
 
     private State state = State.IDLE;
     private boolean detectingEmpty = false;
