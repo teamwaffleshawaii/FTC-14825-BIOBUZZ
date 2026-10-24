@@ -23,7 +23,8 @@ public class TeleOpTurretRed extends TeleOperated {
     // 0.04 servo position / approximately 2.5 degrees.
     public static double SERVO_PER_DEGREE = 0.016;
     public static double TX_DEADBAND_DEGREES = 0.5;
-    // Full servo command range; verify safe physical travel on the robot.
+    // FULL 0..1 command range, NOT a verified safe mechanical range.
+    // Gear-driven turret may bind before either endpoint; field-check limits.
     public static double SERVO_MIN = 0.00;
     public static double SERVO_MAX = 1.00;
     // Compensate if camera optical center is not turret-forward.
