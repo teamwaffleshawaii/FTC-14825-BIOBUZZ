@@ -12,7 +12,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
  * The launcher uses encoder feedback and PIDF to maintain flywheel speed.
  *
  * TeleOp can request a calibrated AprilTag-based target velocity; autonomous
- * currently uses the shared fixed TARGET_VELOCITY. This class controls PIDF
+ * samples alliance AprilTags before each volley, falling back to the shared
+ * TARGET_VELOCITY. This class controls PIDF
  * and ball feeding, not camera target selection.
  */
 @Config
@@ -29,7 +30,7 @@ public class LauncherSubsystem {
     public static double LAUNCH_D = 0.03;
     public static double LAUNCH_F = 20;
 
-    // Shared TeleOp and Autonomous flywheel target, in encoder ticks/second.
+    // Shared TeleOp and Autonomous fallback flywheel target, in encoder ticks/second.
     // Dashboard edits apply to both; save tested values here for future runs.
     public static double TARGET_VELOCITY = 1020.0;
 
