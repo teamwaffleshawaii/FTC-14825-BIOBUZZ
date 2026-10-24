@@ -107,8 +107,7 @@ public class BlueLeft extends LinearOpMode {
                     new SleepAction(1)
             ));
 
-            // Launch regardless of flywheel readiness so the preload balls
-            // are cleared before collecting the next four.
+            // Launch preload balls (first launch uses default forward turret angle)
             if (opModeIsActive() && !isStopRequested()) {
                 // LauncherAction runs the timed feed state machine, not a drive path.
                 // Sample the local alliance tags, lock the speed, then feed balls.
@@ -173,16 +172,15 @@ public class BlueLeft extends LinearOpMode {
                 // Like Blue Right, this does not gate on measured flywheel readiness.
                 if (opModeIsActive() && !isStopRequested()) {
                     // Sample the local alliance tags, lock the speed, then feed balls.
-                    Actions.runBlocking(new AutoVisionLaunchAction(sensor, launcher, false));
+                    Actions.runBlocking(new AutoVisionLaunchAction(sensor, launcher, actuator, false));
                     Actions.runBlocking(new LauncherAction(launcher));
                 }
                 launcher.setFlywheelVelocity(0);
+            }
 
-                // Park after the second launch.
-                if (opModeIsActive() && !isStopRequested()) {
-                    Actions.runBlocking(new SequentialAction(
-                            park ));
-                }
+            // Park after autonomous sequence.
+            if (opModeIsActive() && !isStopRequested()) {
+                Actions.runBlocking(park);
             }
         }
         // Cleanup executes whether autonomous finishes normally or stops early.

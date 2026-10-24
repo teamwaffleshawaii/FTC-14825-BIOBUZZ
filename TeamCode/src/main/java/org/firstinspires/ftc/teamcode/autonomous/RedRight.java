@@ -120,7 +120,7 @@ public class RedRight extends LinearOpMode {
             if (opModeIsActive() && !isStopRequested()) {
                 // LauncherAction runs the timed feed state machine, not a drive path.
                 // Sample the local alliance tags, lock the speed, then feed balls.
-                    Actions.runBlocking(new AutoVisionLaunchAction(sensor, launcher, true));
+                    Actions.runBlocking(new AutoVisionLaunchAction(sensor, launcher, actuator, true));
                     Actions.runBlocking(new LauncherAction(launcher));
             }
 
@@ -166,17 +166,17 @@ public class RedRight extends LinearOpMode {
                 // Launch regardless of flywheel readiness, as with the first volley.
                 if (opModeIsActive() && !isStopRequested()) {
                     // Sample the local alliance tags, lock the speed, then feed balls.
-                    Actions.runBlocking(new AutoVisionLaunchAction(sensor, launcher, true));
+                    Actions.runBlocking(new AutoVisionLaunchAction(sensor, launcher, actuator, true));
                     Actions.runBlocking(new LauncherAction(launcher));
                 }
                 launcher.setFlywheelVelocity(0);
+            }
 
-                // Park after the second launch.
-                if (opModeIsActive() && !isStopRequested()) {
-                    Actions.runBlocking(new SequentialAction(
-                            park1,
-                            park2 ));
-                }
+            // Park after autonomous sequence.
+            if (opModeIsActive() && !isStopRequested()) {
+                Actions.runBlocking(new SequentialAction(
+                        park1,
+                        park2 ));
             }
         }
         // Cleanup executes whether autonomous finishes normally or stops early.
