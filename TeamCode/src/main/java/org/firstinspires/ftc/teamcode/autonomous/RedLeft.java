@@ -94,8 +94,8 @@ public class RedLeft extends LinearOpMode {
         try {
         if (opModeIsActive() && !isStopRequested()) {
 
-            // Optional start delay for strategy (currently disabled).
-            // Actions.runBlocking(new SleepAction(8));
+            // Start delay for partner to score and tip.
+            Actions.runBlocking(new SleepAction(8));
 
             // Spin up while driving to the first launch position.
             // The first volley starts after arriving, regardless of actual speed.

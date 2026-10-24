@@ -13,7 +13,7 @@ import java.util.Arrays;
  */
 @Config
 @TeleOp(name = "TeleOpTurret-RED", group = "TeleOp")
-public class TeleOpTurret extends TeleOperated {
+public class TeleOpTurretRed extends TeleOperated {
     // Automatic aiming is enabled for this experimental OpMode.
     // Set false in Dashboard to return to telemetry-only testing.
     public static boolean AUTO_AIM_ENABLED = true;

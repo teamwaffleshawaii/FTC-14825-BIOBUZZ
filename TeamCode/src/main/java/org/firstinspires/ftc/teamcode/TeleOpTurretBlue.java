@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 /** BLUE alliance turret aiming; uses AprilTags 38-45. */
 @TeleOp(name = "TeleOpTurret-BLUE", group = "TeleOp")
-public class TeleOpTurretBlue extends TeleOpTurret {
+public class TeleOpTurretBlue extends TeleOpTurretRed {
     @Override
     protected boolean isRedAlliance() {
         return false;
