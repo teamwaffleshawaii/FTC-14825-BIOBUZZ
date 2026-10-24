@@ -35,8 +35,8 @@ public class TeleOperated extends LinearOpMode {
     IntakeSubsystem intakeSubsystem;
     DrivetrainSubsystem drivetrain;
 
-    // Shared baseline for TeleOp and Auto. TeleOp may override it temporarily
-    // using calibrated alliance AprilTags; Auto still uses the baseline.
+    // Shared baseline for TeleOp and Auto. Vision may adjust the flywheel
+    // target in both modes; auto samples/locks before each feeding sequence.
     // Remember whether X started the flywheel so changes apply while spinning.
     boolean flywheelEnabled = false;
     // Rumble only once each time X starts the flywheel; Y rearms it.
@@ -106,7 +106,8 @@ public class TeleOperated extends LinearOpMode {
                 updateBallCounter();
                 updateFullAlertLed();
 
-                // Gamepad 2 right bumper begins the automatic four-ball feed.
+                // Gamepad 2 right bumper begins the automatic feeding sequence.
+                // It is NOT gated on launcherReady: operator must wait for green.
                 // launcher.start() ignores new starts while already busy.
                 if (gamepad2.right_bumper) {
                     if (!launchBumperWasPressed && !launcher.isBusy()) {
