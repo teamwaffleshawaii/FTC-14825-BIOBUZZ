@@ -24,7 +24,11 @@ public class Robot {
         launcher = new LauncherSubsystem(actuator, sensor, intake);
     }
 
-    /** Stop drivetrain, feed sequence, and Limelight polling on exit. */
+    /**
+     * Stop drivetrain, feed sequence, and Limelight polling on exit.
+     * TOURNAMENT REVIEW: this does NOT stop the flywheel motor; autonomous
+     * callers currently stop it explicitly. TeleOp should be verified on STOP.
+     */
     public void shutdown() {
         drivetrain.stop();
         launcher.cancel();
