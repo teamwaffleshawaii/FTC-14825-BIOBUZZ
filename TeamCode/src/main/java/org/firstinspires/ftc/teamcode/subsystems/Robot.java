@@ -25,11 +25,12 @@ public class Robot {
     }
 
     /**
-     * Stop drivetrain, feed sequence, and Limelight polling on exit.
-     * TOURNAMENT REVIEW: this does NOT stop the flywheel motor; autonomous
-     * callers currently stop it explicitly. TeleOp should be verified on STOP.
+     * Stop all driven motors and Limelight polling on exit.
+     * Explicitly command zero flywheel velocity rather than relying only on
+     * the FTC runtime's automatic motor stop at the end of an OpMode.
      */
     public void shutdown() {
+        actuator.launchMotor(0);
         drivetrain.stop();
         launcher.cancel();
         intake.stopFeeding();
