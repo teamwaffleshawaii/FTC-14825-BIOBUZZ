@@ -108,17 +108,22 @@ public class TeleOperated extends LinearOpMode {
                 updateBallCounter();
                 updateFullAlertLed();
 
-                // Gamepad 2 right bumper begins the automatic feeding sequence.
-                // It is NOT gated on launcherReady: operator must wait for green.
-                // launcher.start() ignores new starts while already busy.
-                if (gamepad2.right_bumper) {
-                    if (!launchBumperWasPressed && !launcher.isBusy()) {
+                // Y is the operator's immediate launcher STOP / RESET command.
+                // Give it priority over right bumper, including when both are held.
+                // Require a NEW bumper press after Y before another volley starts.
+                if (gamepad2.y) {
+                    launcher.cancel(); // Stop all feeders, lower kicker, return to IDLE.
+                    launchBumperWasPressed = gamepad2.right_bumper;
+                } else {
+                    // The feed is not gated on launcherReady; wait for green.
+                    if (gamepad2.right_bumper && !launchBumperWasPressed
+                            && !launcher.isBusy()) {
                         resetBallCounter();
+                        launcher.start();
                     }
-                    launcher.start();
+                    launchBumperWasPressed = gamepad2.right_bumper;
+                    launcher.update();
                 }
-                launchBumperWasPressed = gamepad2.right_bumper;
-                launcher.update();
 
                 launcherTelemetry();
                 limelightTelemetry();
@@ -169,7 +174,7 @@ public class TeleOperated extends LinearOpMode {
         );
     }
     /**
-     * Gamepad 2 X starts the flywheel; Y stops it.
+     * Gamepad 2 X starts the flywheel; Y stops it and cancels feeding.
      * setVelocity() uses encoder ticks/second and the PIDF motor controller.
      * Only alliance-matching, calibrated tags can adjust the target.
      */
@@ -179,12 +184,13 @@ public class TeleOperated extends LinearOpMode {
             targetVelocity = visionVelocity.update(currentAprilTagFrame,
                     targetVelocity, launcher.isBusy());
         }
-        if (gamepad2.x) {
-            if (!flywheelEnabled) flywheelReadyRumbled = false;
-            flywheelEnabled = true;
-        } else if (gamepad2.y) {
+        if (gamepad2.y) {
+            // STOP wins if X and Y are accidentally pressed together.
             flywheelEnabled = false;
             flywheelReadyRumbled = false;
+        } else if (gamepad2.x) {
+            if (!flywheelEnabled) flywheelReadyRumbled = false;
+            flywheelEnabled = true;
         }
         // Reissue the commanded speed while enabled so Dashboard changes
         // take effect immediately; Y still stops the motor as before.
