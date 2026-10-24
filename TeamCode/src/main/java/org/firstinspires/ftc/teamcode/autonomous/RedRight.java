@@ -62,23 +62,23 @@ public class RedRight extends LinearOpMode {
 
         // Collection path: travel from the first shooting area toward flowers.
         Action flowerPosition1 = drive.actionBuilder(new Pose2d(47, -11.5, Math.toRadians(180) ))
-                .splineTo(new Vector2d(30, -44), Math.toRadians(270))
+                .splineTo(new Vector2d(40, -44), Math.toRadians(270))
                 //...
                 .build();
 
         // Continue through the collection area before the timed pause.
-        Action flowerPosition2 = drive.actionBuilder(new Pose2d(30, -44, Math.toRadians(270) ))
-                .strafeTo(new Vector2d(28, -55))
+        Action flowerPosition2 = drive.actionBuilder(new Pose2d(40, -44, Math.toRadians(270) ))
+                .strafeTo(new Vector2d(23, -55))
                 .build();
 
-        Action moveBack = drive.actionBuilder(new Pose2d(28, -55, Math.toRadians(270) ))
-                .strafeToLinearHeading(new Vector2d(25,-44), Math.toRadians(270))
+        Action moveBack = drive.actionBuilder(new Pose2d(25, -55, Math.toRadians(270) ))
+                .strafeToLinearHeading(new Vector2d(28,-44), Math.toRadians(270))
                 .build();
 
         // CHECK: moveBack ends at (25,-44), but this builder starts (28,-44).
         // Confirm whether the 3-inch discrepancy is intentional.
         // Reposition for the second launch.
-        Action movetolaunchPositionLeft = drive.actionBuilder(new Pose2d(28, -44, Math.toRadians(270) ))
+        Action movetolaunchPositionLeft = drive.actionBuilder(new Pose2d(20, -44, Math.toRadians(270) ))
                 .strafeToLinearHeading(new Vector2d(-30,-58), Math.toRadians(90))
                 .build();
 
@@ -86,7 +86,7 @@ public class RedRight extends LinearOpMode {
         // Confirm heading continuity before running on the field.
         // Final approach to the second shooting pose.
         Action launchPositionLeft = drive.actionBuilder(new Pose2d(-30, -58, Math.toRadians(85) ))
-                .strafeToLinearHeading(new Vector2d(-54,-1.5), Math.toRadians(-5))
+                .strafeToLinearHeading(new Vector2d(-54,-0.5), Math.toRadians(-5))
                 .build();
 
         // Parking is a separate trajectory executed after the second volley.
@@ -112,8 +112,7 @@ public class RedRight extends LinearOpMode {
             // runBlocking executes a Road Runner action until it finishes.
             // Do not use a long Thread.sleep() during trajectory following.
             Actions.runBlocking(new SequentialAction(
-                    launchPositionRight,
-                    new SleepAction(1)
+                    launchPositionRight
             ));
 
             // Launch regardless of flywheel readiness so the preload balls
