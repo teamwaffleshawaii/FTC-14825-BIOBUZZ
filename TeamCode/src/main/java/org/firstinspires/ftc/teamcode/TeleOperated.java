@@ -89,6 +89,8 @@ public class TeleOperated extends LinearOpMode {
         launcher = robot.launcher;
         visionVelocity = new AprilTagVelocityController(isRedAlliance());
 
+        // Always clean up after STOP, even if a loop operation throws.
+        try {
         // Initialization happens BEFORE the match; wait until PLAY is pressed.
         waitForStart();
 
@@ -123,7 +125,9 @@ public class TeleOperated extends LinearOpMode {
                 telemetry.update();
             }
         }
-        robot.shutdown();
+        } finally {
+            robot.shutdown();
+        }
     }
 
     /** Translate driver joystick/D-pad inputs into mecanum motor commands. */
