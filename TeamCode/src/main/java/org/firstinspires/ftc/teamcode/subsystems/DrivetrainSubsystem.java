@@ -5,7 +5,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 /**
  * Shared field-centric mecanum controls for TeleOp.
  *
- * Keeps the existing joystick signs, heading transform and D-pad behavior.
+ * Keeps the existing joystick signs and heading transform.
+ * D-pad translation signs are corrected for the physical robot.
  * Road Runner autonomous trajectories continue to use MecanumDrive.
  */
 public class DrivetrainSubsystem {
@@ -52,15 +53,17 @@ public class DrivetrainSubsystem {
             gyroAngle = -Math.PI / 2;
         }
 
+        // D-pad signs verified against driver-reported physical motion:
+        // Up = forward, Down = backward, Left = left, Right = right.
         if (dpadRight) {
-            stickX = 0.5;
-        } else if (dpadLeft) {
             stickX = -0.5;
+        } else if (dpadLeft) {
+            stickX = 0.5;
         }
         if (dpadUp) {
-            stickY = -0.5;
-        } else if (dpadDown) {
             stickY = 0.5;
+        } else if (dpadDown) {
+            stickY = -0.5;
         }
 
         // Rotate the desired translation vector and mix it with rotation.
