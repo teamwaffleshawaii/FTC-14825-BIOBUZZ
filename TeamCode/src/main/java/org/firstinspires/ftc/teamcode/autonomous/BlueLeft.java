@@ -67,10 +67,10 @@ public class BlueLeft extends LinearOpMode {
 
         // Continue through the collection area before the timed pause.
         Action flowerPosition2 = drive.actionBuilder(new Pose2d(38, 33, Math.toRadians(0) ))
-                .strafeTo(new Vector2d(56, 33))
+                .strafeTo(new Vector2d(57, 33))
                 .build();
 
-        Action moveBack = drive.actionBuilder(new Pose2d(56, 33, Math.toRadians(0) ))
+        Action moveBack = drive.actionBuilder(new Pose2d(53, 33, Math.toRadians(0) ))
                 .strafeToLinearHeading(new Vector2d(40,33), Math.toRadians(0))
                 .build();
 
@@ -81,8 +81,8 @@ public class BlueLeft extends LinearOpMode {
                 .build();
 
         // Parking is a separate trajectory executed after the second volley.
-        Action park = drive.actionBuilder(new Pose2d(47, 11, Math.toRadians(184) ))
-                .strafeToLinearHeading(new Vector2d(51,65), Math.toRadians(270))
+        Action park = drive.actionBuilder(new Pose2d(47, 11, Math.toRadians(4) ))
+                .strafeToLinearHeading(new Vector2d(45,65), Math.toRadians(90))
                 .build();
 
         //Create more trajectories as needed
@@ -95,7 +95,7 @@ public class BlueLeft extends LinearOpMode {
         if (opModeIsActive() && !isStopRequested()) {
 
             // Start delay for partner to score and tip.
-            Actions.runBlocking(new SleepAction(12));
+            //Actions.runBlocking(new SleepAction(12));
 
             // Spin up while driving to the first launch position.
             // The first volley starts after arriving, regardless of actual speed.

@@ -81,7 +81,7 @@ public class RedLeft extends LinearOpMode {
                 .build();
 
         // Parking is a separate trajectory executed after the second volley.
-        Action park = drive.actionBuilder(new Pose2d(-47, -11, Math.toRadians(4) ))
+        Action park = drive.actionBuilder(new Pose2d(30, 60, Math.toRadians(4) ))
                 .strafeToLinearHeading(new Vector2d(-51,-65), Math.toRadians(90))
                 .build();
 
