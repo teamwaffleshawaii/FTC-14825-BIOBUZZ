@@ -131,34 +131,29 @@ public class BlueRight extends LinearOpMode {
                 // Both intake() motors (intake and transfer) run during collection.
                 intakeSubsystem.rampDown();
                 intakeSubsystem.intake(1);
-                    Actions.runBlocking(new SequentialAction(
-                            flowerPosition1,
-                            flowerPosition2,
-                            // Road Runner timed pause to allow collection.
-                            // Unlike Thread.sleep(), this is part of the action sequence.
-                            new SleepAction(3.5)
-                    ));
-
-            }
-
-            if (opModeIsActive() && !isStopRequested()) {
-                // Intake is STILL RUNNING during these two staging paths.
-                // It stops only after both paths complete.
                 Actions.runBlocking(new SequentialAction(
-                        moveBack,
-                        movetolaunchPositionLeft ));
+                        flowerPosition1,
+                        flowerPosition2,
+                        // Road Runner timed pause to allow collection.
+                        // Unlike Thread.sleep(), this is part of the action sequence.
+                        new SleepAction(3.5)
+                ));
+
+                // Immediately stop intake, ramp up, and reverse transfer and step-up after pickup
                 intakeSubsystem.rampUp();
                 intakeSubsystem.stopIntake();
-
-                // Same short retract pulse used when releasing intake in TeleOp.
-                // Back the leading balls away from the launcher before the next volley.
                 intakeSubsystem.startStepUpReversePulse();
                 Actions.runBlocking((packet) -> {
                     intakeSubsystem.update();
                     return intakeSubsystem.isStepUpReverseActive();
                 });
-                // update() stops the step-ups; also stop the transfer motor.
                 intakeSubsystem.stopFeeding();
+            }
+
+            if (opModeIsActive() && !isStopRequested()) {
+                Actions.runBlocking(new SequentialAction(
+                        moveBack,
+                        movetolaunchPositionLeft ));
 
                 // Spin up for the second volley on the way to the launch location.
                 launcher.setFlywheelVelocity(LauncherSubsystem.TARGET_VELOCITY);

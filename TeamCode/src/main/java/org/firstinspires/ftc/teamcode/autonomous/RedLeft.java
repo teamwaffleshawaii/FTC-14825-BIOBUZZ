@@ -50,41 +50,44 @@ public class RedLeft extends LinearOpMode {
         // Starting pose is our best estimate of the robot's field position.
         // Road Runner uses it as the reference for subsequent trajectories.
         MecanumDrive drive = new MecanumDrive(hardwareMap,
-                new Pose2d(-60, -11.5, Math.toRadians(0) ) );
+                new Pose2d(-60, -11.5, Math.toRadians(0)));
 
         // Each action begins at the previous action's expected ending pose.
         // Action builders describe a path; .build() creates an executable action.
         // Road Runner does not move the robot until Actions.runBlocking() runs.
-        Action launchPositionRight = drive.actionBuilder(new Pose2d(-60, -11.5, Math.toRadians(0) ))
-                .strafeToLinearHeading(new Vector2d( -47, -11.5), Math.toRadians(0))
+        Action launchPositionRight = drive.actionBuilder(new Pose2d(-60, -11.5, Math.toRadians(0)))
+                .strafeToLinearHeading(new Vector2d(-47, -11.5), Math.toRadians(0))
                 .build();
 
         // Collection path: travel from the first shooting area toward flowers.
-        Action flowerPosition1 = drive.actionBuilder(new Pose2d(-47, -11.5, Math.toRadians(0) ))
+        Action flowerPosition1 = drive.actionBuilder(new Pose2d(-47, -11.5, Math.toRadians(0)))
                 .splineTo(new Vector2d(-38, -33), Math.toRadians(180))
                 //...
                 .build();
 
         // Continue through the collection area before the timed pause.
-        Action flowerPosition2 = drive.actionBuilder(new Pose2d(-38, -33, Math.toRadians(180) ))
+        Action flowerPosition2 = drive.actionBuilder(new Pose2d(-38, -33, Math.toRadians(180)))
                 .strafeTo(new Vector2d(-56, -33))
                 .build();
 
-        Action moveBack = drive.actionBuilder(new Pose2d(-56, -33, Math.toRadians(180) ))
-                .strafeToLinearHeading(new Vector2d(-40,-33), Math.toRadians(180))
+        Action moveBack = drive.actionBuilder(new Pose2d(-56, -33, Math.toRadians(180)))
+                .strafeToLinearHeading(new Vector2d(-40, -33), Math.toRadians(180))
                 .build();
 
         // Return to the second shooting position (same side of field).
-        Action movetolaunchPositionAgain = drive.actionBuilder(new Pose2d(-40, -33, Math.toRadians(180) ))
-                .strafeToLinearHeading(new Vector2d(-47,-12), Math.toRadians(-1))
-                .strafeToLinearHeading(new Vector2d(-47,-11), Math.toRadians(4))
+        Action movetolaunchPositionAgain = drive.actionBuilder(new Pose2d(-40, -33, Math.toRadians(180)))
+                .strafeToLinearHeading(new Vector2d(-47, -12), Math.toRadians(-1))
+                .strafeToLinearHeading(new Vector2d(-45, -23), Math.toRadians(4))
                 .build();
 
         // Parking is a separate trajectory executed after the second volley.
-        Action park = drive.actionBuilder(new Pose2d(30, 60, Math.toRadians(4) ))
-                .strafeToLinearHeading(new Vector2d(-51,-65), Math.toRadians(90))
+        Action park1 = drive.actionBuilder(new Pose2d(-45, -23, Math.toRadians(4)))
+                .strafeToLinearHeading(new Vector2d(-20, -40), Math.toRadians(90))
                 .build();
 
+        Action park2 = drive.actionBuilder(new Pose2d(-10, -65, Math.toRadians(90)))
+                .strafeToLinearHeading(new Vector2d(-45, -65), Math.toRadians(270))
+                .build();
         //Create more trajectories as needed
 
         waitForStart();
@@ -92,37 +95,34 @@ public class RedLeft extends LinearOpMode {
         // try/finally ensures motors are commanded safe values on exit,
         // including when STOP is pressed or an exception occurs.
         try {
-        if (opModeIsActive() && !isStopRequested()) {
-
-            // Start delay for partner to score and tip.
-            Actions.runBlocking(new SleepAction(12));
-
-            // Spin up while driving to the first launch position.
-            // The first volley starts after arriving, regardless of actual speed.
-            launcher.setFlywheelVelocity(LauncherSubsystem.TARGET_VELOCITY);
-            // runBlocking executes a Road Runner action until it finishes.
-            // Do not use a long Thread.sleep() during trajectory following.
-            Actions.runBlocking(new SequentialAction(
-                    launchPositionRight,
-                    new SleepAction(1)
-            ));
-
-            // Launch regardless of flywheel readiness so the preload balls
-            // are cleared before collecting the next four.
             if (opModeIsActive() && !isStopRequested()) {
-                // LauncherAction runs the timed feed state machine, not a drive path.
-                // Sample the local alliance tags, lock the speed, then feed balls.
+
+                // Spin up while driving to the first launch position.
+                // The first volley starts after arriving, regardless of actual speed.
+                launcher.setFlywheelVelocity(LauncherSubsystem.TARGET_VELOCITY);
+                // runBlocking executes a Road Runner action until it finishes.
+                // Do not use a long Thread.sleep() during trajectory following.
+                Actions.runBlocking(new SequentialAction(
+                        launchPositionRight,
+                        new SleepAction(1)
+                ));
+
+                // Launch regardless of flywheel readiness so the preload balls
+                // are cleared before collecting the next four.
+                if (opModeIsActive() && !isStopRequested()) {
+                    // LauncherAction runs the timed feed state machine, not a drive path.
+                    // Sample the local alliance tags, lock the speed, then feed balls.
                     Actions.runBlocking(new AutoVisionLaunchAction(sensor, launcher, actuator, true));
                     Actions.runBlocking(new LauncherAction(launcher));
-            }
+                }
 
-            // Stop the flywheel regardless of whether the first shot succeeded.
-            launcher.setFlywheelVelocity(0);
+                // Stop the flywheel regardless of whether the first shot succeeded.
+                launcher.setFlywheelVelocity(0);
 
-            if (opModeIsActive() && !isStopRequested()) {
-                // Both intake() motors (intake and transfer) run during collection.
-                intakeSubsystem.rampDown();
-                intakeSubsystem.intake(1);
+                if (opModeIsActive() && !isStopRequested()) {
+                    // Both intake() motors (intake and transfer) run during collection.
+                    intakeSubsystem.rampDown();
+                    intakeSubsystem.intake(1);
                     Actions.runBlocking(new SequentialAction(
                             flowerPosition1,
                             flowerPosition2,
@@ -131,65 +131,58 @@ public class RedLeft extends LinearOpMode {
                             new SleepAction(3.5)
                     ));
 
-            }
-
-            if (opModeIsActive() && !isStopRequested()) {
-                // Keep intake AND transfer running until the robot reaches the
-                // second launch position, as requested. The launcher feed state
-                // machine is not started during either return trajectory.
-                Actions.runBlocking(moveBack);
-                if (opModeIsActive() && !isStopRequested()) {
-                    // Spin up the flywheel during the final approach.
-                    launcher.setFlywheelVelocity(LauncherSubsystem.TARGET_VELOCITY);
-                    Actions.runBlocking(movetolaunchPositionAgain);
-                }
-
-                // Now stop intake/transfer and back balls away from the launcher.
-                intakeSubsystem.stopIntake();
-                intakeSubsystem.rampUp();
-                if (opModeIsActive() && !isStopRequested()) {
-                    // Uses the shared retract default; adjust duration only after testing.
+                    // Immediately stop intake, ramp up, and reverse transfer and step-up after pickup
+                    intakeSubsystem.rampUp();
+                    intakeSubsystem.stopIntake();
                     intakeSubsystem.startStepUpReversePulse();
                     Actions.runBlocking((packet) -> {
                         intakeSubsystem.update();
                         return intakeSubsystem.isStepUpReverseActive();
                     });
+                    intakeSubsystem.stopFeeding();
                 }
-                intakeSubsystem.stopFeeding();
 
-                // Allow the flywheel to settle after retract, before feeding.
                 if (opModeIsActive() && !isStopRequested()) {
-                    Actions.runBlocking(new SleepAction(1));
+                    Actions.runBlocking(moveBack);
+                    if (opModeIsActive() && !isStopRequested()) {
+                        // Spin up the flywheel during the final approach.
+                        launcher.setFlywheelVelocity(LauncherSubsystem.TARGET_VELOCITY);
+                        Actions.runBlocking(movetolaunchPositionAgain);
+                    }
+
+                    // Allow the flywheel to settle after retract, before feeding.
+                    if (opModeIsActive() && !isStopRequested()) {
+                        Actions.runBlocking(new SleepAction(1));
+                    }
+
+                    // Uses the shared autonomous 40 ms empty delay.
+                    // This second volley must first detect a ball
+                    // before an empty sensor reading is allowed to raise the kicker.
+                    // This prevents an initially empty sensor from ending the volley.
+                    launcher.requireBallBeforeKicker = true;
+
+                    // LauncherAction feeds the second four balls only after the return
+                    // drive and spin-up delay. Uses the same 0.04 s delay as Blue Right.
+                    // Like Blue Right, this does not gate on measured flywheel readiness.
+                    if (opModeIsActive() && !isStopRequested()) {
+                        // Sample the local alliance tags, lock the speed, then feed balls.
+                        Actions.runBlocking(new AutoVisionLaunchAction(sensor, launcher, actuator, true));
+                        Actions.runBlocking(new LauncherAction(launcher));
+                    }
+                    launcher.setFlywheelVelocity(0);
                 }
 
-                // Uses the shared autonomous 40 ms empty delay.
-                // This second volley must first detect a ball
-                // before an empty sensor reading is allowed to raise the kicker.
-                // This prevents an initially empty sensor from ending the volley.
-                launcher.requireBallBeforeKicker = true;
-
-                // LauncherAction feeds the second four balls only after the return
-                // drive and spin-up delay. Uses the same 0.04 s delay as Blue Right.
-                // Like Blue Right, this does not gate on measured flywheel readiness.
+                // Park after autonomous sequence.
                 if (opModeIsActive() && !isStopRequested()) {
-                    // Sample the local alliance tags, lock the speed, then feed balls.
-                    Actions.runBlocking(new AutoVisionLaunchAction(sensor, launcher, actuator, true));
-                    Actions.runBlocking(new LauncherAction(launcher));
+                    Actions.runBlocking(new SequentialAction(
+                            park1,
+                            park2));
                 }
-                launcher.setFlywheelVelocity(0);
             }
-
-            // Park after autonomous sequence.
-            if (opModeIsActive() && !isStopRequested()) {
-                Actions.runBlocking(park);
-            }
-        }
-        // Cleanup executes whether autonomous finishes normally or stops early.
+            // Cleanup executes whether autonomous finishes normally or stops early.
         } finally {
             launcher.setFlywheelVelocity(0);
-            intakeSubsystem.rampUp();
             robot.shutdown();
         }
     }
-
 }

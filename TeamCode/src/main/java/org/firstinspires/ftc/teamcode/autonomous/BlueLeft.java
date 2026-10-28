@@ -70,7 +70,7 @@ public class BlueLeft extends LinearOpMode {
                 .strafeTo(new Vector2d(57, 33))
                 .build();
 
-        Action moveBack = drive.actionBuilder(new Pose2d(53, 33, Math.toRadians(0) ))
+        Action moveBack = drive.actionBuilder(new Pose2d(57, 33, Math.toRadians(0) ))
                 .strafeToLinearHeading(new Vector2d(40,33), Math.toRadians(0))
                 .build();
 
@@ -81,8 +81,8 @@ public class BlueLeft extends LinearOpMode {
                 .build();
 
         // Parking is a separate trajectory executed after the second volley.
-        Action park = drive.actionBuilder(new Pose2d(47, 11, Math.toRadians(4) ))
-                .strafeToLinearHeading(new Vector2d(45,65), Math.toRadians(90))
+        Action park = drive.actionBuilder(new Pose2d(47, 11, Math.toRadians(184) ))
+                .strafeToLinearHeading(new Vector2d(33,64), Math.toRadians(90))
                 .build();
 
         //Create more trajectories as needed
@@ -93,9 +93,6 @@ public class BlueLeft extends LinearOpMode {
         // including when STOP is pressed or an exception occurs.
         try {
         if (opModeIsActive() && !isStopRequested()) {
-
-            // Start delay for partner to score and tip.
-            //Actions.runBlocking(new SleepAction(12));
 
             // Spin up while driving to the first launch position.
             // The first volley starts after arriving, regardless of actual speed.
@@ -122,39 +119,32 @@ public class BlueLeft extends LinearOpMode {
                 // Both intake() motors (intake and transfer) run during collection.
                 intakeSubsystem.rampDown();
                 intakeSubsystem.intake(1);
-                    Actions.runBlocking(new SequentialAction(
-                            flowerPosition1,
-                            flowerPosition2,
-                            // Road Runner timed pause to allow collection.
-                            // Unlike Thread.sleep(), this is part of the action sequence.
-                            new SleepAction(3.5)
-                    ));
+                Actions.runBlocking(new SequentialAction(
+                        flowerPosition1,
+                        flowerPosition2,
+                        // Road Runner timed pause to allow collection.
+                        // Unlike Thread.sleep(), this is part of the action sequence.
+                        new SleepAction(3.5)
+                ));
 
+                // Immediately stop intake, ramp up, and reverse transfer and step-up after pickup
+                intakeSubsystem.rampUp();
+                intakeSubsystem.stopIntake();
+                intakeSubsystem.startStepUpReversePulse();
+                Actions.runBlocking((packet) -> {
+                    intakeSubsystem.update();
+                    return intakeSubsystem.isStepUpReverseActive();
+                });
+                intakeSubsystem.stopFeeding();
             }
 
             if (opModeIsActive() && !isStopRequested()) {
-                // Keep intake AND transfer running until the robot reaches the
-                // second launch position, as requested. The launcher feed state
-                // machine is not started during either return trajectory.
                 Actions.runBlocking(moveBack);
                 if (opModeIsActive() && !isStopRequested()) {
                     // Spin up the flywheel during the final approach.
                     launcher.setFlywheelVelocity(LauncherSubsystem.TARGET_VELOCITY);
                     Actions.runBlocking(movetolaunchPositionAgain);
                 }
-
-                // Now stop intake/transfer and back balls away from the launcher.
-                intakeSubsystem.stopIntake();
-                intakeSubsystem.rampUp();
-                if (opModeIsActive() && !isStopRequested()) {
-                    // Uses the shared retract default; adjust duration only after testing.
-                    intakeSubsystem.startStepUpReversePulse();
-                    Actions.runBlocking((packet) -> {
-                        intakeSubsystem.update();
-                        return intakeSubsystem.isStepUpReverseActive();
-                    });
-                }
-                intakeSubsystem.stopFeeding();
 
                 // Allow the flywheel to settle after retract, before feeding.
                 if (opModeIsActive() && !isStopRequested()) {
@@ -180,7 +170,8 @@ public class BlueLeft extends LinearOpMode {
 
             // Park after autonomous sequence.
             if (opModeIsActive() && !isStopRequested()) {
-                Actions.runBlocking(park);
+                Actions.runBlocking(new SequentialAction(
+                        park));
             }
         }
         // Cleanup executes whether autonomous finishes normally or stops early.

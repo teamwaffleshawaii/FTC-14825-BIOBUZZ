@@ -12,10 +12,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class IntakeSubsystem {
     // Dashboard-adjustable pulse after the last A button is released.
     public static double STEPUP_RELEASE_REVERSE_SECONDS = 0.20;
-    public static double STEPUP_RELEASE_REVERSE_POWER = 0.4;
-    public static double TRANSFER_RELEASE_REVERSE_POWER = 0.4;
+    public static double STEPUP_RELEASE_REVERSE_POWER = 0.5;
+    public static double TRANSFER_RELEASE_REVERSE_POWER = 0.35;
     // Tuned transfer speed during launcher feeding (encoder ticks/second).
-    private static final double TRANSFER_FEED_VELOCITY = 1650.0;
+    private static final double TRANSFER_FEED_VELOCITY = 2400.0;
     private boolean transferVelocityModeActive = false;
     private final ElapsedTime stepUpReverseTimer = new ElapsedTime();
     private boolean wasIntaking = false;
