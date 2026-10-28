@@ -86,16 +86,16 @@ public class RedRight extends LinearOpMode {
         // Confirm heading continuity before running on the field.
         // Final approach to the second shooting pose.
         Action launchPositionLeft = drive.actionBuilder(new Pose2d(-30, -58, Math.toRadians(85) ))
-                .strafeToLinearHeading(new Vector2d(-54,-0.5), Math.toRadians(-5))
+                .strafeToLinearHeading(new Vector2d(-54,-17), Math.toRadians(-5))
                 .build();
 
         // Parking is a separate trajectory executed after the second volley.
-        Action park1 = drive.actionBuilder(new Pose2d(-54, -1.5, Math.toRadians(-5) ))
-                .strafeToLinearHeading(new Vector2d(-30,-46), Math.toRadians(90))
+        Action park1 = drive.actionBuilder(new Pose2d(-54, -17, Math.toRadians(-5) ))
+                .strafeToLinearHeading(new Vector2d(-54,-30), Math.toRadians(90))
                 .build();
 
-        Action park2 = drive.actionBuilder(new Pose2d(-30, -46, Math.toRadians(90) ))
-                .strafeToLinearHeading(new Vector2d(-30,-56), Math.toRadians(90))
+        Action park2 = drive.actionBuilder(new Pose2d(-54, -30, Math.toRadians(90) ))
+                .strafeToLinearHeading(new Vector2d(-60,-54), Math.toRadians(90))
                 .build();
 
         //Create more trajectories as needed
@@ -136,10 +136,12 @@ public class RedRight extends LinearOpMode {
                         flowerPosition2,
                         // Road Runner timed pause to allow collection.
                         // Unlike Thread.sleep(), this is part of the action sequence.
-                        new SleepAction(3.5)
+                        new SleepAction(4.5),
+                        // Reverse out of flowers before raising ramp
+                        moveBack
                 ));
 
-                // Immediately stop intake, ramp up, and reverse transfer and step-up after pickup
+                // After backing out of flowers, raise ramp, stop intake, and reverse transfer
                 intakeSubsystem.rampUp();
                 intakeSubsystem.stopIntake();
                 intakeSubsystem.startStepUpReversePulse();
@@ -151,9 +153,7 @@ public class RedRight extends LinearOpMode {
             }
 
             if (opModeIsActive() && !isStopRequested()) {
-                Actions.runBlocking(new SequentialAction(
-                        moveBack,
-                        movetolaunchPositionLeft ));
+                Actions.runBlocking(movetolaunchPositionLeft);
 
                 // Spin up for the second volley on the way to the launch location.
                 launcher.setFlywheelVelocity(LauncherSubsystem.TARGET_VELOCITY);

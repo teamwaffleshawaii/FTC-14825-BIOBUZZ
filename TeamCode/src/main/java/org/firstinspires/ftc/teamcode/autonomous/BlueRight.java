@@ -136,10 +136,12 @@ public class BlueRight extends LinearOpMode {
                         flowerPosition2,
                         // Road Runner timed pause to allow collection.
                         // Unlike Thread.sleep(), this is part of the action sequence.
-                        new SleepAction(3.5)
+                        new SleepAction(4.5),
+                        // Reverse out of flowers before raising ramp
+                        moveBack
                 ));
 
-                // Immediately stop intake, ramp up, and reverse transfer and step-up after pickup
+                // After backing out of flowers, raise ramp, stop intake, and reverse transfer
                 intakeSubsystem.rampUp();
                 intakeSubsystem.stopIntake();
                 intakeSubsystem.startStepUpReversePulse();
@@ -151,9 +153,7 @@ public class BlueRight extends LinearOpMode {
             }
 
             if (opModeIsActive() && !isStopRequested()) {
-                Actions.runBlocking(new SequentialAction(
-                        moveBack,
-                        movetolaunchPositionLeft ));
+                Actions.runBlocking(movetolaunchPositionLeft);
 
                 // Spin up for the second volley on the way to the launch location.
                 launcher.setFlywheelVelocity(LauncherSubsystem.TARGET_VELOCITY);

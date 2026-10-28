@@ -76,17 +76,17 @@ public class RedLeft extends LinearOpMode {
 
         // Return to the second shooting position (same side of field).
         Action movetolaunchPositionAgain = drive.actionBuilder(new Pose2d(-40, -33, Math.toRadians(180)))
-                .strafeToLinearHeading(new Vector2d(-47, -12), Math.toRadians(-1))
-                .strafeToLinearHeading(new Vector2d(-45, -23), Math.toRadians(4))
+                .strafeToLinearHeading(new Vector2d(-45, -12), Math.toRadians(-1))
+                .strafeToLinearHeading(new Vector2d(-45, -25), Math.toRadians(4))
                 .build();
 
         // Parking is a separate trajectory executed after the second volley.
         Action park1 = drive.actionBuilder(new Pose2d(-45, -23, Math.toRadians(4)))
-                .strafeToLinearHeading(new Vector2d(-20, -40), Math.toRadians(90))
+                .strafeToLinearHeading(new Vector2d(-50, -40), Math.toRadians(90))
                 .build();
 
-        Action park2 = drive.actionBuilder(new Pose2d(-10, -65, Math.toRadians(90)))
-                .strafeToLinearHeading(new Vector2d(-45, -65), Math.toRadians(270))
+        Action park2 = drive.actionBuilder(new Pose2d(-50, -40, Math.toRadians(90)))
+                .strafeToLinearHeading(new Vector2d(-50, -65), Math.toRadians(90))
                 .build();
         //Create more trajectories as needed
 
@@ -128,10 +128,12 @@ public class RedLeft extends LinearOpMode {
                             flowerPosition2,
                             // Road Runner timed pause to allow collection.
                             // Unlike Thread.sleep(), this is part of the action sequence.
-                            new SleepAction(3.5)
+                            new SleepAction(4.5),
+                            // Reverse out of flowers before raising ramp
+                            moveBack
                     ));
 
-                    // Immediately stop intake, ramp up, and reverse transfer and step-up after pickup
+                    // After backing out of flowers, raise ramp, stop intake, and reverse transfer
                     intakeSubsystem.rampUp();
                     intakeSubsystem.stopIntake();
                     intakeSubsystem.startStepUpReversePulse();
@@ -143,7 +145,6 @@ public class RedLeft extends LinearOpMode {
                 }
 
                 if (opModeIsActive() && !isStopRequested()) {
-                    Actions.runBlocking(moveBack);
                     if (opModeIsActive() && !isStopRequested()) {
                         // Spin up the flywheel during the final approach.
                         launcher.setFlywheelVelocity(LauncherSubsystem.TARGET_VELOCITY);
