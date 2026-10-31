@@ -85,7 +85,7 @@ public class Actuators {
         stepUpLeft.setDirection(CRServo.Direction.REVERSE);
         stepUpRight.setDirection(CRServo.Direction.FORWARD);
         intakeServoRight.setDirection(Servo.Direction.FORWARD);
-        intakeServoLeft.setDirection(Servo.Direction.REVERSE);
+        intakeServoLeft.setDirection(Servo.Direction.FORWARD);
     }
 
     // Power-based wheel controls.
@@ -156,13 +156,13 @@ public class Actuators {
 
     // The left/right ramp servos move together to open or close the ramp.
     public void intakeRampDown() {
-        intakeServoLeft.setPosition(0.5);
-        intakeServoRight.setPosition(0.5);
+        intakeServoLeft.setPosition(0.3);
+        intakeServoRight.setPosition(0.4);
     }
 
     public void intakeRampUp() {
-        intakeServoLeft.setPosition(0.0);
-        intakeServoRight.setPosition(0.0);
+        intakeServoLeft.setPosition(0.78);
+        intakeServoRight.setPosition(0);
     }
 
 }
