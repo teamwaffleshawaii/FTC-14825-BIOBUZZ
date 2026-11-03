@@ -16,7 +16,7 @@ import java.util.Arrays;
 public class TurretAimController {
 
     // Mechanically centered on the goal after raising the Limelight; field-verified.
-    public static double SERVO_CENTER = 0.49;
+    public static double SERVO_CENTER = 0.52;
     // Increasing servo position turns LEFT. Positive TX points RIGHT.
     public static double SERVO_PER_DEGREE = 0.016;
     public static double TX_DEADBAND_DEGREES = 0.5;
