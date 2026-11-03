@@ -17,14 +17,14 @@ public class TurretAimController {
 
     // Mechanical turret center, recalibrated to 0.48.
     public static double SERVO_CENTER = 0.48;
-    //adjust this as needed
+    // Servo position change per degree of horizontal aiming correction.
     public static double SERVO_PER_DEGREE = 0.016;
     public static double TX_DEADBAND_DEGREES = 0.5;
     public static double SERVO_MIN = 0.00;
     public static double SERVO_MAX = 1.00;
+    // Field-tested common TX bias at 1020, 1035, and 1070 ticks/sec.
+    // Tune in Dashboard only if automatic aim is consistently off-center.
     public static double TX_CENTER_OFFSET_DEGREES = -2.0;
-    //adjust this in FTC Dashboard and make changes if head is not centered
-
 
 
     // Measured RED 30-33 TX offsets, provisionally reused for both RED and BLUE tag groups.
