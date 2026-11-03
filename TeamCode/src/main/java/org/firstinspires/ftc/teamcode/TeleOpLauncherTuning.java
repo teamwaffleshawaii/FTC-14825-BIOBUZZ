@@ -13,10 +13,20 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 public class TeleOpLauncherTuning extends TeleOperated {
     public static double TARGET_TICKS_PER_SECOND = 1020.0;
 
+    private static final String TUNING_CODE_VERSION = "DIAG-2026-11-03-A";
+    private double effectiveLauncherTarget = Double.NaN;
+
     @Override
     protected double getLaunchTargetVelocity() {
         double target = TARGET_TICKS_PER_SECOND;
-        if (!Double.isFinite(target)) return 0.0;
-        return Math.max(0.0, target);
+        effectiveLauncherTarget = Double.isFinite(target) ? Math.max(0.0, target) : 0.0;
+        return effectiveLauncherTarget;
+    }
+    @Override
+    public void launcherTelemetry() {
+        super.launcherTelemetry();
+        telemetry.addData("Dashboard Config Target", TARGET_TICKS_PER_SECOND);
+        telemetry.addData("Effective Launcher Target", effectiveLauncherTarget);
+        telemetry.addData("Tuning Code Version", TUNING_CODE_VERSION);
     }
 }
