@@ -21,7 +21,8 @@ public class VisionConstants {
 
     // Height is measured from the FLOOR to the CENTER of the camera lens.
     // Pitch is measured from horizontal: 0 = level, +45 = pointing upward.
-    // These are current approximate measurements, not precise calibration.
+    // Height is currently recorded as 12 inches; verify from floor to lens center.
+    // These values are documentation only until a pose/distance calculation uses them.
     public static double CAMERA_HEIGHT_IN = 12.0;
     public static double CAMERA_PITCH_DEG = 45.0;
 
