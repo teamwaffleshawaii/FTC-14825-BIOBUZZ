@@ -49,22 +49,23 @@ public class Actuators {
         // Encoder feedback enables velocity control; LauncherSubsystem sets PIDF.
         launchMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        // Zero-power behavior for each motor.
+        // Zero-power behavior for each motor. The selected values below are intentional;
+    // BRAKE resists motion while FLOAT lets a mechanism coast.
         // BRAKE resists motion at zero power; FLOAT allows coasting.
-        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); //or FLOAT
+        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); 
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); //or FLOAT
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); //or FLOAT
         rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); //or FLOAT
         intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); //or FLOAT
         transferMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); //or FLOAT
-        launchMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT); //or BRAKE
+        launchMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT); 
 
-        // Calibrated motor directions.
+        // Calibrated motor directions; do not reverse these without physical testing.
         // Opposite sides of a drivetrain may need reversed directions
         // so a positive command moves the robot the intended way.
-        leftFront.setDirection(DcMotorSimple.Direction.REVERSE); //or FORWARD
+        leftFront.setDirection(DcMotorSimple.Direction.REVERSE); 
         leftBack.setDirection(DcMotorSimple.Direction.REVERSE); //or FORWARD
-        rightFront.setDirection(DcMotorSimple.Direction.FORWARD); //or REVERSE
+        rightFront.setDirection(DcMotorSimple.Direction.FORWARD); 
         rightBack.setDirection(DcMotorSimple.Direction.FORWARD); //or REVERSE
         intakeMotor.setDirection(DcMotorSimple.Direction.FORWARD); //or REVERSE
         transferMotor.setDirection(DcMotorSimple.Direction.REVERSE); //or FORWARD
@@ -159,7 +160,7 @@ public class Actuators {
         intakeServoLeft.setPosition(0.71);
         intakeServoRight.setPosition(0.71);
     }
-//0.78
+
     public void intakeRampUp() {
         intakeServoLeft.setPosition(0.10);
         intakeServoRight.setPosition(0.10);
