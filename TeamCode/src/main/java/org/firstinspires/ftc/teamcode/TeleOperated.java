@@ -178,12 +178,18 @@ public class TeleOperated extends LinearOpMode {
      * setVelocity() uses encoder ticks/second and the PIDF motor controller.
      * Only alliance-matching, calibrated tags can adjust the target.
      */
-    public void launch() {
+    /** Child tuning modes may select a manual target without changing global settings. */
+    protected double getLaunchTargetVelocity() {
         double targetVelocity = LauncherSubsystem.TARGET_VELOCITY;
         if (AprilTagVelocityController.ENABLED) {
             targetVelocity = visionVelocity.update(currentAprilTagFrame,
                     targetVelocity, launcher.isBusy());
         }
+        return targetVelocity;
+    }
+
+    public void launch() {
+        double targetVelocity = getLaunchTargetVelocity();
         if (gamepad2.y) {
             // STOP wins if X and Y are accidentally pressed together.
             flywheelEnabled = false;
