@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 @Config
 @TeleOp(name = "TeleOp-LauncherTuning", group = "Tuning")
 public class TeleOpLauncherTuning extends TeleOperated {
-    public static double TARGET_TICKS_PER_SECOND = 1020.0;
+    public static double TARGET_TICKS_PER_SECOND = 1035.0;
 
     @Override
     protected double getLaunchTargetVelocity() {
