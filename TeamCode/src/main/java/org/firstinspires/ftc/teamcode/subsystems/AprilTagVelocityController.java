@@ -19,18 +19,16 @@ public class AprilTagVelocityController {
     public static double SMOOTHING = 0.25; // 0..1, larger responds faster
     public static double LOST_TARGET_HOLD_SECONDS = 0.5;
 
-    // Rows: tag position left-to-right (0..3); columns: measured positions 1, 2, 3.
-    // Reused for each group of four tags, as requested.
-    // Raised Limelight (+~5 in), recalibrated using RED tags 34-37.
-    // Calibration velocities: 1020, 1040, 1000 ticks/s respectively.
-    // Tag 34/35/36/37 map to rows 0/1/2/3. TX readings are not used here.
+    // Rows: tags 34, 35, 36, 37 (same positions in other tag groups).
+    // Columns: TY measured at 1070, 1035, 1020 ticks/second.
+    // TX is not used for velocity.
     private static final double[][] TAG_POSITION_TY = {
-            {4.40, -0.78, 9.45}, // tag 34
-            {4.41, -0.81, 9.33}, // tag 35
-            {4.42, -0.90, 9.56}, // tag 36
-            {4.42, -0.97, 9.55}  // tag 37
+            {-0.72, 4.95, 7.60}, // tag 34
+            {-0.78, 4.81, 7.60}, // tag 35
+            {-0.84, 4.61, 7.48}, // tag 36
+            {-0.93, 4.45, 7.43}  // tag 37
     };
-    private static final double[] CALIBRATED_SPEEDS = {1020, 1040, 1000};
+    private static final double[] CALIBRATED_SPEEDS = {1070, 1035, 1020};
 
     private final boolean redAlliance;
     private final ElapsedTime sinceValid = new ElapsedTime();
@@ -84,17 +82,16 @@ public class AprilTagVelocityController {
         return filteredVelocity;
     }
 
-    /** Piecewise linear TY interpolation, clamped to the calibrated endpoints. */
+    /** Piecewise linear TY interpolation, clamped to the measured endpoints. */
     private static double interpolate(double[] ty, double observed) {
-        // Measured TY decreases as required velocity increases.
-        if (observed <= ty[1]) return CALIBRATED_SPEEDS[1];
+        if (observed <= ty[0]) return CALIBRATED_SPEEDS[0];
         if (observed >= ty[2]) return CALIBRATED_SPEEDS[2];
-        if (observed <= ty[0]) {
-            double t = (observed - ty[1]) / (ty[0] - ty[1]);
-            return CALIBRATED_SPEEDS[1] + t * (CALIBRATED_SPEEDS[0] - CALIBRATED_SPEEDS[1]);
+        if (observed <= ty[1]) {
+            double t = (observed - ty[0]) / (ty[1] - ty[0]);
+            return CALIBRATED_SPEEDS[0] + t * (CALIBRATED_SPEEDS[1] - CALIBRATED_SPEEDS[0]);
         }
-        double t = (observed - ty[0]) / (ty[2] - ty[0]);
-        return CALIBRATED_SPEEDS[0] + t * (CALIBRATED_SPEEDS[2] - CALIBRATED_SPEEDS[0]);
+        double t = (observed - ty[1]) / (ty[2] - ty[1]);
+        return CALIBRATED_SPEEDS[1] + t * (CALIBRATED_SPEEDS[2] - CALIBRATED_SPEEDS[1]);
     }
 
     public int getCalibratedTagsSeen() { return calibratedTagsSeen; }
