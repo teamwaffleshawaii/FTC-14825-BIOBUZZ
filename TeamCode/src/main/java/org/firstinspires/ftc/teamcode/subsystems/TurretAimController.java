@@ -17,12 +17,15 @@ public class TurretAimController {
 
     // Mechanical turret center, recalibrated to 0.48.
     public static double SERVO_CENTER = 0.48;
-    // Increasing servo position turns LEFT. Positive TX points RIGHT.
+    //adjust this as needed
     public static double SERVO_PER_DEGREE = 0.016;
     public static double TX_DEADBAND_DEGREES = 0.5;
     public static double SERVO_MIN = 0.00;
     public static double SERVO_MAX = 1.00;
     public static double TX_CENTER_OFFSET_DEGREES = -2.0;
+    //adjust this in FTC Dashboard and make changes if head is not centered
+
+
 
     // Measured RED 30-33 TX offsets, provisionally reused for both RED and BLUE tag groups.
     public static double[] TAG_TX_OFFSETS = {-7.04, -3.02, 2.96, 7.02};

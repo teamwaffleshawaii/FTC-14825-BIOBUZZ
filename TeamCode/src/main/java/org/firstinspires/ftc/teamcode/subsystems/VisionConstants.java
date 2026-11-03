@@ -22,7 +22,7 @@ public class VisionConstants {
     // Height is measured from the FLOOR to the CENTER of the camera lens.
     // Pitch is measured from horizontal: 0 = level, +45 = pointing upward.
     // These are current approximate measurements, not precise calibration.
-    public static double CAMERA_HEIGHT_IN = 3.0;
+    public static double CAMERA_HEIGHT_IN = 12.0;
     public static double CAMERA_PITCH_DEG = 45.0;
 
     // Offsets are measured from the ROBOT'S chosen reference point.
