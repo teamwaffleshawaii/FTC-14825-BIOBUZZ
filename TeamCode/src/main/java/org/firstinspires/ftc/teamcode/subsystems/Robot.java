@@ -25,11 +25,15 @@ public class Robot {
     }
 
     /**
-     * Stop all driven motors and Limelight polling on exit.
+     * Return the turret and intake ramp to their stowed positions, then
+     * stop driven motors and Limelight polling on exit.
      * Explicitly command zero flywheel velocity rather than relying only on
      * the FTC runtime's automatic motor stop at the end of an OpMode.
      */
     public void shutdown() {
+        // Leave the turret centered and flower ramp raised for the next OpMode.
+        actuator.turretServo.setPosition(TurretAimController.SERVO_CENTER);
+        actuator.intakeRampUp();
         actuator.launchMotor(0);
         drivetrain.stop();
         launcher.cancel();
