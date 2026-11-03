@@ -22,7 +22,7 @@ public class TurretAimController {
     public static double TX_DEADBAND_DEGREES = 0.5;
     public static double SERVO_MIN = 0.00;
     public static double SERVO_MAX = 1.00;
-    public static double TX_CENTER_OFFSET_DEGREES = 0.0;
+    public static double TX_CENTER_OFFSET_DEGREES = -2.0;
 
     // Measured RED 30-33 TX offsets, provisionally reused for both RED and BLUE tag groups.
     public static double[] TAG_TX_OFFSETS = {-7.04, -3.02, 2.96, 7.02};
