@@ -79,13 +79,13 @@ public class Actuators {
         intakeServoLeft = hwMap.get(Servo.class, "intakeServoLeft");
         turretServo = hwMap.get(Servo.class, "turretServo");
         // Center the turret at initialization for TeleOp and all Robot-based autos.
-        turretServo.setPosition(0.46);
+        turretServo.setPosition(0.49);
         ledIndicator = hwMap.get(Servo.class, "indicatorLED");
         // Calibrated servo directions.
         stepUpLeft.setDirection(CRServo.Direction.REVERSE);
         stepUpRight.setDirection(CRServo.Direction.FORWARD);
         intakeServoRight.setDirection(Servo.Direction.FORWARD);
-        intakeServoLeft.setDirection(Servo.Direction.FORWARD);
+        intakeServoLeft.setDirection(Servo.Direction.REVERSE);
     }
 
     // Power-based wheel controls.
@@ -156,13 +156,13 @@ public class Actuators {
 
     // The left/right ramp servos move together to open or close the ramp.
     public void intakeRampDown() {
-        intakeServoLeft.setPosition(0.1);
-        intakeServoRight.setPosition(0.8);
+        intakeServoLeft.setPosition(0.71);
+        intakeServoRight.setPosition(0.71);
     }
 //0.78
     public void intakeRampUp() {
-        intakeServoLeft.setPosition(0.63);
-        intakeServoRight.setPosition(0.28);
+        intakeServoLeft.setPosition(0.10);
+        intakeServoRight.setPosition(0.10);
     }
 
 }
