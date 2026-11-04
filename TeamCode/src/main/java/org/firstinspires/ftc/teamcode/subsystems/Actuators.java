@@ -131,7 +131,7 @@ public class Actuators {
 
     /** Ready means positive target and measured speed within 30 encoder ticks/s. */
     public boolean isLaunchReady(double targetVelocity) {
-        final double tolerance = 30.0; // Encoder ticks per second, not RPM
+        final double tolerance = 25.0; // Encoder ticks per second, not RPM
         return targetVelocity > 0 &&
                 Math.abs(getLaunchVelocity() - targetVelocity) <= tolerance;
     }

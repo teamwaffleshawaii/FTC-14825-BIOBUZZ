@@ -24,7 +24,7 @@ public class TurretAimController {
     public static double SERVO_MAX = 1.00;
     // Field-tested common TX bias at 1020, 1035, and 1070 ticks/sec.
     // Tune in Dashboard only if automatic aim is consistently off-center.
-    public static double TX_CENTER_OFFSET_DEGREES = -2.0;
+    public static double TX_CENTER_OFFSET_DEGREES = 1.0; //adjust this as needed
 
 
     // Measured RED 30-33 TX offsets, provisionally reused for both RED and BLUE tag groups.
