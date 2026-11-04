@@ -22,7 +22,7 @@ import org.firstinspires.ftc.teamcode.odometry.MecanumDrive;
  * x and y describe position; heading describes robot rotation.
  * Dashboard draws a robot icon so we can visualize the estimated pose.
  */
-//@Disabled
+@Disabled
 @TeleOp
 public class AutoMap extends LinearOpMode {
     @Override

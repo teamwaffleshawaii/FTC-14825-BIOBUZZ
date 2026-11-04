@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
  * TARGET_TICKS_PER_SECOND from FTC Dashboard, never from AprilTags.
  */
 @Config
-@TeleOp(name = "TeleOp-LauncherTuning", group = "Tuning")
+@TeleOp(name = "Launcher Tuning", group = "Tuning")
 public class TeleOpLauncherTuning extends TeleOperated {
     public static double TARGET_TICKS_PER_SECOND = 1035.0;
 

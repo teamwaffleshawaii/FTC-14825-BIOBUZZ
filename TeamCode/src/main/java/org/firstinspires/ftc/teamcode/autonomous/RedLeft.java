@@ -60,13 +60,8 @@ public class RedLeft extends LinearOpMode {
                 .build();
 
         // Collection path: travel from the first shooting area toward flowers.
-        Action flowerPosition1 = drive.actionBuilder(new Pose2d(-47, -11.5, Math.toRadians(0)))
+        Action flowerPosition = drive.actionBuilder(new Pose2d(-47, -11.5, Math.toRadians(0)))
                 .splineTo(new Vector2d(-38, -33), Math.toRadians(180))
-                //...
-                .build();
-
-        // Continue through the collection area before the timed pause.
-        Action flowerPosition2 = drive.actionBuilder(new Pose2d(-38, -33, Math.toRadians(180)))
                 .strafeTo(new Vector2d(-56, -33))
                 .build();
 
@@ -81,14 +76,10 @@ public class RedLeft extends LinearOpMode {
                 .build();
 
         // Parking is a separate trajectory executed after the second volley.
-        Action park1 = drive.actionBuilder(new Pose2d(-45, -23, Math.toRadians(4)))
+        Action park = drive.actionBuilder(new Pose2d(-45, -23, Math.toRadians(4)))
                 .strafeToLinearHeading(new Vector2d(-50, -40), Math.toRadians(90))
-                .build();
-
-        Action park2 = drive.actionBuilder(new Pose2d(-50, -40, Math.toRadians(90)))
                 .strafeToLinearHeading(new Vector2d(-50, -65), Math.toRadians(90))
                 .build();
-        //Create more trajectories as needed
 
         waitForStart();
 
@@ -124,11 +115,10 @@ public class RedLeft extends LinearOpMode {
                     intakeSubsystem.rampDown();
                     intakeSubsystem.intake(1);
                     Actions.runBlocking(new SequentialAction(
-                            flowerPosition1,
-                            flowerPosition2,
+                            flowerPosition,
                             // Road Runner timed pause to allow collection.
                             // Unlike Thread.sleep(), this is part of the action sequence.
-                            new SleepAction(4.5),
+                            new SleepAction(4),
                             // Reverse out of flowers before raising ramp
                             moveBack
                     ));
@@ -176,8 +166,7 @@ public class RedLeft extends LinearOpMode {
                 // Park after autonomous sequence.
                 if (opModeIsActive() && !isStopRequested()) {
                     Actions.runBlocking(new SequentialAction(
-                            park1,
-                            park2));
+                            park));
                 }
             }
             // Cleanup executes whether autonomous finishes normally or stops early.

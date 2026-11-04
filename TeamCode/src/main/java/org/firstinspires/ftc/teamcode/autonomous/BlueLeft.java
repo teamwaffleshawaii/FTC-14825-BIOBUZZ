@@ -60,13 +60,8 @@ public class BlueLeft extends LinearOpMode {
                 .build();
 
         // Collection path: travel from the first shooting area toward flowers.
-        Action flowerPosition1 = drive.actionBuilder(new Pose2d(47, 11.5, Math.toRadians(180) ))
+        Action flowerPosition = drive.actionBuilder(new Pose2d(47, 11.5, Math.toRadians(180) ))
                 .splineTo(new Vector2d(38, 33), Math.toRadians(0))
-                //...
-                .build();
-
-        // Continue through the collection area before the timed pause.
-        Action flowerPosition2 = drive.actionBuilder(new Pose2d(38, 33, Math.toRadians(0) ))
                 .strafeTo(new Vector2d(57, 33))
                 .build();
 
@@ -84,8 +79,6 @@ public class BlueLeft extends LinearOpMode {
         Action park = drive.actionBuilder(new Pose2d(47, 11, Math.toRadians(184) ))
                 .strafeToLinearHeading(new Vector2d(50,64), Math.toRadians(270))
                 .build();
-
-        //Create more trajectories as needed
 
         waitForStart();
 
@@ -120,11 +113,10 @@ public class BlueLeft extends LinearOpMode {
                 intakeSubsystem.rampDown();
                 intakeSubsystem.intake(1);
                 Actions.runBlocking(new SequentialAction(
-                        flowerPosition1,
-                        flowerPosition2,
+                        flowerPosition,
                         // Road Runner timed pause to allow collection.
                         // Unlike Thread.sleep(), this is part of the action sequence.
-                        new SleepAction(4.5),
+                        new SleepAction(4),
                         // Reverse out of flowers before raising ramp
                         moveBack
                 ));

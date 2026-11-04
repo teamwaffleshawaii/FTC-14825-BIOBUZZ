@@ -80,8 +80,6 @@ public class RedRight extends LinearOpMode {
                 .strafeToLinearHeading(new Vector2d(25,-44), Math.toRadians(270))
                 .build();
 
-        // CHECK: previous path ends heading 90 deg; this starts at 85 deg.
-        // Confirm heading continuity before running on the field.
         // Final approach to the second shooting pose.
         Action launchPositionLeft = drive.actionBuilder(new Pose2d(-25, -44, Math.toRadians(270) ))
                 .strafeToLinearHeading(new Vector2d(-50,-20), Math.toRadians(5))
@@ -93,8 +91,6 @@ public class RedRight extends LinearOpMode {
                 .strafeToLinearHeading(new Vector2d(-38,-20), Math.toRadians(90))
                 .strafeToLinearHeading(new Vector2d(-26,-54), Math.toRadians(90))
                 .build();
-
-        //Create more trajectories as needed
 
         waitForStart();
 
