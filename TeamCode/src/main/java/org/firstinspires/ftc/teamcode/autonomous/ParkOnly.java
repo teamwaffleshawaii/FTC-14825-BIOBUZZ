@@ -58,7 +58,10 @@ public class ParkOnly extends LinearOpMode {
             }
         } finally {
             // Stop hardware safely even if the driver presses STOP.
+            launcher.setFlywheelVelocity(0);
+            intakeSubsystem.rampUp();
             robot.shutdown();
+            sleep(1000);
         }
     }
 }

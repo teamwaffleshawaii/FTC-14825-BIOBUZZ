@@ -207,6 +207,7 @@ public class RedRight extends LinearOpMode {
             launcher.setFlywheelVelocity(0);
             intakeSubsystem.rampUp();
             robot.shutdown();
+            sleep(1000);
         }
     }
 

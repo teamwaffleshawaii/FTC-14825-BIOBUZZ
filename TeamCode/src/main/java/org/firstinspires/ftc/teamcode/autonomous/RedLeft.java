@@ -183,7 +183,9 @@ public class RedLeft extends LinearOpMode {
             // Cleanup executes whether autonomous finishes normally or stops early.
         } finally {
             launcher.setFlywheelVelocity(0);
+            intakeSubsystem.rampUp();
             robot.shutdown();
+            sleep(1000);
         }
     }
 }
