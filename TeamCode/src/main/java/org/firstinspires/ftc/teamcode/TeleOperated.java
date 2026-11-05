@@ -231,12 +231,12 @@ public class TeleOperated extends LinearOpMode {
         if (launcherReady) {
             // Flash green: 300ms ON, 150ms OFF
             if ((ledTimer.milliseconds() % 300) < 150) {
-                actuator.ledIndicator.setPosition(0.50); // Green
+                actuator.indicatorGreen(); // Green on both LEDs
             } else {
-                actuator.ledIndicator.setPosition(0.0);  // OFF
+                actuator.indicatorOff(); // OFF on both LEDs
             }
         } else {
-            actuator.ledIndicator.setPosition(0.28); // Solid red
+            actuator.indicatorRed(); // Solid red on both LEDs
         }
     }
     /** Clear the intake passage count when a new volley begins. */
@@ -278,8 +278,11 @@ public class TeleOperated extends LinearOpMode {
             return;
         }
         // Three quick flashes: 100 ms yellow, 100 ms off each.
-        actuator.ledIndicator.setPosition(((int) (elapsed / 0.1)) % 2 == 0
-                ? 0.388 : 0.0);
+        if (((int) (elapsed / 0.1)) % 2 == 0) {
+            actuator.indicatorYellow();
+        } else {
+            actuator.indicatorOff();
+        }
     }
 
     /** Display the current state of the non-blocking four-ball sequence. */
