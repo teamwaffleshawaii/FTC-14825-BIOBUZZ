@@ -65,6 +65,8 @@ public class LauncherSubsystem {
     private double activeEmptyDelay = emptyDelay;
     private boolean completed = false;
     private double lastDistanceCm = Double.NaN;
+    // Last flywheel velocity requested by autonomous, including AprilTag adjustments.
+    private double commandedFlywheelVelocity = 0.0;
 
     public LauncherSubsystem(Actuators actuator, Sensors sensor, IntakeSubsystem intake) {
         this.actuator = actuator;
@@ -177,6 +179,8 @@ public class LauncherSubsystem {
 
     /** Encoder-measured velocity in ticks/second for Dashboard telemetry. */
     public double getActualFlywheelVelocity() { return actuator.getLaunchVelocity(); }
+    /** Actual requested target, rather than the fixed fallback TARGET_VELOCITY. */
+    public double getCommandedFlywheelVelocity() { return commandedFlywheelVelocity; }
     public boolean isBusy() { return state != State.IDLE; }
     public boolean isComplete() { return completed; }
     public State getState() { return state; }
@@ -189,6 +193,7 @@ public class LauncherSubsystem {
     public void setFlywheelVelocity(double velocity) {
         applyPIDF();
         actuator.launchMotor(velocity);
+        commandedFlywheelVelocity = velocity;
     }
     /** True when actual flywheel speed is within the hardware readiness band. */
     public boolean isFlywheelReady() {
