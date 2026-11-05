@@ -14,6 +14,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.odometry.MecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.Actuators;
+import org.firstinspires.ftc.teamcode.subsystems.AutoLedAction;
 import org.firstinspires.ftc.teamcode.subsystems.AutoVisionLaunchAction;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.LauncherAction;
@@ -55,7 +56,7 @@ public class BlueRight extends LinearOpMode {
         //TODO: Put your Odometry trajectory paths here!!!
         //Separate your paths by action (linearSlide movements, intake movements, servo movements, etc.)
         // Action builders describe a path; .build() creates an executable action.
-        // Road Runner does not move the robot until Actions.runBlocking() runs.
+        // Road Runner does not move the robot until AutoLedAction.runBlocking(actuator, launcher, ) runs.
         Action launchPositionRight = drive.actionBuilder(new Pose2d(-60, 11.5, Math.toRadians(0) ))
                 .strafeToLinearHeading(new Vector2d( -47, 11.5), Math.toRadians(0))
                 .build();
@@ -103,7 +104,7 @@ public class BlueRight extends LinearOpMode {
             launcher.setFlywheelVelocity(LauncherSubsystem.TARGET_VELOCITY);
             // runBlocking executes a Road Runner action until it finishes.
             // Do not use a long Thread.sleep() during trajectory following.
-            Actions.runBlocking(new SequentialAction(
+            AutoLedAction.runBlocking(actuator, launcher, new SequentialAction(
                     launchPositionRight
             ));
 
@@ -112,8 +113,8 @@ public class BlueRight extends LinearOpMode {
             if (opModeIsActive() && !isStopRequested()) {
                 // LauncherAction runs the timed feed state machine, not a drive path.
                 // Sample the local alliance tags, lock the speed, then feed balls.
-                    Actions.runBlocking(new AutoVisionLaunchAction(sensor, launcher, actuator, false));
-                    Actions.runBlocking(new LauncherAction(launcher));
+                    AutoLedAction.runBlocking(actuator, launcher, new AutoVisionLaunchAction(sensor, launcher, actuator, false));
+                    AutoLedAction.runBlocking(actuator, launcher, new LauncherAction(launcher));
             }
 
             // Stop the flywheel regardless of whether the first shot succeeded.
@@ -122,7 +123,7 @@ public class BlueRight extends LinearOpMode {
             if (opModeIsActive() && !isStopRequested()) {
                 // Go to the corner to pick up pollen
                 intakeSubsystem.intake(1);
-                Actions.runBlocking(new SequentialAction(
+                AutoLedAction.runBlocking(actuator, launcher, new SequentialAction(
                         pickupGroundPosition,
                         // Road Runner timed pause to allow collection.
                         // Unlike Thread.sleep(), this is part of the action sequence.
@@ -134,7 +135,7 @@ public class BlueRight extends LinearOpMode {
                 //Stop the intake, reverse the step-up a little
                 intakeSubsystem.stopIntake();
                 intakeSubsystem.startStepUpReversePulse();
-                Actions.runBlocking((packet) -> {
+                AutoLedAction.runBlocking(actuator, launcher, (packet) -> {
                     intakeSubsystem.update();
                     return intakeSubsystem.isStepUpReverseActive();
                 });
@@ -148,8 +149,8 @@ public class BlueRight extends LinearOpMode {
                 // Launch regardless of flywheel readiness, as with the first volley.
                 if (opModeIsActive() && !isStopRequested()) {
                     // Sample the local alliance tags, lock the speed, then feed balls.
-                    Actions.runBlocking(new AutoVisionLaunchAction(sensor, launcher, actuator, false));
-                    Actions.runBlocking(new LauncherAction(launcher));
+                    AutoLedAction.runBlocking(actuator, launcher, new AutoVisionLaunchAction(sensor, launcher, actuator, false));
+                    AutoLedAction.runBlocking(actuator, launcher, new LauncherAction(launcher));
                 }
                 launcher.setFlywheelVelocity(0);
             }
@@ -159,7 +160,7 @@ public class BlueRight extends LinearOpMode {
                 // Both intake() motors (intake and transfer) run during collection.
                 intakeSubsystem.rampDown();
                 intakeSubsystem.intake(1);
-                Actions.runBlocking(new SequentialAction(
+                AutoLedAction.runBlocking(actuator, launcher, new SequentialAction(
                         flowerPosition,
                         // Road Runner timed pause to allow collection.
                         // Unlike Thread.sleep(), this is part of the action sequence.
@@ -172,7 +173,7 @@ public class BlueRight extends LinearOpMode {
                 intakeSubsystem.rampUp();
                 intakeSubsystem.stopIntake();
                 intakeSubsystem.startStepUpReversePulse();
-                Actions.runBlocking((packet) -> {
+                AutoLedAction.runBlocking(actuator, launcher, (packet) -> {
                     intakeSubsystem.update();
                     return intakeSubsystem.isStepUpReverseActive();
                 });
@@ -182,19 +183,19 @@ public class BlueRight extends LinearOpMode {
             if (opModeIsActive() && !isStopRequested()) {
                 // Spin up for the second volley on the way to the launch location.
                 launcher.setFlywheelVelocity(LauncherSubsystem.TARGET_VELOCITY);
-                Actions.runBlocking(launchPositionLeft);
+                AutoLedAction.runBlocking(actuator, launcher, launchPositionLeft);
                 // Launch regardless of flywheel readiness, as with the first volley.
                 if (opModeIsActive() && !isStopRequested()) {
                     // Sample the local alliance tags, lock the speed, then feed balls.
-                    Actions.runBlocking(new AutoVisionLaunchAction(sensor, launcher, actuator, false));
-                    Actions.runBlocking(new LauncherAction(launcher));
+                    AutoLedAction.runBlocking(actuator, launcher, new AutoVisionLaunchAction(sensor, launcher, actuator, false));
+                    AutoLedAction.runBlocking(actuator, launcher, new LauncherAction(launcher));
                 }
                 launcher.setFlywheelVelocity(0);
             }
 
             // Park after autonomous sequence.
             if (opModeIsActive() && !isStopRequested()) {
-                Actions.runBlocking(new SequentialAction(
+                AutoLedAction.runBlocking(actuator, launcher, new SequentialAction(
                         park));
             }
         }
