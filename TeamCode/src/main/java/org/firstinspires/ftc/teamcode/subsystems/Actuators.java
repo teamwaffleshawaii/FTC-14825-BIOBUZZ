@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -33,6 +34,8 @@ public class Actuators {
     public Servo intakeServoRight;
     public Servo turretServo;
     public Servo ledIndicator;
+    public RevBlinkinLedDriver revLED;
+    private RevBlinkinLedDriver.BlinkinPattern lastRevPattern;
 
     /** Called once from Robot before any mechanism is used. */
     public void init(HardwareMap hwMap) {
@@ -82,11 +85,41 @@ public class Actuators {
         // Center the turret at initialization for TeleOp and all Robot-based autos.
         turretServo.setPosition(TurretAimController.SERVO_CENTER);
         ledIndicator = hwMap.get(Servo.class, "indicatorLED");
+        revLED = hwMap.get(RevBlinkinLedDriver.class, "revLED");
         // Calibrated servo directions.
         stepUpLeft.setDirection(CRServo.Direction.REVERSE);
         stepUpRight.setDirection(CRServo.Direction.FORWARD);
         intakeServoRight.setDirection(Servo.Direction.FORWARD);
         intakeServoLeft.setDirection(Servo.Direction.REVERSE);
+    }
+
+    // Mirror the original indicator LED on the REV Blinkin without changing its timing.
+    // Use built-in solid colors so no custom Blinkin configuration is required.
+    private void setRevPattern(RevBlinkinLedDriver.BlinkinPattern pattern) {
+        if (lastRevPattern != pattern) {
+            revLED.setPattern(pattern);
+            lastRevPattern = pattern;
+        }
+    }
+
+    public void indicatorGreen() {
+        ledIndicator.setPosition(0.50);
+        setRevPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
+    }
+
+    public void indicatorRed() {
+        ledIndicator.setPosition(0.28);
+        setRevPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
+    }
+
+    public void indicatorYellow() {
+        ledIndicator.setPosition(0.388);
+        setRevPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
+    }
+
+    public void indicatorOff() {
+        ledIndicator.setPosition(0.0);
+        setRevPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
     }
 
     // Power-based wheel controls.
