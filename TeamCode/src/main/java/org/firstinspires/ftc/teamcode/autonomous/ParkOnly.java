@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.odometry.MecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.Actuators;
+import org.firstinspires.ftc.teamcode.subsystems.AutoLedAction;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.LauncherSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
@@ -54,7 +55,7 @@ public class ParkOnly extends LinearOpMode {
         try {
             // Only drive when PLAY is active; no shots or intake actions.
             if (opModeIsActive() && !isStopRequested()) {
-                Actions.runBlocking(park);
+                AutoLedAction.runBlocking(actuator, launcher, park);
             }
         } finally {
             // Stop hardware safely even if the driver presses STOP.
