@@ -76,7 +76,7 @@ public class BlueRight extends LinearOpMode {
                 //...
                 .build();
 
-        Action moveBack = drive.actionBuilder(new Pose2d(-13, 60, Math.toRadians(90) ))
+        Action moveBack = drive.actionBuilder(new Pose2d(-16, 58, Math.toRadians(90) ))
                 .strafeToLinearHeading(new Vector2d(-25,44), Math.toRadians(90))
                 .build();
 
