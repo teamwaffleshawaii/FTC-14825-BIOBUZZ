@@ -67,7 +67,7 @@ public class RedRight extends LinearOpMode {
                 .build();
 
         Action launchPosition2 = drive.actionBuilder(new Pose2d(60, -51, Math.toRadians(0) ))
-                .strafeToLinearHeading(new Vector2d( 55, -51), Math.toRadians(0))
+                .strafeToLinearHeading(new Vector2d( 52, -51), Math.toRadians(0))
                 .strafeToLinearHeading(new Vector2d( 49, -28), Math.toRadians(180))
                 .build();
 
