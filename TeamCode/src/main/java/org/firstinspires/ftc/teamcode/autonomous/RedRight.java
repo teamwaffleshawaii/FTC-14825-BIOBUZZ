@@ -58,15 +58,16 @@ public class RedRight extends LinearOpMode {
         // Action builders describe a path; .build() creates an executable action.
         // Road Runner does not move the robot until AutoLedAction.runBlocking(actuator, launcher, ) runs.
         Action launchPositionRight = drive.actionBuilder(new Pose2d(60, -11.5, Math.toRadians(180) ))
-                .strafeToLinearHeading(new Vector2d( 47, -14.5), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d( 47, -22.5), Math.toRadians(180))
                 .build();
 
-        Action pickupGroundPosition = drive.actionBuilder(new Pose2d(47, -14.5, Math.toRadians(180) ))
+        Action pickupGroundPosition = drive.actionBuilder(new Pose2d(47, -22.5, Math.toRadians(180) ))
                 .strafeToLinearHeading(new Vector2d( 50, -51), Math.toRadians(0))
                 .strafeToLinearHeading(new Vector2d( 60, -51), Math.toRadians(0))
                 .build();
 
         Action launchPosition2 = drive.actionBuilder(new Pose2d(60, -51, Math.toRadians(0) ))
+                .strafeToLinearHeading(new Vector2d( 55, -51), Math.toRadians(0))
                 .strafeToLinearHeading(new Vector2d( 49, -28), Math.toRadians(180))
                 .build();
 

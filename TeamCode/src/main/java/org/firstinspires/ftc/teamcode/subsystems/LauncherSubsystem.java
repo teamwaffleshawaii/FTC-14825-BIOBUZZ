@@ -25,9 +25,9 @@ public class LauncherSubsystem {
     // @Config exposes them in FTC Dashboard while the OpMode runs.
     // Dashboard edits are temporary until we save new defaults in Java.
     // Changes are applied to hardware only when a coefficient changes.
-    public static double LAUNCH_P = 70.0;
+    public static double LAUNCH_P = 75.0;
     public static double LAUNCH_I = 0.0;
-    public static double LAUNCH_D = 0.03;
+    public static double LAUNCH_D = 0.02;
     public static double LAUNCH_F = 19;
 
     // Shared TeleOp and Autonomous fallback flywheel target, in encoder ticks/second.
