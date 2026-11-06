@@ -213,7 +213,7 @@ public class TeleOperated extends LinearOpMode {
 
         // A short one-time signal when the flywheel first reaches target speed.
         if (flywheelEnabled && launcherReady && !flywheelReadyRumbled) {
-            gamepad2.rumble(300);
+            gamepad2.rumble(600);
             flywheelReadyRumbled = true;
         }
 
