@@ -53,7 +53,7 @@ public class LauncherSubsystem {
 
     // Timing values are in SECONDS. Tune cautiously on the actual robot.
     public double emptyDelay = 0.02; // TeleOp: 20 ms
-    public double emptyDelayAutoOnly = 0.05; // Autonomous: 50 ms
+    public double emptyDelayAutoOnly = 0.03; // Autonomous: 30 ms
     public double kickerUpDelay = 0.7;
     public double kickerResetDelay = 0.3;
     private State state = State.IDLE;
