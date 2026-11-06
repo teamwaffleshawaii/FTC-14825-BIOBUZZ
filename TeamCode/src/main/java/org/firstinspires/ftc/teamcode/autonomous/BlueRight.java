@@ -106,7 +106,8 @@ public class BlueRight extends LinearOpMode {
             // runBlocking executes a Road Runner action until it finishes.
             // Do not use a long Thread.sleep() during trajectory following.
             AutoLedAction.runBlocking(actuator, launcher, new SequentialAction(
-                    launchPositionRight
+                    launchPositionRight,
+                    new SleepAction(0.5)
             ));
 
             // Launch regardless of flywheel readiness so the preload balls
