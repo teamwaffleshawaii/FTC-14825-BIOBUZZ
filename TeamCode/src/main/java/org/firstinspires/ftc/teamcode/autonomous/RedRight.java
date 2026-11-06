@@ -58,26 +58,26 @@ public class RedRight extends LinearOpMode {
         // Action builders describe a path; .build() creates an executable action.
         // Road Runner does not move the robot until AutoLedAction.runBlocking(actuator, launcher, ) runs.
         Action launchPositionRight = drive.actionBuilder(new Pose2d(60, -11.5, Math.toRadians(180) ))
-                .strafeToLinearHeading(new Vector2d( 47, -11.5), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d( 47, -14.5), Math.toRadians(180))
                 .build();
 
-        Action pickupGroundPosition = drive.actionBuilder(new Pose2d(47, -11.5, Math.toRadians(180) ))
+        Action pickupGroundPosition = drive.actionBuilder(new Pose2d(47, -14.5, Math.toRadians(180) ))
                 .strafeToLinearHeading(new Vector2d( 50, -51), Math.toRadians(0))
-                .strafeToLinearHeading(new Vector2d( 57, -51), Math.toRadians(0))
+                .strafeToLinearHeading(new Vector2d( 60, -51), Math.toRadians(0))
                 .build();
 
-        Action launchPosition2 = drive.actionBuilder(new Pose2d(57, -51, Math.toRadians(0) ))
+        Action launchPosition2 = drive.actionBuilder(new Pose2d(60, -51, Math.toRadians(0) ))
                 .strafeToLinearHeading(new Vector2d( 49, -28), Math.toRadians(180))
                 .build();
 
         // Collection path: travel from the first shooting area toward flowers.
         Action flowerPosition = drive.actionBuilder(new Pose2d(49, -28, Math.toRadians(180) ))
                 .splineTo(new Vector2d(28, -44), Math.toRadians(270))
-                .strafeTo(new Vector2d(19, -60))
+                .strafeTo(new Vector2d(20, -60))
                 //...
                 .build();
 
-        Action moveBack = drive.actionBuilder(new Pose2d(19, -60, Math.toRadians(270) ))
+        Action moveBack = drive.actionBuilder(new Pose2d(20, -60, Math.toRadians(270) ))
                 .strafeToLinearHeading(new Vector2d(25,-44), Math.toRadians(270))
                 .build();
 

@@ -73,11 +73,11 @@ public class BlueRight extends LinearOpMode {
         // Collection path: travel from the first shooting area toward flowers.
         Action flowerPosition = drive.actionBuilder(new Pose2d(-49, 28, Math.toRadians(0) ))
                 .splineTo(new Vector2d(-28, 44), Math.toRadians(90))
-                .strafeTo(new Vector2d(-16, 58))
+                .strafeTo(new Vector2d(-13, 58))
                 //...
                 .build();
 
-        Action moveBack = drive.actionBuilder(new Pose2d(-16, 58, Math.toRadians(90) ))
+        Action moveBack = drive.actionBuilder(new Pose2d(-30, 58, Math.toRadians(90) ))
                 .strafeToLinearHeading(new Vector2d(-25,44), Math.toRadians(90))
                 .build();
 
