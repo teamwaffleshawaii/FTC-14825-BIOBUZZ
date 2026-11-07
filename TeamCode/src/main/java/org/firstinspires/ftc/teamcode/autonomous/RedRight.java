@@ -58,15 +58,15 @@ public class RedRight extends LinearOpMode {
         // Action builders describe a path; .build() creates an executable action.
         // Road Runner does not move the robot until AutoLedAction.runBlocking(actuator, launcher, ) runs.
         Action launchPositionRight = drive.actionBuilder(new Pose2d(60, -11.5, Math.toRadians(180) ))
-                .strafeToLinearHeading(new Vector2d( 47, -22.5), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d( 47, -25), Math.toRadians(180))
                 .build();
 
-        Action pickupGroundPosition = drive.actionBuilder(new Pose2d(47, -22.5, Math.toRadians(180) ))
+        Action pickupGroundPosition = drive.actionBuilder(new Pose2d(47, -25, Math.toRadians(180) ))
                 .strafeToLinearHeading(new Vector2d( 50, -51), Math.toRadians(0))
-                .strafeToLinearHeading(new Vector2d( 60, -51), Math.toRadians(0))
+                .strafeToLinearHeading(new Vector2d( 60, -54), Math.toRadians(0))
                 .build();
 
-        Action launchPosition2 = drive.actionBuilder(new Pose2d(60, -51, Math.toRadians(0) ))
+        Action launchPosition2 = drive.actionBuilder(new Pose2d(60, -52, Math.toRadians(0) ))
                 .strafeToLinearHeading(new Vector2d( 52, -51), Math.toRadians(0))
                 .strafeToLinearHeading(new Vector2d( 49, -28), Math.toRadians(180))
                 .build();
@@ -74,16 +74,16 @@ public class RedRight extends LinearOpMode {
         // Collection path: travel from the first shooting area toward flowers.
         Action flowerPosition = drive.actionBuilder(new Pose2d(49, -28, Math.toRadians(180) ))
                 .splineTo(new Vector2d(28, -44), Math.toRadians(270))
-                .strafeTo(new Vector2d(20, -60))
+                .strafeTo(new Vector2d(23, -57))
                 //...
                 .build();
 
-        Action moveBack = drive.actionBuilder(new Pose2d(20, -60, Math.toRadians(270) ))
-                .strafeToLinearHeading(new Vector2d(25,-44), Math.toRadians(270))
+        Action moveBack = drive.actionBuilder(new Pose2d(23, -57, Math.toRadians(270) ))
+                .strafeToLinearHeading(new Vector2d(28,-44), Math.toRadians(270))
                 .build();
 
         // Final approach to the second shooting pose.
-        Action launchPositionLeft = drive.actionBuilder(new Pose2d(-25, -44, Math.toRadians(270) ))
+        Action launchPositionLeft = drive.actionBuilder(new Pose2d(28, -44, Math.toRadians(270) ))
                 .strafeToLinearHeading(new Vector2d(-50,-20), Math.toRadians(5))
                 .strafeToLinearHeading(new Vector2d(-50,-15), Math.toRadians(0))
                 .build();
@@ -106,8 +106,7 @@ public class RedRight extends LinearOpMode {
             // runBlocking executes a Road Runner action until it finishes.
             // Do not use a long Thread.sleep() during trajectory following.
             AutoLedAction.runBlocking(actuator, launcher, new SequentialAction(
-                    launchPositionRight,
-                    new SleepAction(0.5)
+                    launchPositionRight
             ));
 
             // Launch regardless of flywheel readiness so the preload balls
@@ -129,7 +128,7 @@ public class RedRight extends LinearOpMode {
                         pickupGroundPosition,
                         // Road Runner timed pause to allow collection.
                         // Unlike Thread.sleep(), this is part of the action sequence.
-                        new SleepAction(3),
+                        new SleepAction(2),
                         // Get ready to launch again
                         launchPosition2
                 ));
@@ -166,12 +165,21 @@ public class RedRight extends LinearOpMode {
                         flowerPosition,
                         // Road Runner timed pause to allow collection.
                         // Unlike Thread.sleep(), this is part of the action sequence.
-                        new SleepAction(3),
+                        new SleepAction(2),
                         // Reverse out of flowers before raising ramp
                         moveBack
                 ));
 
-                // After backing out of flowers, raise ramp, stop intake, and reverse transfer
+
+            }
+
+            if (opModeIsActive() && !isStopRequested()) {
+                // Spin up for the second volley on the way to the launch location.
+                launcher.setFlywheelVelocity(LauncherSubsystem.TARGET_VELOCITY);
+
+                AutoLedAction.runBlocking(actuator, launcher, launchPositionLeft);
+
+                // Raise ramp, stop intake, and reverse transfer
                 intakeSubsystem.rampUp();
                 intakeSubsystem.stopIntake();
                 intakeSubsystem.startStepUpReversePulse();
@@ -180,12 +188,7 @@ public class RedRight extends LinearOpMode {
                     return intakeSubsystem.isStepUpReverseActive();
                 });
                 intakeSubsystem.stopFeeding();
-            }
 
-            if (opModeIsActive() && !isStopRequested()) {
-                // Spin up for the second volley on the way to the launch location.
-                launcher.setFlywheelVelocity(LauncherSubsystem.TARGET_VELOCITY);
-                AutoLedAction.runBlocking(actuator, launcher, launchPositionLeft);
                 // Launch regardless of flywheel readiness, as with the first volley.
                 if (opModeIsActive() && !isStopRequested()) {
                     // Sample the local alliance tags, lock the speed, then feed balls.

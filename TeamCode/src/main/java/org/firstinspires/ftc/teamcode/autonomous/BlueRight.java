@@ -62,11 +62,11 @@ public class BlueRight extends LinearOpMode {
                 .build();
 
         Action pickupGroundPosition = drive.actionBuilder(new Pose2d(-47, 19.5, Math.toRadians(0) ))
-                .strafeToLinearHeading(new Vector2d( -50, 51), Math.toRadians(180))
-                .strafeToLinearHeading(new Vector2d( -57, 51), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d( -50, 51), Math.toRadians(0))
+                .strafeToLinearHeading(new Vector2d( -62, 51), Math.toRadians(0))
                 .build();
 
-        Action launchPosition2 = drive.actionBuilder(new Pose2d(-57, 51, Math.toRadians(180) ))
+        Action launchPosition2 = drive.actionBuilder(new Pose2d(-57, 51, Math.toRadians(0) ))
                 .strafeToLinearHeading(new Vector2d( -50, 51), Math.toRadians(180))
                 .strafeToLinearHeading(new Vector2d( -49, 28), Math.toRadians(0))
                 .build();
@@ -78,12 +78,12 @@ public class BlueRight extends LinearOpMode {
                 //...
                 .build();
 
-        Action moveBack = drive.actionBuilder(new Pose2d(-30, 58, Math.toRadians(90) ))
-                .strafeToLinearHeading(new Vector2d(-25,44), Math.toRadians(90))
+        Action moveBack = drive.actionBuilder(new Pose2d(-13, 58, Math.toRadians(90) ))
+                .strafeToLinearHeading(new Vector2d(-28,58), Math.toRadians(90))
                 .build();
 
         // Final approach to the second shooting pose.
-        Action launchPositionLeft = drive.actionBuilder(new Pose2d(-25, 44, Math.toRadians(90) ))
+        Action launchPositionLeft = drive.actionBuilder(new Pose2d(-28, 44, Math.toRadians(90) ))
                 .strafeToLinearHeading(new Vector2d(50,25), Math.toRadians(185))
                 .strafeToLinearHeading(new Vector2d(50,20), Math.toRadians(180))
                 .build();
@@ -106,8 +106,7 @@ public class BlueRight extends LinearOpMode {
             // runBlocking executes a Road Runner action until it finishes.
             // Do not use a long Thread.sleep() during trajectory following.
             AutoLedAction.runBlocking(actuator, launcher, new SequentialAction(
-                    launchPositionRight,
-                    new SleepAction(0.5)
+                    launchPositionRight
             ));
 
             // Launch regardless of flywheel readiness so the preload balls
@@ -129,7 +128,7 @@ public class BlueRight extends LinearOpMode {
                         pickupGroundPosition,
                         // Road Runner timed pause to allow collection.
                         // Unlike Thread.sleep(), this is part of the action sequence.
-                        new SleepAction(3),
+                        new SleepAction(2),
                         // Get ready to launch again
                         launchPosition2
                 ));
@@ -166,12 +165,18 @@ public class BlueRight extends LinearOpMode {
                         flowerPosition,
                         // Road Runner timed pause to allow collection.
                         // Unlike Thread.sleep(), this is part of the action sequence.
-                        new SleepAction(3),
+                        new SleepAction(2),
                         // Reverse out of flowers before raising ramp
                         moveBack
                 ));
 
-                // After backing out of flowers, raise ramp, stop intake, and reverse transfer
+            }
+
+            if (opModeIsActive() && !isStopRequested()) {
+                // Spin up for the second volley on the way to the launch location.
+                launcher.setFlywheelVelocity(LauncherSubsystem.TARGET_VELOCITY);
+                AutoLedAction.runBlocking(actuator, launcher, launchPositionLeft);
+                // Raise ramp, stop intake, and reverse transfer
                 intakeSubsystem.rampUp();
                 intakeSubsystem.stopIntake();
                 intakeSubsystem.startStepUpReversePulse();
@@ -180,12 +185,6 @@ public class BlueRight extends LinearOpMode {
                     return intakeSubsystem.isStepUpReverseActive();
                 });
                 intakeSubsystem.stopFeeding();
-            }
-
-            if (opModeIsActive() && !isStopRequested()) {
-                // Spin up for the second volley on the way to the launch location.
-                launcher.setFlywheelVelocity(LauncherSubsystem.TARGET_VELOCITY);
-                AutoLedAction.runBlocking(actuator, launcher, launchPositionLeft);
                 // Launch regardless of flywheel readiness, as with the first volley.
                 if (opModeIsActive() && !isStopRequested()) {
                     // Sample the local alliance tags, lock the speed, then feed balls.
