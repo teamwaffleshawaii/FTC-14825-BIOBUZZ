@@ -30,26 +30,17 @@ public class TurretAimController {
     // Measured RED 30-33 TX offsets, provisionally reused for both RED and BLUE tag groups.
     public static double[] TAG_TX_OFFSETS = {-7.04, -3.02, 2.96, 7.02};
 
-    // Experimental, reversible flywheel correction for off-center turret shots.
-    public static boolean ANGLE_VELOCITY_COMP_ENABLED = true;
-    public static double RIGHT_VELOCITY_PER_DEGREE = 0.4;
-    public static double LEFT_VELOCITY_PER_DEGREE = 0.2;
+    // Field-tested symmetric velocity boost for angled turret shots.
+    // Applied in TeleOp and autonomous; capped to avoid excessive corrections.
+    public static double ANGLE_VELOCITY_PER_DEGREE = 0.2;
     public static double MAX_ANGLE_VELOCITY_BOOST = 8.0;
 
-    /**
-     * Servo positions below center correspond to rightward aim with the
-     * current TX-to-servo mapping. Use the commanded servo position rather
-     * than raw camera TX so correction remains valid after the turret aims.
-     */
+    /** Add a small speed boost based on turret rotation from mechanical center. */
     public static double compensateLaunchVelocity(double baseVelocity, double servoPosition) {
-        if (!ANGLE_VELOCITY_COMP_ENABLED || !Double.isFinite(servoPosition)
-                || SERVO_PER_DEGREE <= 0) return baseVelocity;
-        double rightDegrees = (SERVO_CENTER - servoPosition) / SERVO_PER_DEGREE;
-        double gain = rightDegrees >= 0
-                ? Math.max(0, RIGHT_VELOCITY_PER_DEGREE)
-                : Math.max(0, LEFT_VELOCITY_PER_DEGREE);
+        if (!Double.isFinite(servoPosition) || SERVO_PER_DEGREE <= 0) return baseVelocity;
+        double angleDegrees = Math.abs((SERVO_CENTER - servoPosition) / SERVO_PER_DEGREE);
         double boost = Math.min(Math.max(0, MAX_ANGLE_VELOCITY_BOOST),
-                Math.abs(rightDegrees) * gain);
+                angleDegrees * Math.max(0, ANGLE_VELOCITY_PER_DEGREE));
         return baseVelocity + boost;
     }
 
