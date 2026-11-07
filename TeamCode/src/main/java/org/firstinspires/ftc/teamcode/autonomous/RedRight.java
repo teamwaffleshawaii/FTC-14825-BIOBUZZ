@@ -58,10 +58,10 @@ public class RedRight extends LinearOpMode {
         // Action builders describe a path; .build() creates an executable action.
         // Road Runner does not move the robot until AutoLedAction.runBlocking(actuator, launcher, ) runs.
         Action launchPositionRight = drive.actionBuilder(new Pose2d(60, -11.5, Math.toRadians(180) ))
-                .strafeToLinearHeading(new Vector2d( 47, -25), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d( 47, -28), Math.toRadians(160))
                 .build();
 
-        Action pickupGroundPosition = drive.actionBuilder(new Pose2d(47, -25, Math.toRadians(180) ))
+        Action pickupGroundPosition = drive.actionBuilder(new Pose2d(47, -28, Math.toRadians(160) ))
                 .strafeToLinearHeading(new Vector2d( 50, -51), Math.toRadians(0))
                 .strafeToLinearHeading(new Vector2d( 60, -54), Math.toRadians(0))
                 .build();
@@ -85,12 +85,12 @@ public class RedRight extends LinearOpMode {
         // Final approach to the second shooting pose.
         Action launchPositionLeft = drive.actionBuilder(new Pose2d(28, -44, Math.toRadians(270) ))
                 .strafeToLinearHeading(new Vector2d(-50,-20), Math.toRadians(5))
-                .strafeToLinearHeading(new Vector2d(-50,-15), Math.toRadians(0))
+                .strafeToLinearHeading(new Vector2d(-50,-15), Math.toRadians(25))
                 .build();
 
         // Parking is a separate trajectory executed after the second volley.
-        Action park = drive.actionBuilder(new Pose2d(-50, -15, Math.toRadians(-5) ))
-                .strafeToLinearHeading(new Vector2d(-38,-20), Math.toRadians(90))
+        Action park = drive.actionBuilder(new Pose2d(-50, -15, Math.toRadians(25) ))
+                .strafeToLinearHeading(new Vector2d(-42,-20), Math.toRadians(90))
                 .strafeToLinearHeading(new Vector2d(-26,-54), Math.toRadians(90))
                 .build();
 
@@ -174,10 +174,11 @@ public class RedRight extends LinearOpMode {
             }
 
             if (opModeIsActive() && !isStopRequested()) {
-                // Spin up for the second volley on the way to the launch location.
-                launcher.setFlywheelVelocity(LauncherSubsystem.TARGET_VELOCITY);
 
                 AutoLedAction.runBlocking(actuator, launcher, launchPositionLeft);
+
+                // Spin up for the second volley on the way to the launch location.
+                launcher.setFlywheelVelocity(LauncherSubsystem.TARGET_VELOCITY);
 
                 // Raise ramp, stop intake, and reverse transfer
                 intakeSubsystem.rampUp();
