@@ -58,27 +58,28 @@ public class BlueLeft extends LinearOpMode {
         // Road Runner does not move the robot until AutoLedAction.runBlocking(actuator, launcher, ) runs.
         Action launchPositionRight = drive.actionBuilder(new Pose2d(60, 11.5, Math.toRadians(180) ))
                 .strafeToLinearHeading(new Vector2d( 47, 11.5), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d( 46, 32), Math.toRadians(200))
                 .build();
 
         // Collection path: travel from the first shooting area toward flowers.
-        Action flowerPosition = drive.actionBuilder(new Pose2d(47, 11.5, Math.toRadians(180) ))
+        Action flowerPosition = drive.actionBuilder(new Pose2d(46, 32, Math.toRadians(200) ))
                 .splineTo(new Vector2d(38, 33), Math.toRadians(0))
-                .strafeTo(new Vector2d(57, 33))
+                .strafeTo(new Vector2d(58, 33))
                 .build();
 
-        Action moveBack = drive.actionBuilder(new Pose2d(57, 33, Math.toRadians(0) ))
+        Action moveBack = drive.actionBuilder(new Pose2d(58, 33, Math.toRadians(0) ))
                 .strafeToLinearHeading(new Vector2d(40,33), Math.toRadians(0))
                 .build();
 
         // Return to the second shooting position (same side of field).
         Action movetolaunchPositionAgain = drive.actionBuilder(new Pose2d(40, 33, Math.toRadians(0) ))
                 .strafeToLinearHeading(new Vector2d(47,12), Math.toRadians(179))
-                .strafeToLinearHeading(new Vector2d(47,11), Math.toRadians(184))
+                .strafeToLinearHeading(new Vector2d(46,32), Math.toRadians(200))
                 .build();
 
         // Parking is a separate trajectory executed after the second volley.
-        Action park = drive.actionBuilder(new Pose2d(47, 11, Math.toRadians(184) ))
-                .strafeToLinearHeading(new Vector2d(50,64), Math.toRadians(270))
+        Action park = drive.actionBuilder(new Pose2d(46, 32, Math.toRadians(184) ))
+                .strafeToLinearHeading(new Vector2d(50,60), Math.toRadians(270))
                 .build();
 
         waitForStart();
@@ -88,22 +89,24 @@ public class BlueLeft extends LinearOpMode {
         try {
         if (opModeIsActive() && !isStopRequested()) {
 
+            //Wait for x seconds for the partner to score
+            new SleepAction(1);
+
             // Spin up while driving to the first launch position.
             // The first volley starts after arriving, regardless of actual speed.
             launcher.setFlywheelVelocity(LauncherSubsystem.TARGET_VELOCITY);
             // runBlocking executes a Road Runner action until it finishes.
             // Do not use a long Thread.sleep() during trajectory following.
             AutoLedAction.runBlocking(actuator, launcher, new SequentialAction(
-                    launchPositionRight,
-                    new SleepAction(1)
+                    launchPositionRight
             ));
 
             // Launch preload balls (first launch uses default forward turret angle)
             if (opModeIsActive() && !isStopRequested()) {
                 // LauncherAction runs the timed feed state machine, not a drive path.
                 // Sample the local alliance tags, lock the speed, then feed balls.
-                    AutoLedAction.runBlocking(actuator, launcher, new AutoVisionLaunchAction(sensor, launcher, false));
-                    AutoLedAction.runBlocking(actuator, launcher, new LauncherAction(launcher));
+                AutoLedAction.runBlocking(actuator, launcher, new AutoVisionLaunchAction(sensor, launcher, actuator, false));
+                AutoLedAction.runBlocking(actuator, launcher, new LauncherAction(launcher));
             }
 
             // Stop the flywheel regardless of whether the first shot succeeded.
@@ -117,7 +120,7 @@ public class BlueLeft extends LinearOpMode {
                         flowerPosition,
                         // Road Runner timed pause to allow collection.
                         // Unlike Thread.sleep(), this is part of the action sequence.
-                        new SleepAction(4),
+                        new SleepAction(2),
                         // Reverse out of flowers before raising ramp
                         moveBack
                 ));
