@@ -57,8 +57,6 @@ public class AutoVisionLaunchAction implements Action {
             } else {
                 selectedVelocity = LauncherSubsystem.TARGET_VELOCITY;
             }
-            launcher.setFlywheelVelocity(selectedVelocity);
-
             // 2. Turret Auto-Aiming
             if (actuators != null) {
                 Double turretTarget = TurretAimController.calculateTurretServoPosition(freshFrame, redAlliance);
@@ -68,13 +66,20 @@ public class AutoVisionLaunchAction implements Action {
                 }
             }
 
+            // Apply the same small angle boost as TeleOp after aiming.
+            // Keep the unmodified TY estimate separate to avoid accumulating boosts.
+            double finalVelocity = actuators == null ? selectedVelocity
+                    : TurretAimController.compensateLaunchVelocity(
+                            selectedVelocity, actuators.turretServo.getPosition());
+            launcher.setFlywheelVelocity(finalVelocity);
+
             if (timer.seconds() >= sampleSeconds) {
                 locked = true;
                 timer.reset();
             }
         }
 
-        packet.put("Auto Vision Target (ticks/s)", selectedVelocity);
+        packet.put("Auto Vision Target (ticks/s)", launcher.getCommandedFlywheelVelocity());
         packet.put("Auto Vision Tags", estimator.getCalibratedTagsSeen());
         packet.put("Auto Vision Locked", locked);
         packet.put("Auto Turret Target", lockedTurretPosition != null ? lockedTurretPosition : "Unchanged");
