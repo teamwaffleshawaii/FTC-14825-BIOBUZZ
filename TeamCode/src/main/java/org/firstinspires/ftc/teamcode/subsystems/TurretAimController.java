@@ -32,7 +32,7 @@ public class TurretAimController {
 
     // Field-tested symmetric velocity boost for angled turret shots.
     // Applied in TeleOp and autonomous; capped to avoid excessive corrections.
-    public static double ANGLE_VELOCITY_PER_DEGREE = 0.2;
+    public static double ANGLE_VELOCITY_PER_DEGREE = 0.2; //change this to 0.0 if not working
     public static double MAX_ANGLE_VELOCITY_BOOST = 8.0;
 
     /** Add a small speed boost based on turret rotation from mechanical center. */

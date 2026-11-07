@@ -14,7 +14,7 @@ public class AutoVisionLaunchAction implements Action {
     public static double SAMPLE_SECONDS = 0.5;
     public static double SETTLE_SECONDS = 0.5;
     // Autonomous-only correction for consistent ~3-inch overshoot; tune in Dashboard.
-    public static double AUTO_VELOCITY_OFFSET = -15.0;
+    public static double AUTO_VELOCITY_OFFSET = -15.0; //adjust this if overshooting or undershooting
 
     private final Sensors sensors;
     private final LauncherSubsystem launcher;
