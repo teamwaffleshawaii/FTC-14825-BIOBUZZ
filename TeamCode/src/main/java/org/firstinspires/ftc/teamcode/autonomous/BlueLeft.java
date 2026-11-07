@@ -78,7 +78,7 @@ public class BlueLeft extends LinearOpMode {
                 .build();
 
         // Parking is a separate trajectory executed after the second volley.
-        Action park = drive.actionBuilder(new Pose2d(46, 32, Math.toRadians(184) ))
+        Action park = drive.actionBuilder(new Pose2d(46, 32, Math.toRadians(200) ))
                 .strafeToLinearHeading(new Vector2d(50,60), Math.toRadians(270))
                 .build();
 

@@ -66,7 +66,7 @@ public class BlueRight extends LinearOpMode {
                 .strafeToLinearHeading(new Vector2d( -62, 51), Math.toRadians(180))
                 .build();
 
-        Action launchPosition2 = drive.actionBuilder(new Pose2d(-57, 51, Math.toRadians(180) ))
+        Action launchPosition2 = drive.actionBuilder(new Pose2d(-62, 51, Math.toRadians(180) ))
                 .strafeToLinearHeading(new Vector2d( -45, 51), Math.toRadians(180))
                 .strafeToLinearHeading(new Vector2d( -49, 28), Math.toRadians(-20))
                 .build();
@@ -83,7 +83,7 @@ public class BlueRight extends LinearOpMode {
                 .build();
 
         // Final approach to the second shooting pose.
-        Action launchPositionLeft = drive.actionBuilder(new Pose2d(-28, 44, Math.toRadians(90) ))
+        Action launchPositionLeft = drive.actionBuilder(new Pose2d(-28, 58, Math.toRadians(90) ))
                 .strafeToLinearHeading(new Vector2d(50,25), Math.toRadians(185))
                 .strafeToLinearHeading(new Vector2d(50,20), Math.toRadians(200))
                 .build();
