@@ -15,6 +15,7 @@ import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.LauncherSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
 import org.firstinspires.ftc.teamcode.subsystems.Sensors;
+import org.firstinspires.ftc.teamcode.subsystems.TurretAimController;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
@@ -185,7 +186,8 @@ public class TeleOperated extends LinearOpMode {
             targetVelocity = visionVelocity.update(currentAprilTagFrame,
                     targetVelocity, launcher.isBusy());
         }
-        return targetVelocity;
+        return TurretAimController.compensateLaunchVelocity(
+                targetVelocity, actuator.turretServo.getPosition());
     }
 
     public void launch() {
