@@ -13,6 +13,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class AutoVisionLaunchAction implements Action {
     public static double SAMPLE_SECONDS = 0.5;
     public static double SETTLE_SECONDS = 0.5;
+    // Autonomous-only correction for consistent ~3-inch overshoot; tune in Dashboard.
+    public static double AUTO_VELOCITY_OFFSET = -5.0;
 
     private final Sensors sensors;
     private final LauncherSubsystem launcher;
@@ -71,7 +73,7 @@ public class AutoVisionLaunchAction implements Action {
             double finalVelocity = actuators == null ? selectedVelocity
                     : TurretAimController.compensateLaunchVelocity(
                             selectedVelocity, actuators.turretServo.getPosition());
-            launcher.setFlywheelVelocity(finalVelocity);
+            launcher.setFlywheelVelocity(Math.max(0, finalVelocity + AUTO_VELOCITY_OFFSET));
 
             if (timer.seconds() >= sampleSeconds) {
                 locked = true;
