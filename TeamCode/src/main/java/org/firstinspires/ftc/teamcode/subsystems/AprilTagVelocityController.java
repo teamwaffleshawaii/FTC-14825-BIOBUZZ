@@ -20,15 +20,16 @@ public class AprilTagVelocityController {
     public static double LOST_TARGET_HOLD_SECONDS = 0.5;
 
     // Rows: tags 34, 35, 36, 37 (same positions in other tag groups).
-    // Columns: TY measured at 1055, 1035, 1025 ticks/second.
+    // Columns: TY at position 2 (920), position 1 (855), position 3 (850).
+    // TY columns must remain ascending for piecewise interpolation.
     // TX is used for turret aiming elsewhere, not flywheel velocity.
     private static final double[][] TAG_POSITION_TY = {
-            {-3.21, 4.18, 8.50}, // tag 34
-            {-3.14, 4.13, 8.35}, // tag 35
-            {-3.22, 4.01, 8.13}, // tag 36
-            {-3.30, 3.93, 7.95}  // tag 37
+            {-2.85, 4.27, 7.66}, // tag 34
+            {-2.62, 4.23, 7.58}, // tag 35
+            {-2.29, 4.15, 7.42}, // tag 36
+            {-2.07, 4.07, 7.25}  // tag 37
     };
-    private static final double[] CALIBRATED_SPEEDS = {1320, 1300, 1290};
+    private static final double[] CALIBRATED_SPEEDS = {920, 855, 850};
 
     private final boolean redAlliance;
     private final ElapsedTime sinceValid = new ElapsedTime();
