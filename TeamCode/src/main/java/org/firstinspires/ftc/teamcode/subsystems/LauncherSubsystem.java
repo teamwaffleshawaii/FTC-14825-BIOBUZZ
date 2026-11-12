@@ -25,14 +25,14 @@ public class LauncherSubsystem {
     // @Config exposes them in FTC Dashboard while the OpMode runs.
     // Dashboard edits are temporary until we save new defaults in Java.
     // Changes are applied to hardware only when a coefficient changes.
-    public static double LAUNCH_P = 80.0;
+    public static double LAUNCH_P = 100.0;
     public static double LAUNCH_I = 0.0;
-    public static double LAUNCH_D = 0.02;
-    public static double LAUNCH_F = 38;
+    public static double LAUNCH_D = 0.05;
+    public static double LAUNCH_F = 27.5;
 
     // Shared TeleOp and Autonomous fallback flywheel target, in encoder ticks/second.
     // Dashboard edits apply to both; save tested values here for future runs.
-    public static double TARGET_VELOCITY = 790.0;
+    public static double TARGET_VELOCITY = 855.0;
 
     // Remember the values last sent to the motor controller.
     // NaN (not-a-number) guarantees the first applyPIDF() writes all values.

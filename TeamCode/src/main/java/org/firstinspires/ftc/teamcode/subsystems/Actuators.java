@@ -185,7 +185,7 @@ public class Actuators {
     }
 
     public void kickerDown() {
-        kickerServo.setPosition(0.60);
+        kickerServo.setPosition(0.64);
     }
 
     // The left/right ramp servos move together to open or close the ramp.
