@@ -58,22 +58,22 @@ public class BlueRight extends LinearOpMode {
         // Action builders describe a path; .build() creates an executable action.
         // Road Runner does not move the robot until AutoLedAction.runBlocking(actuator, launcher, ) runs.
         Action launchPositionRight = drive.actionBuilder(new Pose2d(-60, 11.5, Math.toRadians(0) ))
-                .strafeToLinearHeading(new Vector2d( -40, 25), Math.toRadians(-20))
+                .strafeToLinearHeading(new Vector2d( -40, 29), Math.toRadians(-20))
                 .build();
 
-        Action pickupGroundPosition = drive.actionBuilder(new Pose2d(-40, 25, Math.toRadians(-20) ))
+        Action pickupGroundPosition = drive.actionBuilder(new Pose2d(-40, 29, Math.toRadians(-20) ))
                 .strafeToLinearHeading(new Vector2d( -50, 51), Math.toRadians(180))
                 .strafeToLinearHeading(new Vector2d( -62, 51), Math.toRadians(180))
                 .build();
 
         Action launchPosition2 = drive.actionBuilder(new Pose2d(-62, 51, Math.toRadians(180) ))
                 .strafeToLinearHeading(new Vector2d( -45, 51), Math.toRadians(180))
-                .strafeToLinearHeading(new Vector2d( -49, 28), Math.toRadians(-20))
+                .strafeToLinearHeading(new Vector2d( -49, 30), Math.toRadians(-20))
                 .build();
 
         // Collection path: travel from the first shooting area toward flowers.
-        Action flowerPosition = drive.actionBuilder(new Pose2d(-49, 28, Math.toRadians(-20) ))
-                .splineTo(new Vector2d(-28, 44), Math.toRadians(90))
+        Action flowerPosition = drive.actionBuilder(new Pose2d(-49, 30, Math.toRadians(-20) ))
+                .splineTo(new Vector2d(-28, 45), Math.toRadians(90))
                 .strafeTo(new Vector2d(-20, 58))
                 //...
                 .build();
@@ -82,20 +82,22 @@ public class BlueRight extends LinearOpMode {
                 .strafeToLinearHeading(new Vector2d(-28,58), Math.toRadians(90))
                 .build();
 
-        // Final approach to the second shooting pose.
+        // Final approach to the second shooting pose (routing via Y=40 across mid-field to clear the hive).
         Action launchPositionLeft = drive.actionBuilder(new Pose2d(-28, 58, Math.toRadians(90) ))
-                .strafeToLinearHeading(new Vector2d(50,25), Math.toRadians(185))
-                .strafeToLinearHeading(new Vector2d(50,20), Math.toRadians(200))
+                .strafeToLinearHeading(new Vector2d(0, 40), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(50, 27), Math.toRadians(185))
+                .strafeToLinearHeading(new Vector2d(50, 22), Math.toRadians(200))
                 .build();
 
-        // Direct approach to second shooting pose if skipping flower (from ground launch position).
-        Action launchPositionLeftFromGround = drive.actionBuilder(new Pose2d(-49, 28, Math.toRadians(-20) ))
-                .strafeToLinearHeading(new Vector2d(50,25), Math.toRadians(185))
-                .strafeToLinearHeading(new Vector2d(50,20), Math.toRadians(200))
+        // Direct approach to second shooting pose if skipping flower (routing via Y=40 across mid-field to clear the hive).
+        Action launchPositionLeftFromGround = drive.actionBuilder(new Pose2d(-49, 30, Math.toRadians(-20) ))
+                .strafeToLinearHeading(new Vector2d(0, 40), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(50, 27), Math.toRadians(185))
+                .strafeToLinearHeading(new Vector2d(50, 22), Math.toRadians(200))
                 .build();
 
         // Parking is a separate trajectory executed after the second volley.
-        Action park = drive.actionBuilder(new Pose2d(50, 20, Math.toRadians(200) ))
+        Action park = drive.actionBuilder(new Pose2d(50, 22, Math.toRadians(200) ))
                 .strafeToLinearHeading(new Vector2d(45,15), Math.toRadians(270))
                 .strafeToLinearHeading(new Vector2d(30,50), Math.toRadians(270))
                 .build();
