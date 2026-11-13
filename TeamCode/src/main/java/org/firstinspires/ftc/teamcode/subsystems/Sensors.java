@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -118,6 +119,41 @@ public class Sensors {
         // A frame without any tags should not be treated as a target lock.
         List<LLResultTypes.FiducialResult> tags = result.getFiducialResults();
         return tags != null && !tags.isEmpty() ? result : null;
+    }
+
+    /**
+     * Checks if the Limelight detects a valid alliance AprilTag within the given timeout window.
+     * RED alliance tags are 30-37, BLUE alliance tags are 38-45.
+     */
+    public boolean seesAllianceAprilTag(boolean redAlliance, double timeoutSeconds) {
+        ElapsedTime timer = new ElapsedTime();
+        int minTag = redAlliance ? 30 : 38;
+        int maxTag = redAlliance ? 37 : 45;
+
+        do {
+            LLResult freshFrame = getFreshAprilTagResult();
+            if (freshFrame != null && freshFrame.getFiducialResults() != null) {
+                for (LLResultTypes.FiducialResult tag : freshFrame.getFiducialResults()) {
+                    int id = tag.getFiducialId();
+                    if (id >= minTag && id <= maxTag) {
+                        return true;
+                    }
+                }
+            }
+            if (timeoutSeconds <= 0) break;
+            try {
+                Thread.sleep(20);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        } while (timer.seconds() < timeoutSeconds);
+
+        return false;
+    }
+
+    public boolean seesAllianceAprilTag(boolean redAlliance) {
+        return seesAllianceAprilTag(redAlliance, 0.5);
     }
 
     public LLResult getLimelightResult() {

@@ -88,6 +88,12 @@ public class BlueRight extends LinearOpMode {
                 .strafeToLinearHeading(new Vector2d(50,20), Math.toRadians(200))
                 .build();
 
+        // Direct approach to second shooting pose if skipping flower (from ground launch position).
+        Action launchPositionLeftFromGround = drive.actionBuilder(new Pose2d(-49, 28, Math.toRadians(-20) ))
+                .strafeToLinearHeading(new Vector2d(50,25), Math.toRadians(185))
+                .strafeToLinearHeading(new Vector2d(50,20), Math.toRadians(200))
+                .build();
+
         // Parking is a separate trajectory executed after the second volley.
         Action park = drive.actionBuilder(new Pose2d(50, 20, Math.toRadians(200) ))
                 .strafeToLinearHeading(new Vector2d(45,15), Math.toRadians(270))
@@ -143,57 +149,87 @@ public class BlueRight extends LinearOpMode {
                 intakeSubsystem.stopFeeding();
             }
 
-            //launch the ground pollen
-            if (opModeIsActive() && !isStopRequested()) {
-                // Spin up for the second volley on the way to the launch location.
-                launcher.setFlywheelVelocity(LauncherSubsystem.TARGET_VELOCITY);
-                // Launch regardless of flywheel readiness, as with the first volley.
+            // After ground pickup, check if Limelight sees the correct blue alliance AprilTag (IDs 38-45)
+            boolean seesAllianceTag = sensor.seesAllianceAprilTag(false, 0.5);
+
+            if (seesAllianceTag) {
+                // launch the ground pollen
                 if (opModeIsActive() && !isStopRequested()) {
-                    // Sample the local alliance tags, lock the speed, then feed balls.
-                    AutoLedAction.runBlocking(actuator, launcher, new AutoVisionLaunchAction(sensor, launcher, actuator, false));
-                    AutoLedAction.runBlocking(actuator, launcher, new LauncherAction(launcher));
+                    // Spin up for the second volley on the way to the launch location.
+                    launcher.setFlywheelVelocity(LauncherSubsystem.TARGET_VELOCITY);
+                    // Launch regardless of flywheel readiness, as with the first volley.
+                    if (opModeIsActive() && !isStopRequested()) {
+                        // Sample the local alliance tags, lock the speed, then feed balls.
+                        AutoLedAction.runBlocking(actuator, launcher, new AutoVisionLaunchAction(sensor, launcher, actuator, false));
+                        AutoLedAction.runBlocking(actuator, launcher, new LauncherAction(launcher));
+                    }
+                    launcher.setFlywheelVelocity(0);
                 }
-                launcher.setFlywheelVelocity(0);
-            }
 
-            //Go to the flower
-            if (opModeIsActive() && !isStopRequested()) {
-                // Both intake() motors (intake and transfer) run during collection.
-                intakeSubsystem.rampDown();
-                intakeSubsystem.intake(1);
-                AutoLedAction.runBlocking(actuator, launcher, new SequentialAction(
-                        flowerPosition,
-                        // Road Runner timed pause to allow collection.
-                        // Unlike Thread.sleep(), this is part of the action sequence.
-                        new SleepAction(2),
-                        // Reverse out of flowers before raising ramp
-                        moveBack
-                ));
-
-            }
-
-            if (opModeIsActive() && !isStopRequested()) {
-                AutoLedAction.runBlocking(actuator, launcher, launchPositionLeft);
-
-                // Spin up for the second volley on the way to the launch location.
-                launcher.setFlywheelVelocity(LauncherSubsystem.TARGET_VELOCITY);
-
-                // Raise ramp, stop intake, and reverse transfer
-                intakeSubsystem.rampUp();
-                intakeSubsystem.stopIntake();
-                intakeSubsystem.startStepUpReversePulse();
-                AutoLedAction.runBlocking(actuator, launcher, (packet) -> {
-                    intakeSubsystem.update();
-                    return intakeSubsystem.isStepUpReverseActive();
-                });
-                intakeSubsystem.stopFeeding();
-                // Launch regardless of flywheel readiness, as with the first volley.
+                // Go to the flower
                 if (opModeIsActive() && !isStopRequested()) {
-                    // Sample the local alliance tags, lock the speed, then feed balls.
-                    AutoLedAction.runBlocking(actuator, launcher, new AutoVisionLaunchAction(sensor, launcher, actuator, false));
-                    AutoLedAction.runBlocking(actuator, launcher, new LauncherAction(launcher));
+                    // Both intake() motors (intake and transfer) run during collection.
+                    intakeSubsystem.rampDown();
+                    intakeSubsystem.intake(1);
+                    AutoLedAction.runBlocking(actuator, launcher, new SequentialAction(
+                            flowerPosition,
+                            // Road Runner timed pause to allow collection.
+                            // Unlike Thread.sleep(), this is part of the action sequence.
+                            new SleepAction(2),
+                            // Reverse out of flowers before raising ramp
+                            moveBack
+                    ));
                 }
-                launcher.setFlywheelVelocity(0);
+
+                if (opModeIsActive() && !isStopRequested()) {
+                    AutoLedAction.runBlocking(actuator, launcher, launchPositionLeft);
+
+                    // Spin up for the second volley on the way to the launch location.
+                    launcher.setFlywheelVelocity(LauncherSubsystem.TARGET_VELOCITY);
+
+                    // Raise ramp, stop intake, and reverse transfer
+                    intakeSubsystem.rampUp();
+                    intakeSubsystem.stopIntake();
+                    intakeSubsystem.startStepUpReversePulse();
+                    AutoLedAction.runBlocking(actuator, launcher, (packet) -> {
+                        intakeSubsystem.update();
+                        return intakeSubsystem.isStepUpReverseActive();
+                    });
+                    intakeSubsystem.stopFeeding();
+                    // Launch regardless of flywheel readiness, as with the first volley.
+                    if (opModeIsActive() && !isStopRequested()) {
+                        // Sample the local alliance tags, lock the speed, then feed balls.
+                        AutoLedAction.runBlocking(actuator, launcher, new AutoVisionLaunchAction(sensor, launcher, actuator, false));
+                        AutoLedAction.runBlocking(actuator, launcher, new LauncherAction(launcher));
+                    }
+                    launcher.setFlywheelVelocity(0);
+                }
+            } else {
+                // Limelight does not see blue alliance AprilTag:
+                // Skip ground launch and flower pickup, head straight to the other side to launch!
+                if (opModeIsActive() && !isStopRequested()) {
+                    AutoLedAction.runBlocking(actuator, launcher, launchPositionLeftFromGround);
+
+                    // Spin up for the volley on the way to the launch location.
+                    launcher.setFlywheelVelocity(LauncherSubsystem.TARGET_VELOCITY);
+
+                    // Raise ramp, stop intake, and reverse transfer
+                    intakeSubsystem.rampUp();
+                    intakeSubsystem.stopIntake();
+                    intakeSubsystem.startStepUpReversePulse();
+                    AutoLedAction.runBlocking(actuator, launcher, (packet) -> {
+                        intakeSubsystem.update();
+                        return intakeSubsystem.isStepUpReverseActive();
+                    });
+                    intakeSubsystem.stopFeeding();
+                    // Launch regardless of flywheel readiness.
+                    if (opModeIsActive() && !isStopRequested()) {
+                        // Sample the local alliance tags, lock the speed, then feed balls.
+                        AutoLedAction.runBlocking(actuator, launcher, new AutoVisionLaunchAction(sensor, launcher, actuator, false));
+                        AutoLedAction.runBlocking(actuator, launcher, new LauncherAction(launcher));
+                    }
+                    launcher.setFlywheelVelocity(0);
+                }
             }
 
             // Park after autonomous sequence.
