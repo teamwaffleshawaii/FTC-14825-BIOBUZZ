@@ -110,6 +110,13 @@ public class TeleOperated extends LinearOpMode {
                 telemetry.addData("Defender Position", defender.getPosition());
                 // Read Limelight once per loop for both velocity and telemetry.
                 currentAprilTagFrame = sensor.getFreshAprilTagResult();
+                // Aim the turret using the latest alliance AprilTags. Dashboard
+                // TX_CENTER_OFFSET_DEGREES is read on every valid frame.
+                Double turretTarget = TurretAimController.calculateTurretServoPosition(
+                        currentAprilTagFrame, isRedAlliance());
+                if (turretTarget != null) {
+                    actuator.turretServo.setPosition(turretTarget);
+                }
                 launch();
                 updateBallCounter();
                 updateFullAlertLed();
