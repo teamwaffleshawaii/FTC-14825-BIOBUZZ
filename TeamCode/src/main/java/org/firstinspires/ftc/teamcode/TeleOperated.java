@@ -107,10 +107,7 @@ public class TeleOperated extends LinearOpMode {
                 intake();
                 flowerRamp();
                 defender.update(gamepad1.right_bumper || gamepad1.right_trigger_pressed);
-                telemetry.addData("Defender Target (ticks)", defender.getTarget());
-                telemetry.addData("Defender Position (ticks)", defender.getPosition());
-                telemetry.addData("Defender Error (ticks)", defender.getError());
-                telemetry.addData("Defender Power", defender.getPower());
+                telemetry.addData("Defender Position", defender.getPosition());
                 // Read Limelight once per loop for both velocity and telemetry.
                 currentAprilTagFrame = sensor.getFreshAprilTagResult();
                 launch();
@@ -227,13 +224,10 @@ public class TeleOperated extends LinearOpMode {
         }
 
         //Display launcher telemetry
-        telemetry.addData("Target Velocity", targetVelocity);
-        telemetry.addData("Actual Velocity", currentVelocity);
-        telemetry.addData("Velocity Error", flywheelEnabled ? targetVelocity - currentVelocity : 0);
-        telemetry.addData("Launcher Ready", launcherReady);
+        telemetry.addData("Launcher Target Velocity", targetVelocity);
+        telemetry.addData("Launcher Actual Velocity", currentVelocity);
         telemetry.addData("Vision Velocity", AprilTagVelocityController.ENABLED
                 && visionVelocity.hasRecentCalibration() ? "Calibrated" : "Baseline / hold");
-        telemetry.addData("Calibrated Tags", visionVelocity.getCalibratedTagsSeen());
 
         // Ready means measured speed is within the tolerance in Actuators.
         // LED position numbers are device-specific PWM commands, not brightness.
@@ -274,8 +268,6 @@ public class TeleOperated extends LinearOpMode {
                 ballTransitionTimer.reset();
             }
         }
-        telemetry.addData("Balls Counted", ballsCounted);
-        telemetry.addData("Intake Color Alpha", lastBallAlpha);
     }
 
     /** Temporarily override the usual red/green LED with three yellow flashes. */
@@ -298,32 +290,28 @@ public class TeleOperated extends LinearOpMode {
     public void launcherTelemetry() {
         // Read the sensor every TeleOp loop, even when the launcher is idle.
         // This is telemetry-only; the launcher state machine still controls the kicker.
-        telemetry.addData("Distance (cm)", sensor.getDistance(DistanceUnit.CM));
-        telemetry.addData("Detecting Empty", launcher.isDetectingEmpty());
-        telemetry.addData("Launch State", launcher.getState());
+        telemetry.addData("kickerDistance", sensor.getDistance(DistanceUnit.CM));
     }
 
     /** Let experimental child OpModes reuse the already-validated camera frame. */
     protected LLResult getTurretAprilTagFrame() { return currentAprilTagFrame; }
 
-    /** Show only this alliance's fresh AprilTags; the velocity estimator runs separately. */
+    /** One compact telemetry line for all fresh alliance AprilTags. */
     public void limelightTelemetry() {
         LLResult result = currentAprilTagFrame;
+        StringBuilder tags = new StringBuilder();
         if (result != null) {
-            telemetry.addData("Limelight Age (ms)", result.getStaleness());
-            int allianceTags = 0;
-            for (LLResultTypes.FiducialResult tag : result.getFiducialResults()) {
-                if (visionVelocity.acceptsTag(tag.getFiducialId())) allianceTags++;
-            }
-            telemetry.addData("Alliance AprilTags Seen", allianceTags);
             for (LLResultTypes.FiducialResult tag : result.getFiducialResults()) {
                 if (!visionVelocity.acceptsTag(tag.getFiducialId())) continue;
-                telemetry.addData("AprilTag " + tag.getFiducialId(),
-                        "TX: %.2f deg, TY: %.2f deg",
-                        tag.getTargetXDegrees(), tag.getTargetYDegrees());
+                if (tags.length() > 0) tags.append(" | ");
+                tags.append(String.format(java.util.Locale.US,
+                        "%d TX %.2f TY %.2f",
+                        tag.getFiducialId(),
+                        tag.getTargetXDegrees(),
+                        tag.getTargetYDegrees()));
             }
-        } else {
-            telemetry.addData("Limelight AprilTags", "No fresh AprilTag detection");
         }
+        telemetry.addData("Limelight Apriltag",
+                tags.length() > 0 ? tags.toString() : "No fresh alliance AprilTag");
     }
 }
