@@ -26,6 +26,8 @@ public class Actuators {
     // DcMotorEx adds encoder velocity methods used by flywheel PIDF.
     public DcMotorEx launchMotor;
 
+    public DcMotorEx defenderMotor;
+
     // Servos and continuous-rotation servos configured on this robot.
     public Servo kickerServo;
     public CRServo stepUpRight;
@@ -47,32 +49,36 @@ public class Actuators {
         intakeMotor = hwMap.get(DcMotor.class, "intakeMotor");
         transferMotor = hwMap.get(DcMotorEx.class, "transferMotor");
         launchMotor = hwMap.get(DcMotorEx.class, "launchMotor");
+        defenderMotor = hwMap.get(DcMotorEx.class, "defenderMotor");
 
-        // Keep the encoder mode here; LauncherSubsystem owns PIDF tuning.
-        // Encoder feedback enables velocity control; LauncherSubsystem sets PIDF.
+        // Keep the encoder mode here; LauncherSubsystem and defenderSubsystem owns PIDF tuning.
+        // Encoder feedback enables velocity control; LauncherSubsystem and defenderSubsystem set PIDF.
         launchMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        defenderMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Zero-power behavior for each motor. The selected values below are intentional;
     // BRAKE resists motion while FLOAT lets a mechanism coast.
         // BRAKE resists motion at zero power; FLOAT allows coasting.
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); 
-        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); //or FLOAT
-        leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); //or FLOAT
-        rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); //or FLOAT
-        intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); //or FLOAT
-        transferMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); //or FLOAT
-        launchMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT); 
+        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        transferMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        launchMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        defenderMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // Calibrated motor directions; do not reverse these without physical testing.
         // Opposite sides of a drivetrain may need reversed directions
         // so a positive command moves the robot the intended way.
         leftFront.setDirection(DcMotorSimple.Direction.REVERSE); 
-        leftBack.setDirection(DcMotorSimple.Direction.REVERSE); //or FORWARD
+        leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
         rightFront.setDirection(DcMotorSimple.Direction.FORWARD); 
-        rightBack.setDirection(DcMotorSimple.Direction.FORWARD); //or REVERSE
-        intakeMotor.setDirection(DcMotorSimple.Direction.FORWARD); //or REVERSE
-        transferMotor.setDirection(DcMotorSimple.Direction.REVERSE); //or FORWARD
-        launchMotor.setDirection(DcMotorSimple.Direction.REVERSE); //or FORWARD
+        rightBack.setDirection(DcMotorSimple.Direction.FORWARD);
+        intakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        transferMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        launchMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        defenderMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Servo hardware names must match the robot configuration.
         // Standard Servo uses a position (0.0-1.0); CRServo uses motor-like power.
