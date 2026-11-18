@@ -24,12 +24,12 @@ public class AprilTagVelocityController {
     // TY columns must remain ascending for piecewise interpolation.
     // TX is used for turret aiming elsewhere, not flywheel velocity.
     private static final double[][] TAG_POSITION_TY = {
-            {-2.85, 4.27, 7.66}, // tag 34
-            {-2.62, 4.23, 7.58}, // tag 35
-            {-2.29, 4.15, 7.42}, // tag 36
-            {-2.07, 4.07, 7.25}  // tag 37
+            {4.23, 9.83, 13.54}, // tag 34
+            {4.41, 9.77, 13.55}, // tag 35
+            {4.67, 9.69, 13.54}, // tag 36
+            {4.84, 9.61, 13.52}  // tag 37
     };
-    private static final double[] CALIBRATED_SPEEDS = {920, 855, 850};
+    private static final double[] CALIBRATED_SPEEDS = {865, 845, 830};
 
     private final boolean redAlliance;
     private final ElapsedTime sinceValid = new ElapsedTime();
