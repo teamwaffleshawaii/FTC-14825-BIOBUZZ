@@ -14,6 +14,7 @@ public class Robot {
     public final IntakeSubsystem intake;
     public final DrivetrainSubsystem drivetrain;
     public final LauncherSubsystem launcher;
+    public final DefenderSubsystem defender;
 
     /** Initialize in dependency order: motors/sensors before their users. */
     public Robot(HardwareMap hardwareMap) {
@@ -22,6 +23,7 @@ public class Robot {
         drivetrain = new DrivetrainSubsystem(actuator, sensor);
         intake = new IntakeSubsystem(actuator);
         launcher = new LauncherSubsystem(actuator, sensor, intake);
+        defender = new DefenderSubsystem(actuator);
     }
 
     /**
@@ -36,6 +38,7 @@ public class Robot {
         actuator.intakeRampUp();
         actuator.launchMotor(0);
         drivetrain.stop();
+        defender.stop();
         launcher.cancel();
         intake.stopFeeding();
         sensor.stopLimelight();
