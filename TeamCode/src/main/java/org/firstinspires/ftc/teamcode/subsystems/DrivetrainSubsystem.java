@@ -24,11 +24,10 @@ public class DrivetrainSubsystem {
     /**
      * Convert joystick commands into four mecanum wheel powers.
      * Field-centric driving rotates joystick directions using robot heading.
-     * The right bumper switches to robot-centric control; D-pad overrides
+     * Field-centric translation is always used; D-pad overrides
      * translation for small controlled movements.
      */
     public void drive(double leftStickX, double leftStickY, double rightStickX,
-                      boolean robotCentric,
                       boolean dpadRight, boolean dpadLeft,
                       boolean dpadUp, boolean dpadDown) {
         // Right stick controls turning. Reduce translation when rotating.
@@ -47,11 +46,6 @@ public class DrivetrainSubsystem {
             gyroAngle -= 3 * Math.PI / 2;
         }
         gyroAngle = -gyroAngle;
-
-        // Robot-centric means forward follows the robot's front, not the field.
-        if (robotCentric) {
-            gyroAngle = -Math.PI / 2;
-        }
 
         // D-pad signs verified against driver-reported physical motion:
         // Up = forward, Down = backward, Left = left, Right = right.
