@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import org.firstinspires.ftc.teamcode.subsystems.Actuators;
 import org.firstinspires.ftc.teamcode.subsystems.AprilTagVelocityController;
 import org.firstinspires.ftc.teamcode.subsystems.DrivetrainSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.DefenderSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.LauncherSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
@@ -35,6 +36,7 @@ public class TeleOperated extends LinearOpMode {
     Sensors sensor;
     IntakeSubsystem intakeSubsystem;
     DrivetrainSubsystem drivetrain;
+    DefenderSubsystem defender;
 
     // Shared baseline for TeleOp and Auto. Vision may adjust the flywheel
     // target in both modes; auto samples/locks before each feeding sequence.
@@ -87,6 +89,7 @@ public class TeleOperated extends LinearOpMode {
         sensor = robot.sensor;
         intakeSubsystem = robot.intake;
         drivetrain = robot.drivetrain;
+        defender = robot.defender;
         launcher = robot.launcher;
         visionVelocity = new AprilTagVelocityController(isRedAlliance());
 
@@ -103,6 +106,11 @@ public class TeleOperated extends LinearOpMode {
                 resetAngle();
                 intake();
                 flowerRamp();
+                defender.update(gamepad1.right_bumper || gamepad1.right_trigger_pressed);
+                telemetry.addData("Defender Target (ticks)", defender.getTarget());
+                telemetry.addData("Defender Position (ticks)", defender.getPosition());
+                telemetry.addData("Defender Error (ticks)", defender.getError());
+                telemetry.addData("Defender Power", defender.getPower());
                 // Read Limelight once per loop for both velocity and telemetry.
                 currentAprilTagFrame = sensor.getFreshAprilTagResult();
                 launch();
@@ -142,7 +150,6 @@ public class TeleOperated extends LinearOpMode {
                 gamepad1.left_stick_x,
                 gamepad1.left_stick_y,
                 gamepad1.right_stick_x,
-                gamepad1.right_bumper,
                 gamepad1.dpad_right,
                 gamepad1.dpad_left,
                 gamepad1.dpad_up,
