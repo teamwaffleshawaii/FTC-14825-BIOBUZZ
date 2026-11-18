@@ -29,7 +29,7 @@ Motor 1: leftBack (goBILDA 435 RPM, no Encoder)
 
 Motor 2: transferMotor (goBILDA 1620 RPM, Encoder plugged in)
 
-Motor 3: Empty - to be added later
+Motor 3: defenderMotor (REV UltraPlanetary Motor 12:1 gear ratio)
 
 Servo 0: revLED (REV BlinkIn LED Driver) - to be added later
 
