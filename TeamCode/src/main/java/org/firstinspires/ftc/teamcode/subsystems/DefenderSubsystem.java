@@ -13,12 +13,12 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @Config
 public class DefenderSubsystem {
     public static int RETRACTED_TICKS = 0;
-    public static int EXTENDED_TICKS = 896;
-    public static double P = 0.004;
+    public static int EXTENDED_TICKS = 1100;
+    public static double P = 0.015;
     public static double I = 0.0;
     public static double D = 0.0;
-    public static double F = 0.0;
-    public static double MAX_POWER = 0.45;
+    public static double F = 0.001;
+    public static double MAX_POWER = 1.00;
     public static double POSITION_TOLERANCE = 12.0;
     public static double INTEGRAL_LIMIT = 1000.0;
 
