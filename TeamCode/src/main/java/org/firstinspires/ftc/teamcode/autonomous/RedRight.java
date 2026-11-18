@@ -3,11 +3,17 @@
 
 package org.firstinspires.ftc.teamcode.autonomous;
 
+import com.acmerobotics.roadrunner.AccelConstraint;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.AngularVelConstraint;
+import com.acmerobotics.roadrunner.MinVelConstraint;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.ProfileAccelConstraint;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.Vector2d;
+import com.acmerobotics.roadrunner.VelConstraint;
+import java.util.Arrays;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -73,33 +79,48 @@ public class RedRight extends LinearOpMode {
 
         // Collection path: travel from the first shooting area toward flowers.
         Action flowerPosition = drive.actionBuilder(new Pose2d(49, -31, Math.toRadians(180) ))
-                .splineTo(new Vector2d(28, -45), Math.toRadians(270))
-                .strafeTo(new Vector2d(23, -58))
+                .splineTo(new Vector2d(28, -42), Math.toRadians(270))
+                .strafeTo(new Vector2d(23, -55))
                 //...
                 .build();
 
-        Action moveBack = drive.actionBuilder(new Pose2d(23, -58, Math.toRadians(270) ))
-                .strafeToLinearHeading(new Vector2d(28,-45), Math.toRadians(270))
+        Action moveBack = drive.actionBuilder(new Pose2d(23, -55, Math.toRadians(270) ))
+                .strafeToLinearHeading(new Vector2d(28,-42), Math.toRadians(270))
                 .build();
 
-        // Final approach to the second shooting pose (routing via Y=-40 across mid-field to clear the hive).
-        Action launchPositionLeft = drive.actionBuilder(new Pose2d(28, -45, Math.toRadians(270) ))
-                .strafeToLinearHeading(new Vector2d(0, -40), Math.toRadians(0))
-                .strafeToLinearHeading(new Vector2d(-50,-25), Math.toRadians(5))
-                .strafeToLinearHeading(new Vector2d(-50,-18), Math.toRadians(25))
+        // Speed up the crossing across the field
+        VelConstraint fastVel = new MinVelConstraint(Arrays.asList(
+                drive.kinematics.new WheelVelConstraint(95),
+                new AngularVelConstraint(Math.PI * 1.5)
+        ));
+        AccelConstraint fastAccel = new ProfileAccelConstraint(-75, 90);
+
+        // Final approach to the second shooting pose (fast crossing via Y=-38 across mid-field to clear the hive).
+        Action launchPositionLeft = drive.actionBuilder(new Pose2d(28, -42, Math.toRadians(270) ))
+                .strafeToLinearHeading(new Vector2d(0, -38), Math.toRadians(0), fastVel, fastAccel)
+                .strafeToLinearHeading(new Vector2d(-45, -25), Math.toRadians(20), fastVel, fastAccel)
                 .build();
 
-        // Direct approach to second shooting pose if skipping flower (routing via Y=-40 across mid-field to clear the hive).
-        Action launchPositionLeftFromGround = drive.actionBuilder(new Pose2d(49, -31, Math.toRadians(180) ))
-                .strafeToLinearHeading(new Vector2d(0, -40), Math.toRadians(0))
-                .strafeToLinearHeading(new Vector2d(-50,-25), Math.toRadians(5))
-                .strafeToLinearHeading(new Vector2d(-50,-18), Math.toRadians(25))
+        // Direct approach to second shooting pose if skipping flower (fast crossing via Y=-38 across mid-field to clear the hive).
+        Action launchPositionLeftFromGround = drive.actionBuilder(new Pose2d(49, -25, Math.toRadians(180) ))
+                .strafeToLinearHeading(new Vector2d(0, -33), Math.toRadians(0), fastVel, fastAccel)
+                .strafeToLinearHeading(new Vector2d(-55, -25), Math.toRadians(17), fastVel, fastAccel)
                 .build();
 
-        // Parking is a separate trajectory executed after the second volley.
-        Action park = drive.actionBuilder(new Pose2d(-50, -18, Math.toRadians(25) ))
-                .strafeToLinearHeading(new Vector2d(-42,-20), Math.toRadians(90))
-                .strafeToLinearHeading(new Vector2d(-26,-50), Math.toRadians(90))
+        // Left-side flower collection (behind the left shooting pose)
+        Action flowerPositionLeft = drive.actionBuilder(new Pose2d(-55, -25, Math.toRadians(17) ))
+                .splineTo(new Vector2d(-38, -30), Math.toRadians(180))
+                .strafeTo(new Vector2d(-66, -21))
+                .build();
+
+        Action moveBackLeft = drive.actionBuilder(new Pose2d(-66, -21, Math.toRadians(180) ))
+                .strafeToLinearHeading(new Vector2d(-40, -30), Math.toRadians(180))
+                .build();
+
+        // Parking is a separate trajectory executed directly after collecting from left flower.
+        Action park = drive.actionBuilder(new Pose2d(-40, -30, Math.toRadians(180) ))
+                .strafeToLinearHeading(new Vector2d(-30, -40), Math.toRadians(90))
+                .strafeToLinearHeading(new Vector2d(-25, -51), Math.toRadians(90))
                 .build();
 
         waitForStart();
@@ -134,10 +155,7 @@ public class RedRight extends LinearOpMode {
                 intakeSubsystem.intake(1);
                 AutoLedAction.runBlocking(actuator, launcher, new SequentialAction(
                         pickupGroundPosition,
-                        // Road Runner timed pause to allow collection.
-                        // Unlike Thread.sleep(), this is part of the action sequence.
-                        new SleepAction(2),
-                        // Get ready to launch again
+                        new SleepAction(1.2),
                         launchPosition2
                 ));
 
@@ -152,16 +170,13 @@ public class RedRight extends LinearOpMode {
             }
 
             // After ground pickup, check if Limelight sees the correct red alliance AprilTag (IDs 30-37)
-            boolean seesAllianceTag = sensor.seesAllianceAprilTag(true, 0.5);
+            boolean seesAllianceTag = sensor.seesAllianceAprilTag(true, 0.1);
 
             if (seesAllianceTag) {
                 // launch the ground pollen
                 if (opModeIsActive() && !isStopRequested()) {
-                    // Spin up for the second volley on the way to the launch location.
                     launcher.setFlywheelVelocity(LauncherSubsystem.TARGET_VELOCITY);
-                    // Launch regardless of flywheel readiness, as with the first volley.
                     if (opModeIsActive() && !isStopRequested()) {
-                        // Sample the local alliance tags, lock the speed, then feed balls.
                         AutoLedAction.runBlocking(actuator, launcher, new AutoVisionLaunchAction(sensor, launcher, actuator, true));
                         AutoLedAction.runBlocking(actuator, launcher, new LauncherAction(launcher));
                     }
@@ -170,53 +185,62 @@ public class RedRight extends LinearOpMode {
 
                 // Go to the flower
                 if (opModeIsActive() && !isStopRequested()) {
-                    // Both intake() motors (intake and transfer) run during collection.
                     intakeSubsystem.rampDown();
                     intakeSubsystem.intake(1);
                     AutoLedAction.runBlocking(actuator, launcher, new SequentialAction(
                             flowerPosition,
-                            // Road Runner timed pause to allow collection.
-                            // Unlike Thread.sleep(), this is part of the action sequence.
-                            new SleepAction(2),
-                            // Reverse out of flowers before raising ramp
+                            new SleepAction(1.2),
                             moveBack
                     ));
                 }
 
                 if (opModeIsActive() && !isStopRequested()) {
-                    AutoLedAction.runBlocking(actuator, launcher, launchPositionLeft);
-
-                    // Spin up for the second volley on the way to the launch location.
+                    // Spin up flywheel while crossing to the left side
                     launcher.setFlywheelVelocity(LauncherSubsystem.TARGET_VELOCITY);
 
-                    // Raise ramp, stop intake, and reverse transfer
-                    intakeSubsystem.rampUp();
-                    intakeSubsystem.stopIntake();
-                    intakeSubsystem.startStepUpReversePulse();
-                    AutoLedAction.runBlocking(actuator, launcher, (packet) -> {
-                        intakeSubsystem.update();
-                        return intakeSubsystem.isStepUpReverseActive();
-                    });
-                    intakeSubsystem.stopFeeding();
-
-                    // Launch regardless of flywheel readiness, as with the first volley.
-                    if (opModeIsActive() && !isStopRequested()) {
-                        // Sample the local alliance tags, lock the speed, then feed balls.
-                        AutoLedAction.runBlocking(actuator, launcher, new AutoVisionLaunchAction(sensor, launcher, actuator, true));
-                        AutoLedAction.runBlocking(actuator, launcher, new LauncherAction(launcher));
-                    }
-                    launcher.setFlywheelVelocity(0);
+                    AutoLedAction.runBlocking(actuator, launcher, launchPositionLeft);
                 }
             } else {
                 // Limelight does not see red alliance AprilTag:
-                // Skip ground launch and flower pickup, head straight to the other side to launch!
+                // Skip ground launch and flower pickup, head straight to the other side!
                 if (opModeIsActive() && !isStopRequested()) {
-                    AutoLedAction.runBlocking(actuator, launcher, launchPositionLeftFromGround);
-
-                    // Spin up for the volley on the way to the launch location.
+                    // Spin up flywheel while crossing to the left side
                     launcher.setFlywheelVelocity(LauncherSubsystem.TARGET_VELOCITY);
 
-                    // Raise ramp, stop intake, and reverse transfer
+                    AutoLedAction.runBlocking(actuator, launcher, launchPositionLeftFromGround);
+                }
+            }
+
+            // Once arrived on the left side: launch, pick up from left flower behind it, and park!
+            if (opModeIsActive() && !isStopRequested()) {
+                // Raise ramp, stop intake, and reverse transfer from crossing
+                intakeSubsystem.rampUp();
+                intakeSubsystem.stopIntake();
+                intakeSubsystem.startStepUpReversePulse();
+                AutoLedAction.runBlocking(actuator, launcher, (packet) -> {
+                    intakeSubsystem.update();
+                    return intakeSubsystem.isStepUpReverseActive();
+                });
+                intakeSubsystem.stopFeeding();
+
+                // Launch on left side
+                if (opModeIsActive() && !isStopRequested()) {
+                    AutoLedAction.runBlocking(actuator, launcher, new AutoVisionLaunchAction(sensor, launcher, actuator, true));
+                    AutoLedAction.runBlocking(actuator, launcher, new LauncherAction(launcher));
+                }
+                launcher.setFlywheelVelocity(0);
+
+                // Collect from the left-side flower behind the robot
+                if (opModeIsActive() && !isStopRequested()) {
+                    intakeSubsystem.rampDown();
+                    intakeSubsystem.intake(1);
+                    AutoLedAction.runBlocking(actuator, launcher, new SequentialAction(
+                            flowerPositionLeft,
+                            new SleepAction(1.2),
+                            moveBackLeft
+                    ));
+
+                    // After backing out of left flower, raise ramp, stop intake, and reverse transfer
                     intakeSubsystem.rampUp();
                     intakeSubsystem.stopIntake();
                     intakeSubsystem.startStepUpReversePulse();
@@ -225,15 +249,13 @@ public class RedRight extends LinearOpMode {
                         return intakeSubsystem.isStepUpReverseActive();
                     });
                     intakeSubsystem.stopFeeding();
-
-                    // Launch regardless of flywheel readiness.
-                    if (opModeIsActive() && !isStopRequested()) {
-                        // Sample the local alliance tags, lock the speed, then feed balls.
-                        AutoLedAction.runBlocking(actuator, launcher, new AutoVisionLaunchAction(sensor, launcher, actuator, true));
-                        AutoLedAction.runBlocking(actuator, launcher, new LauncherAction(launcher));
-                    }
-                    launcher.setFlywheelVelocity(0);
                 }
+            }
+
+            // Park after picking up from left flower.
+            if (opModeIsActive() && !isStopRequested()) {
+                AutoLedAction.runBlocking(actuator, launcher, new SequentialAction(
+                        park));
             }
 
             // Park after autonomous sequence.
