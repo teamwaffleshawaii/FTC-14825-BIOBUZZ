@@ -28,7 +28,7 @@ public class LauncherSubsystem {
     public static double LAUNCH_P = 100.0;
     public static double LAUNCH_I = 0.0;
     public static double LAUNCH_D = 0.05;
-    public static double LAUNCH_F = 24;
+    public static double LAUNCH_F = 23.5;
 
     // Shared TeleOp and Autonomous fallback flywheel target, in encoder ticks/second.
     // Dashboard edits apply to both; save tested values here for future runs.
