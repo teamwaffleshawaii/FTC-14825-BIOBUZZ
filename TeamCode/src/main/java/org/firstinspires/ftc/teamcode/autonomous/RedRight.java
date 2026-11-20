@@ -117,8 +117,13 @@ public class RedRight extends LinearOpMode {
                 .strafeToLinearHeading(new Vector2d(-40, -30), Math.toRadians(180))
                 .build();
 
-        // Parking is a separate trajectory executed directly after collecting from left flower.
-        Action park = drive.actionBuilder(new Pose2d(-40, -30, Math.toRadians(180) ))
+        Action movetolaunchPositionAgainLeft = drive.actionBuilder(new Pose2d(-40, -30, Math.toRadians(180) ))
+                .strafeToLinearHeading(new Vector2d(-45, -10), Math.toRadians(-1))
+                .strafeToLinearHeading(new Vector2d(-55, -25), Math.toRadians(17))
+                .build();
+
+        // Parking is a separate trajectory executed after the left-side volley.
+        Action park = drive.actionBuilder(new Pose2d(-55, -25, Math.toRadians(17) ))
                 .strafeToLinearHeading(new Vector2d(-30, -40), Math.toRadians(90))
                 .strafeToLinearHeading(new Vector2d(-25, -51), Math.toRadians(90))
                 .build();
@@ -249,6 +254,20 @@ public class RedRight extends LinearOpMode {
                         return intakeSubsystem.isStepUpReverseActive();
                     });
                     intakeSubsystem.stopFeeding();
+                }
+
+                // Move to left launch position again and launch left flower balls
+                if (opModeIsActive() && !isStopRequested()) {
+                    launcher.setFlywheelVelocity(LauncherSubsystem.TARGET_VELOCITY);
+                    AutoLedAction.runBlocking(actuator, launcher, movetolaunchPositionAgainLeft);
+
+                    launcher.requireBallBeforeKicker = true;
+
+                    if (opModeIsActive() && !isStopRequested()) {
+                        AutoLedAction.runBlocking(actuator, launcher, new AutoVisionLaunchAction(sensor, launcher, actuator, true));
+                        AutoLedAction.runBlocking(actuator, launcher, new LauncherAction(launcher));
+                    }
+                    launcher.setFlywheelVelocity(0);
                 }
             }
 

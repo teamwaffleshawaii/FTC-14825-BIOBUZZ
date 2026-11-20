@@ -117,8 +117,13 @@ public class BlueRight extends LinearOpMode {
                 .strafeToLinearHeading(new Vector2d(40, 36), Math.toRadians(0))
                 .build();
 
-        // Parking is a separate trajectory executed directly after collecting from left flower.
-        Action park = drive.actionBuilder(new Pose2d(40, 36, Math.toRadians(0) ))
+        Action movetolaunchPositionAgainLeft = drive.actionBuilder(new Pose2d(40, 36, Math.toRadians(0) ))
+                .strafeToLinearHeading(new Vector2d(47, 14), Math.toRadians(179))
+                .strafeToLinearHeading(new Vector2d(46, 32), Math.toRadians(200))
+                .build();
+
+        // Parking is a separate trajectory executed after the left-side volley.
+        Action park = drive.actionBuilder(new Pose2d(46, 32, Math.toRadians(200) ))
                 .strafeToLinearHeading(new Vector2d(50, 60), Math.toRadians(270))
                 .build();
 
@@ -248,6 +253,20 @@ public class BlueRight extends LinearOpMode {
                         return intakeSubsystem.isStepUpReverseActive();
                     });
                     intakeSubsystem.stopFeeding();
+                }
+
+                // Move to left launch position again and launch left flower balls
+                if (opModeIsActive() && !isStopRequested()) {
+                    launcher.setFlywheelVelocity(LauncherSubsystem.TARGET_VELOCITY);
+                    AutoLedAction.runBlocking(actuator, launcher, movetolaunchPositionAgainLeft);
+
+                    launcher.requireBallBeforeKicker = true;
+
+                    if (opModeIsActive() && !isStopRequested()) {
+                        AutoLedAction.runBlocking(actuator, launcher, new AutoVisionLaunchAction(sensor, launcher, actuator, false));
+                        AutoLedAction.runBlocking(actuator, launcher, new LauncherAction(launcher));
+                    }
+                    launcher.setFlywheelVelocity(0);
                 }
             }
 
