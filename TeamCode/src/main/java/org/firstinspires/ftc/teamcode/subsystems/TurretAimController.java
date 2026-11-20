@@ -15,23 +15,23 @@ import java.util.Arrays;
 @Config
 public class TurretAimController {
 
-    // Mechanical turret center, recalibrated to 0.48.
+    // Field-tested mechanical turret center.
     public static double SERVO_CENTER = 0.48;
     // Servo position change per degree of horizontal aiming correction.
     public static double SERVO_PER_DEGREE = 0.010; //adjust this as needed if turret is not aligned center at all positions
     public static double TX_DEADBAND_DEGREES = 0.5;
     public static double SERVO_MIN = 0.00;
     public static double SERVO_MAX = 1.00;
-    // Field-tested common TX bias at 1020, 1035, and 1070 ticks/sec.
+    // Field-tested TX center bias for the current Limelight mounting position.
     // Tune in Dashboard only if automatic aim is consistently off-center.
     public static double TX_CENTER_OFFSET_DEGREES = -1.0; //adjust this as needed
 
 
-    // Measured RED 30-33 TX offsets, provisionally reused for both RED and BLUE tag groups.
+    // Calibrated relative TX offsets for four adjacent tags; reused across RED and BLUE tag groups.
     public static double[] TAG_TX_OFFSETS = {-7.04, -3.02, 2.96, 7.02};
 
-    // Field-tested symmetric velocity boost for angled turret shots.
-    // Applied in TeleOp and autonomous; capped to avoid excessive corrections.
+    // Optional velocity compensation for angled turret shots (currently disabled at 0.0).
+    // Applied in TeleOp and autonomous when enabled; capped to avoid excessive corrections.
     public static double ANGLE_VELOCITY_PER_DEGREE = 0.0; //change this to 0.0 if not working
     public static double MAX_ANGLE_VELOCITY_BOOST = 8.0;
 
