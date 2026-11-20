@@ -306,19 +306,20 @@ public class TeleOperated extends LinearOpMode {
     /** One compact telemetry line for all fresh alliance AprilTags. */
     public void limelightTelemetry() {
         LLResult result = currentAprilTagFrame;
-        StringBuilder tags = new StringBuilder();
+        int tagCount = 0;
         if (result != null) {
             for (LLResultTypes.FiducialResult tag : result.getFiducialResults()) {
                 if (!visionVelocity.acceptsTag(tag.getFiducialId())) continue;
-                if (tags.length() > 0) tags.append(" | ");
-                tags.append(String.format(java.util.Locale.US,
-                        "%d TX %.2f TY %.2f",
-                        tag.getFiducialId(),
-                        tag.getTargetXDegrees(),
-                        tag.getTargetYDegrees()));
+                telemetry.addData("AprilTag " + tag.getFiducialId(),
+                        String.format(java.util.Locale.US,
+                                "TX %.2f  TY %.2f",
+                                tag.getTargetXDegrees(),
+                                tag.getTargetYDegrees()));
+                tagCount++;
             }
         }
-        telemetry.addData("Limelight Apriltag",
-                tags.length() > 0 ? tags.toString() : "No fresh alliance AprilTag");
+        if (tagCount == 0) {
+            telemetry.addLine("No fresh alliance AprilTag");
+        }
     }
 }
