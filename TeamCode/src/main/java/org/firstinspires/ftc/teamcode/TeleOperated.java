@@ -197,8 +197,7 @@ public class TeleOperated extends LinearOpMode {
             targetVelocity = visionVelocity.update(currentAprilTagFrame,
                     targetVelocity, launcher.isBusy());
         }
-        return TurretAimController.compensateLaunchVelocity(
-                targetVelocity, actuator.turretServo.getPosition());
+        return targetVelocity;
     }
 
     public void launch() {
