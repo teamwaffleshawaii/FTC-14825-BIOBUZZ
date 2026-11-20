@@ -18,7 +18,7 @@ public class TurretAimController {
     // Mechanical turret center, recalibrated to 0.48.
     public static double SERVO_CENTER = 0.48;
     // Servo position change per degree of horizontal aiming correction.
-    public static double SERVO_PER_DEGREE = 0.016;
+    public static double SERVO_PER_DEGREE = 0.010; //adjust this as needed if turret is not aligned center at all positions
     public static double TX_DEADBAND_DEGREES = 0.5;
     public static double SERVO_MIN = 0.00;
     public static double SERVO_MAX = 1.00;
