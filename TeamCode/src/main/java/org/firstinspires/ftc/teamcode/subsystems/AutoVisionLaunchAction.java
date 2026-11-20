@@ -66,12 +66,7 @@ public class AutoVisionLaunchAction implements Action {
                 }
             }
 
-            // Apply the same small angle boost as TeleOp after aiming.
-            // Keep the unmodified TY estimate separate to avoid accumulating boosts.
-            double finalVelocity = actuators == null ? selectedVelocity
-                    : TurretAimController.compensateLaunchVelocity(
-                            selectedVelocity, actuators.turretServo.getPosition());
-            launcher.setFlywheelVelocity(finalVelocity);
+            launcher.setFlywheelVelocity(selectedVelocity);
 
             if (timer.seconds() >= sampleSeconds) {
                 locked = true;
