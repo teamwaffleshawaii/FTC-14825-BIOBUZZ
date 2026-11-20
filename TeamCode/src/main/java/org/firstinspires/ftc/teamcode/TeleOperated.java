@@ -38,6 +38,12 @@ public class TeleOperated extends LinearOpMode {
     DrivetrainSubsystem drivetrain;
     DefenderSubsystem defender;
 
+    // Driver 1 bumper toggles; edge detection prevents repeated toggles while held.
+    private boolean flowerRampDown = false;
+    private boolean flowerBumperWasPressed = false;
+    private boolean defenderExtended = false;
+    private boolean defenderBumperWasPressed = false;
+
     // Shared baseline for TeleOp and Auto. Vision may adjust the flywheel
     // target in both modes; auto samples/locks before each feeding sequence.
     // Remember whether X started the flywheel so changes apply while spinning.
@@ -106,7 +112,7 @@ public class TeleOperated extends LinearOpMode {
                 resetAngle();
                 intake();
                 flowerRamp();
-                defender.update(gamepad1.right_bumper || gamepad1.right_trigger_pressed);
+                updateDefenderToggle();
                 telemetry.addData("Defender Position", defender.getPosition());
                 // Read Limelight once per loop for both velocity and telemetry.
                 currentAprilTagFrame = sensor.getFreshAprilTagResult();
@@ -169,14 +175,30 @@ public class TeleOperated extends LinearOpMode {
         }
     }
 
-    /** Move the intake ramp with gamepad 1 trigger or bumper. */
-    public void flowerRamp(){
-        if (gamepad1.left_trigger_pressed || gamepad1.left_bumper){
+    /** Left bumper toggles the flower ramp; release before pressing again. */
+    public void flowerRamp() {
+        boolean pressed = gamepad1.left_bumper;
+        if (pressed && !flowerBumperWasPressed) {
+            flowerRampDown = !flowerRampDown;
+        }
+        flowerBumperWasPressed = pressed;
+        if (flowerRampDown) {
             intakeSubsystem.rampDown();
         } else {
             intakeSubsystem.rampUp();
         }
     }
+
+    /** Right bumper toggles the defender's PIDF-controlled target position. */
+    private void updateDefenderToggle() {
+        boolean pressed = gamepad1.right_bumper;
+        if (pressed && !defenderBumperWasPressed) {
+            defenderExtended = !defenderExtended;
+        }
+        defenderBumperWasPressed = pressed;
+        defender.update(defenderExtended);
+    }
+
     /** Map either driver's A/B buttons to the intake subsystem. */
     public void intake() {
         intakeSubsystem.updateManualIntake(
