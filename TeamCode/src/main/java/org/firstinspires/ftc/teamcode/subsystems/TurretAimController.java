@@ -30,20 +30,6 @@ public class TurretAimController {
     // Calibrated relative TX offsets for four adjacent tags; reused across RED and BLUE tag groups.
     public static double[] TAG_TX_OFFSETS = {-7.04, -3.02, 2.96, 7.02};
 
-    // Optional velocity compensation for angled turret shots (currently disabled at 0.0).
-    // Applied in TeleOp and autonomous when enabled; capped to avoid excessive corrections.
-    public static double ANGLE_VELOCITY_PER_DEGREE = 0.0; //change this to 0.0 if not working
-    public static double MAX_ANGLE_VELOCITY_BOOST = 8.0;
-
-    /** Add a small speed boost based on turret rotation from mechanical center. */
-    public static double compensateLaunchVelocity(double baseVelocity, double servoPosition) {
-        if (!Double.isFinite(servoPosition) || SERVO_PER_DEGREE <= 0) return baseVelocity;
-        double angleDegrees = Math.abs((SERVO_CENTER - servoPosition) / SERVO_PER_DEGREE);
-        double boost = Math.min(Math.max(0, MAX_ANGLE_VELOCITY_BOOST),
-                angleDegrees * Math.max(0, ANGLE_VELOCITY_PER_DEGREE));
-        return baseVelocity + boost;
-    }
-
     private TurretAimController() {}
 
     /**
