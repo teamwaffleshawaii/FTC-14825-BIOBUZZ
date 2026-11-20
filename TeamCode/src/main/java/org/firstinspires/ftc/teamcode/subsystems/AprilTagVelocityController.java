@@ -20,16 +20,17 @@ public class AprilTagVelocityController {
     public static double LOST_TARGET_HOLD_SECONDS = 0.5;
 
     // Rows: tags 34, 35, 36, 37 (same positions in other tag groups).
-    // Columns: TY at position 2 (920), position 1 (855), position 3 (850).
+    // Columns: TY measured at 880, 860, and 845 ticks/sec, respectively.
     // TY columns must remain ascending for piecewise interpolation.
+    // Recalibrated after raising the Limelight mounting height.
     // TX is used for turret aiming elsewhere, not flywheel velocity.
     private static final double[][] TAG_POSITION_TY = {
-            {-15.22, -9.62, -5.91}, // tag 34
-            {-15.00, -9.64, -5.86}, // tag 35
-            {-14.75, -9.73, -5.88}, // tag 36
-            {-14.51, -9.74, -5.83}  // tag 37
+            {-2.98, 0.04, 6.06}, // tag 34
+            {-3.04, 0.05, 6.04}, // tag 35
+            {-3.15, 0.04, 5.90}, // tag 36
+            {-3.23, 0.04, 5.81}  // tag 37
     };
-    private static final double[] CALIBRATED_SPEEDS = {865, 845, 830};
+    private static final double[] CALIBRATED_SPEEDS = {880, 860, 845};
 
     private final boolean redAlliance;
     private final ElapsedTime sinceValid = new ElapsedTime();
