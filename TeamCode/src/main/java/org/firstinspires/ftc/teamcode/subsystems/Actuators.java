@@ -201,8 +201,8 @@ public class Actuators {
     }
 
     public void intakeRampUp() {
-        intakeServoLeft.setPosition(0.13 - 0.01);
-        intakeServoRight.setPosition(0.13);
+        intakeServoLeft.setPosition(0.17 - 0.01);
+        intakeServoRight.setPosition(0.17);
     }
 
 }
