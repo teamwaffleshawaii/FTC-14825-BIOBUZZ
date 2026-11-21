@@ -30,7 +30,7 @@ public class AprilTagVelocityController {
             {-3.15, 0.04, 5.90}, // tag 36
             {-3.23, 0.04, 5.81}  // tag 37
     };
-    private static final double[] CALIBRATED_SPEEDS = {880, 860, 845};
+    private static final double[] CALIBRATED_SPEEDS = {890, 868, 850};
 
     private final boolean redAlliance;
     private final ElapsedTime sinceValid = new ElapsedTime();

@@ -175,9 +175,9 @@ public class TeleOperated extends LinearOpMode {
         }
     }
 
-    /** Left bumper toggles the flower ramp; release before pressing again. */
+    /** Right bumper toggles the flower ramp; release before pressing again. */
     public void flowerRamp() {
-        boolean pressed = gamepad1.left_bumper;
+        boolean pressed = gamepad1.right_bumper;
         if (pressed && !flowerBumperWasPressed) {
             flowerRampDown = !flowerRampDown;
         }
@@ -189,9 +189,9 @@ public class TeleOperated extends LinearOpMode {
         }
     }
 
-    /** Right bumper toggles the defender's PIDF-controlled target position. */
+    /** Left bumper toggles the defender's PIDF-controlled target position. */
     private void updateDefenderToggle() {
-        boolean pressed = gamepad1.right_bumper;
+        boolean pressed = gamepad1.left_bumper;
         if (pressed && !defenderBumperWasPressed) {
             defenderExtended = !defenderExtended;
         }
@@ -219,7 +219,9 @@ public class TeleOperated extends LinearOpMode {
             targetVelocity = visionVelocity.update(currentAprilTagFrame,
                     targetVelocity, launcher.isBusy());
         }
-        return targetVelocity;
+        // Apply angle and hypotenuse distance compensation for off-axis shots
+        double angleDegrees = TurretAimController.getHorizontalAngleDegrees(currentAprilTagFrame, isRedAlliance());
+        return TurretAimController.compensateLaunchVelocity(targetVelocity, angleDegrees);
     }
 
     public void launch() {

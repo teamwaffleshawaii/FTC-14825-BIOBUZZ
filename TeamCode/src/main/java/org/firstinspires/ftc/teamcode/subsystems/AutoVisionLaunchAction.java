@@ -66,7 +66,11 @@ public class AutoVisionLaunchAction implements Action {
                 }
             }
 
-            launcher.setFlywheelVelocity(selectedVelocity);
+            // 3. Apply angle & hypotenuse velocity compensation
+            double angleDegrees = TurretAimController.getHorizontalAngleDegrees(freshFrame, redAlliance);
+            double finalVelocity = TurretAimController.compensateLaunchVelocity(selectedVelocity, angleDegrees);
+
+            launcher.setFlywheelVelocity(finalVelocity);
 
             if (timer.seconds() >= sampleSeconds) {
                 locked = true;

@@ -62,29 +62,29 @@ public class RedOffset extends LinearOpMode {
 
         // 1. Drive forward into first launch position
         Action driveToLaunchPosition = drive.actionBuilder(new Pose2d(60, -36, Math.toRadians(180)))
-                .strafeToLinearHeading(new Vector2d(45, -36), Math.toRadians(150))
+                .strafeToLinearHeading(new Vector2d(48, -36), Math.toRadians(150))
                 .build();
 
         // 2. Drive straight across to the other side of the hive, angled slightly left toward the flower
         Action driveToOtherSide = drive.actionBuilder(new Pose2d(45, -36, Math.toRadians(150)))
-                .splineToConstantHeading(new Vector2d(23, -40), Math.toRadians(180), fastVel, fastAccel)
+                .splineToConstantHeading(new Vector2d(23, -55), Math.toRadians(180), fastVel, fastAccel)
                 .splineToConstantHeading(new Vector2d(-34, -50), Math.toRadians(180), fastVel, fastAccel)
                 .build();
 
         // 3. Flower pickup on the other side
         Action flowerPosition = drive.actionBuilder(new Pose2d(-40, -45, Math.toRadians(180)))
                 .strafeToConstantHeading(new Vector2d(-50, -22))
-                .strafeTo(new Vector2d(-62, -23))
+                .strafeTo(new Vector2d(-65, -27))
                 .build();
 
-        Action moveBack = drive.actionBuilder(new Pose2d(-63, -26, Math.toRadians(180)))
+        Action moveBack = drive.actionBuilder(new Pose2d(-65, -27, Math.toRadians(180)))
                 .strafeToLinearHeading(new Vector2d(-40, -30), Math.toRadians(180))
                 .build();
 
         // 4. Turn around to face goal for launching flower balls
         Action turnAroundToLaunch = drive.actionBuilder(new Pose2d(-40, -30, Math.toRadians(180)))
                 .strafeToLinearHeading(new Vector2d(-45, -10), Math.toRadians(-1))
-                .strafeToLinearHeading(new Vector2d(-45, -30), Math.toRadians(20))
+                .strafeToLinearHeading(new Vector2d(-50, -20), Math.toRadians(20))
                 .build();
 
         // 5. Park after launching
@@ -122,7 +122,7 @@ public class RedOffset extends LinearOpMode {
                     intakeSubsystem.intake(1);
                     AutoLedAction.runBlocking(actuator, launcher, new SequentialAction(
                             flowerPosition,
-                            new SleepAction(1.2),
+                            new SleepAction(2.2),
                             moveBack
                     ));
 
