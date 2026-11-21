@@ -25,12 +25,12 @@ public class AprilTagVelocityController {
     // Recalibrated after raising the Limelight mounting height.
     // TX is used for turret aiming elsewhere, not flywheel velocity.
     private static final double[][] TAG_POSITION_TY = {
-            {-2.98, 0.04, 6.06}, // tag 34
-            {-3.04, 0.05, 6.04}, // tag 35
-            {-3.15, 0.04, 5.90}, // tag 36
-            {-3.23, 0.04, 5.81}  // tag 37
+            {-3.81, 0.53, 5.87}, // tag 34
+            {-3.89, 0.53, 5.79}, // tag 35
+            {-4.00, 0.52, 5.71}, // tag 36
+            {-4.09, 0.50, 5.59}  // tag 37
     };
-    private static final double[] CALIBRATED_SPEEDS = {890, 868, 850};
+    private static final double[] CALIBRATED_SPEEDS = {911, 873, 868};
 
     private final boolean redAlliance;
     private final ElapsedTime sinceValid = new ElapsedTime();
