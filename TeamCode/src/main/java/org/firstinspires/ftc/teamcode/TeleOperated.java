@@ -55,18 +55,6 @@ public class TeleOperated extends LinearOpMode {
     // Readiness is based on the currently commanded target, not the baseline.
     boolean launcherReady = false;
 
-    // Count each ball once as it passes the intake-to-transfer color sensor.
-    public static double BALL_ALPHA_ON = 0.40;
-    public static double BALL_ALPHA_OFF = 0.15;
-    public static double BALL_DEBOUNCE_SECONDS = 0.06;
-    private int ballsCounted = 0;
-    private boolean ballAtSensor = false;
-    private boolean launchBumperWasPressed = false;
-    private final ElapsedTime ballTransitionTimer = new ElapsedTime();
-    private final ElapsedTime fullAlertTimer = new ElapsedTime();
-    private boolean fullAlertActive = false;
-    private double lastBallAlpha = Double.NaN;
-
     LauncherSubsystem launcher;
     private AprilTagVelocityController visionVelocity;
     private LLResult currentAprilTagFrame;
@@ -77,6 +65,7 @@ public class TeleOperated extends LinearOpMode {
     // ElapsedTime measures real elapsed time without pausing the robot loop.
     // It is used to blink the indicator LED without sleep().
     private final ElapsedTime ledTimer = new ElapsedTime();
+    private boolean launchBumperWasPressed = false;
 
     // FTC SDK calls runOpMode() when the driver selects and starts this OpMode.
     @Override
@@ -124,8 +113,6 @@ public class TeleOperated extends LinearOpMode {
                     actuator.turretServo.setPosition(turretTarget);
                 }
                 launch();
-                updateBallCounter();
-                updateFullAlertLed();
 
                 // Y is the operator's immediate launcher STOP / RESET command.
                 // Give it priority over right bumper, including when both are held.
@@ -137,7 +124,6 @@ public class TeleOperated extends LinearOpMode {
                     // The feed is not gated on launcherReady; wait for green.
                     if (gamepad2.right_bumper && !launchBumperWasPressed
                             && !launcher.isBusy()) {
-                        resetBallCounter();
                         launcher.start();
                     }
                     launchBumperWasPressed = gamepad2.right_bumper;
@@ -272,50 +258,6 @@ public class TeleOperated extends LinearOpMode {
             actuator.indicatorRed(); // Solid red on both LEDs
         }
     }
-    /** Clear the intake passage count when a new volley begins. */
-    private void resetBallCounter() {
-        ballsCounted = 0;
-        ballAtSensor = false;
-        fullAlertActive = false;
-        ballTransitionTimer.reset();
-    }
-
-    /** Count rising ball detections, not every loop while a ball is present. */
-    private void updateBallCounter() {
-        lastBallAlpha = sensor.getIntakeColorAlpha();
-        if (Double.isFinite(lastBallAlpha) &&
-                ballTransitionTimer.seconds() >= BALL_DEBOUNCE_SECONDS) {
-            if (!ballAtSensor && lastBallAlpha >= BALL_ALPHA_ON) {
-                ballAtSensor = true;
-                ballsCounted++;
-                ballTransitionTimer.reset();
-                if (ballsCounted == 4) {
-                    fullAlertActive = true;
-                    fullAlertTimer.reset();
-                }
-            } else if (ballAtSensor && lastBallAlpha <= BALL_ALPHA_OFF) {
-                ballAtSensor = false;
-                ballTransitionTimer.reset();
-            }
-        }
-    }
-
-    /** Temporarily override the usual red/green LED with three yellow flashes. */
-    private void updateFullAlertLed() {
-        if (!fullAlertActive) return;
-        double elapsed = fullAlertTimer.seconds();
-        if (elapsed >= 0.6) {
-            fullAlertActive = false;
-            return;
-        }
-        // Three quick flashes: 100 ms yellow, 100 ms off each.
-        if (((int) (elapsed / 0.1)) % 2 == 0) {
-            actuator.indicatorYellow();
-        } else {
-            actuator.indicatorOff();
-        }
-    }
-
     /** Display the current state of the non-blocking four-ball sequence. */
     public void launcherTelemetry() {
         // Read the sensor every TeleOp loop, even when the launcher is idle.
