@@ -24,6 +24,9 @@ public class DrivetrainSubsystem {
     private static final double DRIVE_METERS_PER_TICK =
             Math.PI * DRIVE_WHEEL_DIAMETER_METERS / DRIVE_ENCODER_TICKS_PER_REV;
 
+    // D-pad strafe power; increased from 0.50 for quicker left/right movement.
+    private static final double DPAD_STRAFE_POWER = 0.70;
+
     private final ElapsedTime driveVelocityTimer = new ElapsedTime();
     private boolean driveVelocityInitialized = false;
     private int previousLeftFrontTicks;
@@ -67,9 +70,9 @@ public class DrivetrainSubsystem {
         // D-pad signs verified against driver-reported physical motion:
         // Up = forward, Down = backward, Left = left, Right = right.
         if (dpadRight) {
-            stickX = -0.5;
+            stickX = -DPAD_STRAFE_POWER;
         } else if (dpadLeft) {
-            stickX = 0.5;
+            stickX = DPAD_STRAFE_POWER;
         }
         if (dpadUp) {
             stickY = 0.5;
