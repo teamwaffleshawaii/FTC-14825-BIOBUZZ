@@ -50,6 +50,15 @@ public class TeleOperated extends LinearOpMode {
     boolean flywheelEnabled = false;
     // Rumble only once each time X starts the flywheel; Y rearms it.
     private boolean flywheelReadyRumbled = false;
+    // Moving-shot compensation is Dashboard-tunable. Keep gain at zero until
+    // its sign and magnitude are validated with controlled field testing.
+    public static boolean MOVING_SHOT_COMPENSATION_ENABLED = true;
+    public static double MOVING_SHOT_GAIN_TICKS_PER_MPS = 0.0;
+    public static double MAX_MOVING_SHOT_ADJUSTMENT_TICKS = 40.0;
+    public static double MOVING_SHOT_SMOOTHING = 0.20;
+    private double filteredMovingShotAdjustment = 0.0;
+    private double measuredTowardGoalVelocityMps = 0.0;
+
     // Actual encoder velocity (ticks/second), refreshed every loop.
     double currentVelocity = 0;
     // Readiness is based on the currently commanded target, not the baseline.
@@ -205,9 +214,36 @@ public class TeleOperated extends LinearOpMode {
             targetVelocity = visionVelocity.update(currentAprilTagFrame,
                     targetVelocity, launcher.isBusy());
         }
-        // Apply angle and hypotenuse distance compensation for off-axis shots
-        double angleDegrees = TurretAimController.getHorizontalAngleDegrees(currentAprilTagFrame, isRedAlliance());
-        return TurretAimController.compensateLaunchVelocity(targetVelocity, angleDegrees);
+
+        // Keep the existing calibrated AprilTag and off-axis compensation.
+        // The fixed Limelight reports target direction relative to the chassis.
+        double angleDegrees = TurretAimController.getHorizontalAngleDegrees(
+                currentAprilTagFrame, isRedAlliance());
+        targetVelocity = TurretAimController.compensateLaunchVelocity(
+                targetVelocity, angleDegrees);
+
+        // Estimate chassis velocity along the goal line. Freeze this adjustment
+        // throughout a volley so the target does not change between fed balls.
+        if (!launcher.isBusy()) {
+            double desiredAdjustment = 0.0;
+            if (MOVING_SHOT_COMPENSATION_ENABLED
+                    && visionVelocity.getCalibratedTagsSeen() > 0) {
+                measuredTowardGoalVelocityMps =
+                        drivetrain.getVelocityTowardTargetMps(angleDegrees);
+                double limit = Math.max(0.0, MAX_MOVING_SHOT_ADJUSTMENT_TICKS);
+                desiredAdjustment = -measuredTowardGoalVelocityMps
+                        * MOVING_SHOT_GAIN_TICKS_PER_MPS;
+                desiredAdjustment = Math.max(-limit, Math.min(limit, desiredAdjustment));
+            } else {
+                measuredTowardGoalVelocityMps = 0.0;
+            }
+
+            double alpha = Math.max(0.0, Math.min(1.0, MOVING_SHOT_SMOOTHING));
+            filteredMovingShotAdjustment += alpha
+                    * (desiredAdjustment - filteredMovingShotAdjustment);
+        }
+
+        return targetVelocity + filteredMovingShotAdjustment;
     }
 
     public void launch() {
@@ -240,6 +276,10 @@ public class TeleOperated extends LinearOpMode {
         }
 
         //Display launcher telemetry
+        telemetry.addData("Moving Shot Toward Goal (m/s)",
+                measuredTowardGoalVelocityMps);
+        telemetry.addData("Moving Shot Velocity Adjustment",
+                filteredMovingShotAdjustment);
         telemetry.addData("Launcher Target Velocity", targetVelocity);
         telemetry.addData("Launcher Actual Velocity", currentVelocity);
         telemetry.addData("Vision Velocity", AprilTagVelocityController.ENABLED
