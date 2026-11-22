@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
  * Shared field-centric mecanum controls for TeleOp.
@@ -15,6 +16,22 @@ public class DrivetrainSubsystem {
     private final Actuators actuator;
     private final Sensors sensor;
     private double resetAngle = 0;
+
+    // goBILDA Yellow Jacket 435 RPM (13.7:1), direct drive to 104 mm wheels.
+    // Encoder resolution is 384.5 pulses per output-shaft revolution.
+    private static final double DRIVE_ENCODER_TICKS_PER_REV = 384.5;
+    private static final double DRIVE_WHEEL_DIAMETER_METERS = 0.104;
+    private static final double DRIVE_METERS_PER_TICK =
+            Math.PI * DRIVE_WHEEL_DIAMETER_METERS / DRIVE_ENCODER_TICKS_PER_REV;
+
+    private final ElapsedTime driveVelocityTimer = new ElapsedTime();
+    private boolean driveVelocityInitialized = false;
+    private int previousLeftFrontTicks;
+    private int previousRightFrontTicks;
+    private int previousLeftBackTicks;
+    private int previousRightBackTicks;
+    private double robotForwardVelocityMps = 0.0;
+    private double robotStrafeVelocityMps = 0.0;
 
     public DrivetrainSubsystem(Actuators actuator, Sensors sensor) {
         this.actuator = actuator;
@@ -70,6 +87,71 @@ public class DrivetrainSubsystem {
         actuator.leftBack(pX - pRotate);
         actuator.rightBack(pY + pRotate);
         actuator.rightFront(pX + pRotate);
+
+        // Estimate chassis translation from encoder deltas without changing
+        // the existing RUN_WITHOUT_ENCODER drivetrain control.
+        updateDriveVelocityEstimate();
+    }
+
+    /**
+     * Estimate robot-centric forward and rightward velocity from the four
+     * mecanum wheel encoders. Opposing wheel contributions cancel rotation.
+     */
+    private void updateDriveVelocityEstimate() {
+        int lf = actuator.leftFront.getCurrentPosition();
+        int rf = actuator.rightFront.getCurrentPosition();
+        int lb = actuator.leftBack.getCurrentPosition();
+        int rb = actuator.rightBack.getCurrentPosition();
+        double dt = driveVelocityTimer.seconds();
+
+        if (!driveVelocityInitialized || dt <= 0.001 || dt > 0.25) {
+            previousLeftFrontTicks = lf;
+            previousRightFrontTicks = rf;
+            previousLeftBackTicks = lb;
+            previousRightBackTicks = rb;
+            driveVelocityTimer.reset();
+            driveVelocityInitialized = true;
+            robotForwardVelocityMps = 0.0;
+            robotStrafeVelocityMps = 0.0;
+            return;
+        }
+
+        double lfMps = (lf - previousLeftFrontTicks) * DRIVE_METERS_PER_TICK / dt;
+        double rfMps = (rf - previousRightFrontTicks) * DRIVE_METERS_PER_TICK / dt;
+        double lbMps = (lb - previousLeftBackTicks) * DRIVE_METERS_PER_TICK / dt;
+        double rbMps = (rb - previousRightBackTicks) * DRIVE_METERS_PER_TICK / dt;
+
+        previousLeftFrontTicks = lf;
+        previousRightFrontTicks = rf;
+        previousLeftBackTicks = lb;
+        previousRightBackTicks = rb;
+        driveVelocityTimer.reset();
+
+        // Inverse mecanum kinematics. Positive strafe is robot-right.
+        double forward = (lfMps + rfMps + lbMps + rbMps) * 0.25;
+        double strafe = (-lfMps + rfMps + lbMps - rbMps) * 0.25;
+
+        // Light filtering reduces encoder quantization without adding much lag.
+        robotForwardVelocityMps += 0.35 * (forward - robotForwardVelocityMps);
+        robotStrafeVelocityMps += 0.35 * (strafe - robotStrafeVelocityMps);
+    }
+
+    public double getRobotForwardVelocityMps() {
+        return robotForwardVelocityMps;
+    }
+
+    public double getRobotStrafeVelocityMps() {
+        return robotStrafeVelocityMps;
+    }
+
+    /**
+     * Positive result means robot translation is toward the observed goal.
+     * Limelight TX is relative to the chassis because the camera is fixed.
+     */
+    public double getVelocityTowardTargetMps(double targetTxDegrees) {
+        double angle = Math.toRadians(targetTxDegrees);
+        return robotForwardVelocityMps * Math.cos(angle)
+                + robotStrafeVelocityMps * Math.sin(angle);
     }
 
     /** Preserve the existing driver's heading-reset behavior. */
