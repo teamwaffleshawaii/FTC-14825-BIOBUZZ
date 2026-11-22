@@ -196,13 +196,13 @@ public class Actuators {
 
     // The left/right ramp servos move together to open or close the ramp.
     public void intakeRampDown() {
-        intakeServoLeft.setPosition(0.66);
-        intakeServoRight.setPosition(0.66);
+        intakeServoLeft.setPosition(0.6);
+        intakeServoRight.setPosition(0.6);
     }
 
     public void intakeRampUp() {
-        intakeServoLeft.setPosition(0.17 - 0.01);
-        intakeServoRight.setPosition(0.17);
+        intakeServoLeft.setPosition(0.1);
+        intakeServoRight.setPosition(0.1);
     }
 
 }
