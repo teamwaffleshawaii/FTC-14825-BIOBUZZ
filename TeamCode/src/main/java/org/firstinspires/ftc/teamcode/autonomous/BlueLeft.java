@@ -1,5 +1,7 @@
+
 // Blue Left autonomous using Road Runner odometry.
-// Verify starting pose, headings, and ball-feed timing on the real field.
+// Waits up to 11 seconds for a Blue Alliance AprilTag.
+// If no tag is detected, the robot skips the normal autonomous and parks.
 
 package org.firstinspires.ftc.teamcode.autonomous;
 
@@ -8,7 +10,6 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.Vector2d;
-import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -22,16 +23,10 @@ import org.firstinspires.ftc.teamcode.subsystems.LauncherSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
 import org.firstinspires.ftc.teamcode.subsystems.Sensors;
 
-/**
- * STUDENT GUIDE: Left-side autonomous route using Road Runner odometry.
- * A Pose2d contains field X, Y and robot heading (in radians).
- * Trajectories below are built BEFORE PLAY and run in a planned sequence.
- * Verify all coordinates against the actual field before a match.
- */
-@Autonomous (name = "Blue Left", group = "Auto")
+@Autonomous(name = "Blue Left", group = "Auto")
 public class BlueLeft extends LinearOpMode {
 
-    // References to shared Robot subsystems (not duplicate hardware).
+    // References to shared Robot subsystems.
     Robot robot;
     Actuators actuator;
     Sensors sensor;
@@ -40,144 +35,302 @@ public class BlueLeft extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        // Robot initializes all shared hardware and subsystems.
+
+        // Initialize robot hardware and subsystems.
         robot = new Robot(hardwareMap);
         actuator = robot.actuator;
         sensor = robot.sensor;
         intakeSubsystem = robot.intake;
         launcher = robot.launcher;
 
-        // Starting pose must match the robot's real position and heading.
-        // Starting pose is our best estimate of the robot's field position.
-        // Road Runner uses it as the reference for subsequent trajectories.
-        MecanumDrive drive = new MecanumDrive(hardwareMap,
-                new Pose2d(60, 11.5, Math.toRadians(180) ) );
+        // Starting pose.
+        Pose2d startingPose = new Pose2d(
+                60, 11.5, Math.toRadians(180)
+        );
 
-        // Each action begins at the previous action's expected ending pose.
-        // Action builders describe a path; .build() creates an executable action.
-        // Road Runner does not move the robot until AutoLedAction.runBlocking(actuator, launcher, ) runs.
-        Action launchPositionRight = drive.actionBuilder(new Pose2d(60, 11.5, Math.toRadians(180) ))
-                .strafeToLinearHeading(new Vector2d( 47, 11.5), Math.toRadians(180))
-                .strafeToLinearHeading(new Vector2d( 46, 32), Math.toRadians(200))
+        MecanumDrive drive = new MecanumDrive(hardwareMap, startingPose);
+
+        // First shooting position.
+        Action launchPositionRight = drive.actionBuilder(
+                        new Pose2d(60, 11.5, Math.toRadians(180)))
+                .strafeToLinearHeading(
+                        new Vector2d(47, 11.5), Math.toRadians(180))
+                .strafeToLinearHeading(
+                        new Vector2d(46, 32), Math.toRadians(200))
                 .build();
 
-        // Collection path: travel from the first shooting area toward flowers.
-        Action flowerPosition = drive.actionBuilder(new Pose2d(46, 32, Math.toRadians(200) ))
-                .splineTo(new Vector2d(38, 33), Math.toRadians(0))
-                .strafeTo(new Vector2d(58, 33))
+        // Collection path.
+        Action flowerPosition = drive.actionBuilder(
+                        new Pose2d(46, 32, Math.toRadians(200)))
+                .splineTo(
+                        new Vector2d(38, 33), Math.toRadians(0))
+                .strafeTo(
+                        new Vector2d(58, 30))
                 .build();
 
-        Action moveBack = drive.actionBuilder(new Pose2d(58, 33, Math.toRadians(0) ))
-                .strafeToLinearHeading(new Vector2d(40,33), Math.toRadians(0))
+        // Move backward out of the collection area.
+        Action moveBack = drive.actionBuilder(
+                        new Pose2d(58, 30, Math.toRadians(0)))
+                .strafeToLinearHeading(
+                        new Vector2d(40, 33), Math.toRadians(0))
                 .build();
 
-        // Return to the second shooting position (same side of field).
-        Action movetolaunchPositionAgain = drive.actionBuilder(new Pose2d(40, 33, Math.toRadians(0) ))
-                .strafeToLinearHeading(new Vector2d(47,12), Math.toRadians(179))
-                .strafeToLinearHeading(new Vector2d(46,32), Math.toRadians(200))
+        // Return to the second shooting position.
+        Action movetolaunchPositionAgain = drive.actionBuilder(
+                        new Pose2d(40, 33, Math.toRadians(0)))
+                .strafeToLinearHeading(
+                        new Vector2d(47, 12), Math.toRadians(179))
+                .strafeToLinearHeading(
+                        new Vector2d(46, 32), Math.toRadians(200))
                 .build();
 
-        // Parking is a separate trajectory executed after the second volley.
-        Action park = drive.actionBuilder(new Pose2d(46, 32, Math.toRadians(200) ))
-                .strafeToLinearHeading(new Vector2d(50,60), Math.toRadians(270))
+        // Normal parking path after completing the autonomous.
+        Action park = drive.actionBuilder(
+                        new Pose2d(46, 32, Math.toRadians(200)))
+                .strafeToLinearHeading(
+                        new Vector2d(50, 60), Math.toRadians(270))
+                .build();
+
+        // Emergency parking path if no AprilTag is detected.
+        // This path starts at the robot's actual starting pose.
+        Action parkFromStart = drive.actionBuilder(
+                        new Pose2d(60, 11.5, Math.toRadians(180)))
+                .strafeToLinearHeading(
+                        new Vector2d(50, 60), Math.toRadians(270))
                 .build();
 
         waitForStart();
 
-        // try/finally ensures motors are commanded safe values on exit,
-        // including when STOP is pressed or an exception occurs.
         try {
-        if (opModeIsActive() && !isStopRequested()) {
-
-            //Wait for x seconds for the partner to score
-            new SleepAction(1);
-
-            // Spin up while driving to the first launch position.
-            // The first volley starts after arriving, regardless of actual speed.
-            launcher.setFlywheelVelocity(LauncherSubsystem.TARGET_VELOCITY);
-            // runBlocking executes a Road Runner action until it finishes.
-            // Do not use a long Thread.sleep() during trajectory following.
-            AutoLedAction.runBlocking(actuator, launcher, new SequentialAction(
-                    launchPositionRight
-            ));
-
-            // Launch preload balls (first launch uses default forward turret angle)
             if (opModeIsActive() && !isStopRequested()) {
-                // LauncherAction runs the timed feed state machine, not a drive path.
-                // Sample the local alliance tags, lock the speed, then feed balls.
-                AutoLedAction.runBlocking(actuator, launcher, new AutoVisionLaunchAction(sensor, launcher, actuator, false));
-                AutoLedAction.runBlocking(actuator, launcher, new LauncherAction(launcher));
-            }
 
-            // Stop the flywheel regardless of whether the first shot succeeded.
-            launcher.setFlywheelVelocity(0);
+                // ==========================================
+                // WAIT UP TO 11 SECONDS FOR BLUE APRILTAG
+                // ==========================================
 
-            if (opModeIsActive() && !isStopRequested()) {
-                // Both intake() motors (intake and transfer) run during collection.
-                intakeSubsystem.rampDown();
-                intakeSubsystem.intake(1);
-                AutoLedAction.runBlocking(actuator, launcher, new SequentialAction(
-                        flowerPosition,
-                        // Road Runner timed pause to allow collection.
-                        // Unlike Thread.sleep(), this is part of the action sequence.
-                        new SleepAction(2),
-                        // Reverse out of flowers before raising ramp
-                        moveBack
-                ));
+                final double TAG_WAIT_SECONDS = 11.0;
 
-                // After backing out of flowers, raise ramp, stop intake, and reverse transfer
-                intakeSubsystem.rampUp();
-                intakeSubsystem.stopIntake();
-                intakeSubsystem.startStepUpReversePulse();
-                AutoLedAction.runBlocking(actuator, launcher, (packet) -> {
-                    intakeSubsystem.update();
-                    return intakeSubsystem.isStepUpReverseActive();
-                });
-                intakeSubsystem.stopFeeding();
-            }
+                boolean aprilTagDetected = false;
 
-            if (opModeIsActive() && !isStopRequested()) {
-                if (opModeIsActive() && !isStopRequested()) {
-                    // Spin up the flywheel during the final approach.
-                    launcher.setFlywheelVelocity(LauncherSubsystem.TARGET_VELOCITY);
-                    AutoLedAction.runBlocking(actuator, launcher, movetolaunchPositionAgain);
+                long tagWaitStartTime = System.nanoTime();
+
+                telemetry.addLine("WAITING FOR BLUE ALLIANCE APRILTAG");
+                telemetry.addData("Time limit", "%.0f seconds", TAG_WAIT_SECONDS);
+                telemetry.update();
+
+                while (opModeIsActive()
+                        && !isStopRequested()
+                        && !aprilTagDetected
+                        && (System.nanoTime() - tagWaitStartTime)
+                        / 1_000_000_000.0 < TAG_WAIT_SECONDS) {
+
+                    // Check for a Blue Alliance AprilTag.
+                    aprilTagDetected = sensor.seesAllianceAprilTag(false, 0.5);
+
+                    double elapsedSeconds =
+                            (System.nanoTime() - tagWaitStartTime)
+                                    / 1_000_000_000.0;
+
+                    double remainingSeconds =
+                            TAG_WAIT_SECONDS - elapsedSeconds;
+
+                    telemetry.clearAll();
+                    telemetry.addLine("WAITING FOR BLUE ALLIANCE APRILTAG");
+                    telemetry.addData("Tag detected", aprilTagDetected);
+                    telemetry.addData("Time remaining", "%.1f seconds",
+                            Math.max(0, remainingSeconds));
+                    telemetry.update();
+
+                    idle();
                 }
 
-                // Allow the flywheel to settle after retract, before feeding.
-                if (opModeIsActive() && !isStopRequested()) {
-                    AutoLedAction.runBlocking(actuator, launcher, new SleepAction(1));
+                // Stop immediately if STOP was pressed.
+                if (!opModeIsActive() || isStopRequested()) {
+                    return;
                 }
 
-                // Uses the shared autonomous 40 ms empty delay.
-                // This second volley must first detect a ball
-                // before an empty sensor reading is allowed to raise the kicker.
-                // This prevents an initially empty sensor from ending the volley.
-                launcher.requireBallBeforeKicker = true;
+                // ==========================================
+                // NO TAG FOUND: SKIP NORMAL AUTO AND PARK
+                // ==========================================
 
-                // LauncherAction feeds the second four balls only after the return
-                // drive and spin-up delay. Uses the same 0.04 s delay as Blue Right.
-                // Like Blue Right, this does not gate on measured flywheel readiness.
-                if (opModeIsActive() && !isStopRequested()) {
-                    // Sample the local alliance tags, lock the speed, then feed balls.
-                    AutoLedAction.runBlocking(actuator, launcher, new AutoVisionLaunchAction(sensor, launcher, actuator, false));
-                    AutoLedAction.runBlocking(actuator, launcher, new LauncherAction(launcher));
+                if (!aprilTagDetected) {
+
+                    telemetry.clearAll();
+                    telemetry.addLine("NO APRILTAG DETECTED");
+                    telemetry.addLine("11 SECOND TIMEOUT");
+                    telemetry.addLine("SKIPPING NORMAL AUTONOMOUS");
+                    telemetry.addLine("RUNNING PARKING PATH");
+                    telemetry.update();
+
+                    // Make sure the flywheel and intake are stopped.
+                    launcher.setFlywheelVelocity(0);
+                    intakeSubsystem.stopIntake();
+                    intakeSubsystem.stopFeeding();
+
+                    if (opModeIsActive() && !isStopRequested()) {
+                        AutoLedAction.runBlocking(
+                                actuator,
+                                launcher,
+                                new SequentialAction(parkFromStart)
+                        );
+                    }
+
+                } else {
+
+                    // ==========================================
+                    // APRILTAG FOUND: RUN NORMAL AUTONOMOUS
+                    // ==========================================
+
+                    telemetry.clearAll();
+                    telemetry.addLine("BLUE APRILTAG DETECTED!");
+                    telemetry.addLine("STARTING NORMAL AUTONOMOUS");
+                    telemetry.update();
+
+                    // Wait one second before beginning the paths.
+                    AutoLedAction.runBlocking(
+                            actuator,
+                            launcher,
+                            new SleepAction(1)
+                    );
+
+                    // Spin up while driving to the first launch position.
+                    launcher.setFlywheelVelocity(
+                            LauncherSubsystem.TARGET_VELOCITY
+                    );
+
+                    AutoLedAction.runBlocking(
+                            actuator,
+                            launcher,
+                            new SequentialAction(
+                                    launchPositionRight
+                            )
+                    );
+
+                    // Launch preload balls.
+                    if (opModeIsActive() && !isStopRequested()) {
+
+                        AutoLedAction.runBlocking(
+                                actuator,
+                                launcher,
+                                new AutoVisionLaunchAction(
+                                        sensor, launcher, actuator, false
+                                )
+                        );
+
+                        AutoLedAction.runBlocking(
+                                actuator,
+                                launcher,
+                                new LauncherAction(launcher)
+                        );
+                    }
+
+                    // Stop the flywheel after the first volley.
+                    launcher.setFlywheelVelocity(0);
+
+                    // Collect balls.
+                    if (opModeIsActive() && !isStopRequested()) {
+
+                        intakeSubsystem.rampDown();
+                        intakeSubsystem.intake(1);
+
+                        AutoLedAction.runBlocking(
+                                actuator,
+                                launcher,
+                                new SequentialAction(
+                                        flowerPosition,
+                                        new SleepAction(2),
+                                        moveBack
+                                )
+                        );
+
+                        // Raise ramp, stop intake, and reverse transfer.
+                        intakeSubsystem.rampUp();
+                        intakeSubsystem.stopIntake();
+                        intakeSubsystem.startStepUpReversePulse();
+
+                        AutoLedAction.runBlocking(
+                                actuator,
+                                launcher,
+                                (packet) -> {
+                                    intakeSubsystem.update();
+                                    return intakeSubsystem.isStepUpReverseActive();
+                                }
+                        );
+
+                        intakeSubsystem.stopFeeding();
+                    }
+
+                    // Return to the second shooting position.
+                    if (opModeIsActive() && !isStopRequested()) {
+
+                        launcher.setFlywheelVelocity(
+                                LauncherSubsystem.TARGET_VELOCITY
+                        );
+
+                        AutoLedAction.runBlocking(
+                                actuator,
+                                launcher,
+                                movetolaunchPositionAgain
+                        );
+
+                        // Allow the flywheel to settle.
+                        if (opModeIsActive() && !isStopRequested()) {
+                            AutoLedAction.runBlocking(
+                                    actuator,
+                                    launcher,
+                                    new SleepAction(1)
+                            );
+                        }
+
+                        // Require a ball before allowing the kicker to rise.
+                        launcher.requireBallBeforeKicker = true;
+
+                        // Launch the second volley.
+                        if (opModeIsActive() && !isStopRequested()) {
+
+                            AutoLedAction.runBlocking(
+                                    actuator,
+                                    launcher,
+                                    new AutoVisionLaunchAction(
+                                            sensor, launcher, actuator, false
+                                    )
+                            );
+
+                            AutoLedAction.runBlocking(
+                                    actuator,
+                                    launcher,
+                                    new LauncherAction(launcher)
+                            );
+                        }
+
+                        launcher.setFlywheelVelocity(0);
+                    }
+
+                    // Normal parking path after completing autonomous.
+                    if (opModeIsActive() && !isStopRequested()) {
+
+                        AutoLedAction.runBlocking(
+                                actuator,
+                                launcher,
+                                new SequentialAction(
+                                        park
+                                )
+                        );
+                    }
                 }
-                launcher.setFlywheelVelocity(0);
             }
 
-            // Park after autonomous sequence.
-            if (opModeIsActive() && !isStopRequested()) {
-                AutoLedAction.runBlocking(actuator, launcher, new SequentialAction(
-                        park));
-            }
-        }
-        // Cleanup executes whether autonomous finishes normally or stops early.
         } finally {
+
+            // Cleanup whether autonomous finishes or STOP is pressed.
             launcher.setFlywheelVelocity(0);
             intakeSubsystem.rampUp();
+            intakeSubsystem.stopIntake();
+            intakeSubsystem.stopFeeding();
+
             robot.shutdown();
+
             sleep(1000);
         }
     }
-
 }

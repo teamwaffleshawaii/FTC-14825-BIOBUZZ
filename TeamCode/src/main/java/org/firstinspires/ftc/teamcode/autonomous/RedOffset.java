@@ -1,3 +1,4 @@
+
 package org.firstinspires.ftc.teamcode.autonomous;
 
 import com.acmerobotics.roadrunner.AccelConstraint;
@@ -10,6 +11,7 @@ import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.VelConstraint;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -25,15 +27,9 @@ import org.firstinspires.ftc.teamcode.subsystems.Sensors;
 
 import java.util.Arrays;
 
-/**
- * Autonomous route starting one tile further down from Red Right (Y = -36).
- * Moves forward toward goal, launches preloads, drives straight across to the
- * other side of the hive, picks up from the flower, turns around and launches.
- */
-@Autonomous (name = "RedOffset", group = "Auto")
+@Autonomous(name = "RedOffset", group = "Auto")
 public class RedOffset extends LinearOpMode {
 
-    // References to shared Robot subsystems.
     Robot robot;
     Actuators actuator;
     Sensors sensor;
@@ -42,126 +38,332 @@ public class RedOffset extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        // Robot initializes all shared hardware and subsystems.
+
+        // Initialize robot and subsystems.
         robot = new Robot(hardwareMap);
+
         actuator = robot.actuator;
         sensor = robot.sensor;
         intakeSubsystem = robot.intake;
         launcher = robot.launcher;
 
-        // Starting pose: 1 tile further down in Y from Red Right (60, -36, 180°).
-        MecanumDrive drive = new MecanumDrive(hardwareMap,
-                new Pose2d(60, -36, Math.toRadians(180)));
+        // Starting pose.
+        Pose2d startPose = new Pose2d(
+                60, -36, Math.toRadians(180)
+        );
 
-        // Fast crossing constraints across the field
+        MecanumDrive drive = new MecanumDrive(hardwareMap, startPose);
+
+        // Fast crossing constraints.
         VelConstraint fastVel = new MinVelConstraint(Arrays.asList(
                 drive.kinematics.new WheelVelConstraint(95),
                 new AngularVelConstraint(Math.PI * 1.5)
         ));
-        AccelConstraint fastAccel = new ProfileAccelConstraint(-75, 90);
 
-        // 1. Drive forward into first launch position
-        Action driveToLaunchPosition = drive.actionBuilder(new Pose2d(60, -36, Math.toRadians(180)))
-                .strafeToLinearHeading(new Vector2d(48, -36), Math.toRadians(150))
-                .build();
+        AccelConstraint fastAccel =
+                new ProfileAccelConstraint(-75, 90);
 
-        // 2. Drive straight across to the other side of the hive, angled slightly left toward the flower
-        Action driveToOtherSide = drive.actionBuilder(new Pose2d(45, -36, Math.toRadians(150)))
-                .splineToConstantHeading(new Vector2d(23, -55), Math.toRadians(180), fastVel, fastAccel)
-                .splineToConstantHeading(new Vector2d(-34, -50), Math.toRadians(180), fastVel, fastAccel)
-                .build();
+        // 1. Move to the original-side launch position.
+        Action driveToLaunchPosition =
+                drive.actionBuilder(startPose)
+                        .strafeToLinearHeading(
+                                new Vector2d(48, -36),
+                                Math.toRadians(150)
+                        )
+                        .build();
 
-        // 3. Flower pickup on the other side
-        Action flowerPosition = drive.actionBuilder(new Pose2d(-40, -45, Math.toRadians(180)))
-                .strafeToConstantHeading(new Vector2d(-50, -22))
-                .strafeTo(new Vector2d(-65, -27))
-                .build();
+        // 2. Ground pickup.
+        Action pickupGroundPosition =
+                drive.actionBuilder(
+                                new Pose2d(48, -36, Math.toRadians(150))
+                        )
+                        .strafeToLinearHeading(
+                                new Vector2d(50, -51),
+                                Math.toRadians(0)
+                        )
+                        .strafeToLinearHeading(
+                                new Vector2d(60, -54),
+                                Math.toRadians(0)
+                        )
+                        .build();
 
-        Action moveBack = drive.actionBuilder(new Pose2d(-65, -27, Math.toRadians(180)))
-                .strafeToLinearHeading(new Vector2d(-40, -30), Math.toRadians(180))
-                .build();
+        // 3. Cross directly from ground pickup to the opposite side.
+        Action crossToOppositeLaunch =
+                drive.actionBuilder(
+                                new Pose2d(60, -54, Math.toRadians(0))
+                        )
+                        .strafeToLinearHeading(
+                                new Vector2d(40, -33),
+                                Math.toRadians(0),
+                                fastVel,
+                                fastAccel
+                        )
+                        .splineToConstantHeading(
+                                new Vector2d(-40, -25),
+                                Math.toRadians(18),
+                                fastVel,
+                                fastAccel
+                        )
+                        .build();
 
-        // 4. Turn around to face goal for launching flower balls
-        Action turnAroundToLaunch = drive.actionBuilder(new Pose2d(-40, -30, Math.toRadians(180)))
-                .strafeToLinearHeading(new Vector2d(-45, -10), Math.toRadians(-1))
-                .strafeToLinearHeading(new Vector2d(-50, -20), Math.toRadians(20))
-                .build();
+        // 4. Approach the opposite-side flower.
+        Action secondFlowerApproach =
+                drive.actionBuilder(
+                                new Pose2d(-40, -25, Math.toRadians(17))
+                        )
+                        .strafeToLinearHeading(
+                                new Vector2d(-45, -10),
+                                Math.toRadians(-1),
+                                fastVel,
+                                fastAccel
+                        )
+                        .strafeToLinearHeading(
+                                new Vector2d(-40, -45),
+                                Math.toRadians(180),
+                                fastVel,
+                                fastAccel
+                        )
+                        .build();
 
-        // 5. Park after launching
-        Action park = drive.actionBuilder(new Pose2d(-45, -30, Math.toRadians(20)))
-                .strafeToLinearHeading(new Vector2d(-50, -40), Math.toRadians(90))
-                .strafeToLinearHeading(new Vector2d(-50, -61), Math.toRadians(90))
-                .build();
+        Action secondFlowerPosition =
+                drive.actionBuilder(
+                                new Pose2d(-40, -45, Math.toRadians(180))
+                        )
+                        .strafeToConstantHeading(
+                                new Vector2d(-50, -22)
+                        )
+                        .strafeTo(
+                                new Vector2d(-65, -31)
+                        )
+                        .build();
+
+        Action secondFlowerMoveBack =
+                drive.actionBuilder(
+                                new Pose2d(-65, -31, Math.toRadians(180))
+                        )
+                        .strafeToLinearHeading(
+                                new Vector2d(-40, -32),
+                                Math.toRadians(180)
+                        )
+                        .build();
+
+        // 5. Return to the opposite-side launch position.
+        Action returnToOppositeLaunch =
+                drive.actionBuilder(
+                                new Pose2d(-40, -32, Math.toRadians(180))
+                        )
+                        .strafeToLinearHeading(
+                                new Vector2d(-45, -10),
+                                Math.toRadians(-1)
+                        )
+                        .strafeToLinearHeading(
+                                new Vector2d(-55, -25),
+                                Math.toRadians(17)
+                        )
+                        .build();
+
+        // 6. Park from the opposite side.
+        Action park =
+                drive.actionBuilder(
+                                new Pose2d(-55, -25, Math.toRadians(17))
+                        )
+                        .strafeToLinearHeading(
+                                new Vector2d(-30, -40),
+                                Math.toRadians(90)
+                        )
+                        .strafeToLinearHeading(
+                                new Vector2d(-25, -55),
+                                Math.toRadians(90)
+                        )
+                        .build();
 
         waitForStart();
 
         try {
+
             if (opModeIsActive() && !isStopRequested()) {
-                // Spin up flywheel while driving to launch position
-                launcher.setFlywheelVelocity(LauncherSubsystem.TARGET_VELOCITY);
 
-                AutoLedAction.runBlocking(actuator, launcher, new SequentialAction(
+                // FIRST LAUNCH: PRELOAD BALLS.
+                launcher.setFlywheelVelocity(
+                        LauncherSubsystem.TARGET_VELOCITY
+                );
+
+                AutoLedAction.runBlocking(
+                        actuator,
+                        launcher,
                         driveToLaunchPosition
-                ));
+                );
 
-                // Aim turret with Limelight vision, lock speed, and launch preloads
-                if (opModeIsActive() && !isStopRequested()) {
-                    AutoLedAction.runBlocking(actuator, launcher, new AutoVisionLaunchAction(sensor, launcher, actuator, true));
-                    AutoLedAction.runBlocking(actuator, launcher, new LauncherAction(launcher));
-                }
+                AutoLedAction.runBlocking(
+                        actuator,
+                        launcher,
+                        new AutoVisionLaunchAction(
+                                sensor, launcher, actuator, true
+                        )
+                );
+
+                AutoLedAction.runBlocking(
+                        actuator,
+                        launcher,
+                        new LauncherAction(launcher)
+                );
+
                 launcher.setFlywheelVelocity(0);
 
-                // Drive straight across to the other side of the hive
+                // GROUND PICKUP.
                 if (opModeIsActive() && !isStopRequested()) {
-                    AutoLedAction.runBlocking(actuator, launcher, driveToOtherSide);
-                }
 
-                // Pick up from the flower on the other side
-                if (opModeIsActive() && !isStopRequested()) {
-                    intakeSubsystem.rampDown();
                     intakeSubsystem.intake(1);
-                    AutoLedAction.runBlocking(actuator, launcher, new SequentialAction(
-                            flowerPosition,
-                            new SleepAction(2.2),
-                            moveBack
-                    ));
 
-                    // After backing out of flower, raise ramp, stop intake, and reverse transfer
-                    intakeSubsystem.rampUp();
+                    AutoLedAction.runBlocking(
+                            actuator,
+                            launcher,
+                            new SequentialAction(
+                                    pickupGroundPosition,
+                                    new SleepAction(1.2)
+                            )
+                    );
+
                     intakeSubsystem.stopIntake();
+
                     intakeSubsystem.startStepUpReversePulse();
-                    AutoLedAction.runBlocking(actuator, launcher, (packet) -> {
-                        intakeSubsystem.update();
-                        return intakeSubsystem.isStepUpReverseActive();
-                    });
+
+                    AutoLedAction.runBlocking(
+                            actuator,
+                            launcher,
+                            packet -> {
+                                intakeSubsystem.update();
+                                return intakeSubsystem.isStepUpReverseActive();
+                            }
+                    );
+
                     intakeSubsystem.stopFeeding();
                 }
 
-                // Turn around to launch position and launch flower balls
+                // CROSS DIRECTLY TO THE OPPOSITE SIDE.
                 if (opModeIsActive() && !isStopRequested()) {
-                    launcher.setFlywheelVelocity(LauncherSubsystem.TARGET_VELOCITY);
-                    AutoLedAction.runBlocking(actuator, launcher, turnAroundToLaunch);
+
+                    launcher.setFlywheelVelocity(
+                            LauncherSubsystem.TARGET_VELOCITY
+                    );
+
+                    AutoLedAction.runBlocking(
+                            actuator,
+                            launcher,
+                            crossToOppositeLaunch
+                    );
+                }
+
+                // SECOND LAUNCH: GROUND PICKUP.
+                if (opModeIsActive() && !isStopRequested()) {
 
                     launcher.requireBallBeforeKicker = true;
 
-                    if (opModeIsActive() && !isStopRequested()) {
-                        AutoLedAction.runBlocking(actuator, launcher, new AutoVisionLaunchAction(sensor, launcher, actuator, true));
-                        AutoLedAction.runBlocking(actuator, launcher, new LauncherAction(launcher));
-                    }
+                    AutoLedAction.runBlocking(
+                            actuator,
+                            launcher,
+                            new AutoVisionLaunchAction(
+                                    sensor, launcher, actuator, true
+                            )
+                    );
+
+                    AutoLedAction.runBlocking(
+                            actuator,
+                            launcher,
+                            new LauncherAction(launcher)
+                    );
+
                     launcher.setFlywheelVelocity(0);
                 }
 
-                // Park after launching
+                // OPPOSITE-SIDE FLOWER PICKUP.
                 if (opModeIsActive() && !isStopRequested()) {
-                    AutoLedAction.runBlocking(actuator, launcher, new SequentialAction(
+
+                    intakeSubsystem.rampDown();
+                    intakeSubsystem.intake(1);
+
+                    AutoLedAction.runBlocking(
+                            actuator,
+                            launcher,
+                            new SequentialAction(
+                                    secondFlowerApproach,
+                                    secondFlowerPosition,
+                                    new SleepAction(2.2),
+                                    secondFlowerMoveBack
+                            )
+                    );
+
+                    intakeSubsystem.rampUp();
+                    intakeSubsystem.stopIntake();
+
+                    intakeSubsystem.startStepUpReversePulse();
+
+                    AutoLedAction.runBlocking(
+                            actuator,
+                            launcher,
+                            packet -> {
+                                intakeSubsystem.update();
+                                return intakeSubsystem.isStepUpReverseActive();
+                            }
+                    );
+
+                    intakeSubsystem.stopFeeding();
+                }
+
+                // RETURN TO THE OPPOSITE-SIDE LAUNCH POSITION.
+                if (opModeIsActive() && !isStopRequested()) {
+
+                    launcher.setFlywheelVelocity(
+                            LauncherSubsystem.TARGET_VELOCITY
+                    );
+
+                    AutoLedAction.runBlocking(
+                            actuator,
+                            launcher,
+                            returnToOppositeLaunch
+                    );
+                }
+
+                // THIRD LAUNCH: SECOND FLOWER.
+                if (opModeIsActive() && !isStopRequested()) {
+
+                    launcher.requireBallBeforeKicker = true;
+
+                    AutoLedAction.runBlocking(
+                            actuator,
+                            launcher,
+                            new AutoVisionLaunchAction(
+                                    sensor, launcher, actuator, true
+                            )
+                    );
+
+                    AutoLedAction.runBlocking(
+                            actuator,
+                            launcher,
+                            new LauncherAction(launcher)
+                    );
+
+                    launcher.setFlywheelVelocity(0);
+                }
+
+                // PARK.
+                if (opModeIsActive() && !isStopRequested()) {
+
+                    AutoLedAction.runBlocking(
+                            actuator,
+                            launcher,
                             park
-                    ));
+                    );
                 }
             }
+
         } finally {
+
             launcher.setFlywheelVelocity(0);
             intakeSubsystem.rampUp();
+
             robot.shutdown();
+
             sleep(1000);
         }
     }
