@@ -25,7 +25,7 @@ public class DrivetrainSubsystem {
             Math.PI * DRIVE_WHEEL_DIAMETER_METERS / DRIVE_ENCODER_TICKS_PER_REV;
 
     // Full commanded power for D-pad left/right strafing.
-    private static final double DPAD_STRAFE_POWER = 0.85;
+    private static final double DPAD_STRAFE_POWER = 0.65;
 
     private final ElapsedTime driveVelocityTimer = new ElapsedTime();
     private boolean driveVelocityInitialized = false;
