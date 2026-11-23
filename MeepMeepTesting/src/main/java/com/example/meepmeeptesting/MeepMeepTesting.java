@@ -21,14 +21,14 @@ public class MeepMeepTesting {
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setConstraints(70, 70, Math.toRadians(180), Math.toRadians(180), 14.5)
                 .build();
-        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(60, -11.5, Math.toRadians(180)))
-                .strafeToLinearHeading(new Vector2d( 47, -11.5), Math.toRadians(180))
-                .splineTo(new Vector2d(30, -44), Math.toRadians(270))
-                .strafeTo(new Vector2d(25, -55))
-                .strafeToLinearHeading(new Vector2d(25,-40), Math.toRadians(90))
-                .strafeToLinearHeading(new Vector2d(-25,-58), Math.toRadians(90))
-                .strafeToLinearHeading(new Vector2d(-54,-1.5), Math.toRadians(-5))
-                .strafeToLinearHeading(new Vector2d(-30,-56), Math.toRadians(90))
+        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(60, -36, Math.toRadians(180)))
+                .strafeToLinearHeading(new Vector2d( 47, -36), Math.toRadians(100))
+                .splineTo(new Vector2d(55, -60), Math.toRadians(270))
+                .strafeTo(new Vector2d(63, -60))
+                .strafeToLinearHeading(new Vector2d(0,-47), Math.toRadians(0))
+                .strafeToLinearHeading(new Vector2d(-50,-40), Math.toRadians(0))
+                .strafeToLinearHeading(new Vector2d(-50,-30), Math.toRadians(24))
+                .strafeToLinearHeading(new Vector2d(-30,-30                                                                                                                         ), Math.toRadians(90))
 
                 //.strafeToLinearHeading(new Vector2d(63, -56), Math.toRadians(270))
                 // Run your test paths here

@@ -28,9 +28,9 @@ public class TurretAimController {
 
     // Angle and Hypotenuse velocity compensation parameters
     public static boolean HYPOTENUSE_COMPENSATION_ENABLED = true;
-    public static double HYPOTENUSE_SCALE = 1.15; // gentle factor for 1/cos(theta) distance increase
-    public static double ANGLE_VELOCITY_PER_DEGREE = 1.0; // slight extra speed boost per degree off-center (ticks/sec)
-    public static double MAX_ANGLE_VELOCITY_BOOST = 60.0; // cap on velocity boost from angled shots
+    public static double HYPOTENUSE_SCALE = 0.5; // gentle factor for 1/cos(theta) distance increase
+    public static double ANGLE_VELOCITY_PER_DEGREE = 0.5; // slight extra speed boost per degree off-center (ticks/sec)
+    public static double MAX_ANGLE_VELOCITY_BOOST = 50.0; // cap on velocity boost from angled shots
 
     // Calibrated relative TX offsets for four adjacent tags; reused across RED and BLUE tag groups.
     public static double[] TAG_TX_OFFSETS = {-7.04, -3.02, 2.96, 7.02};

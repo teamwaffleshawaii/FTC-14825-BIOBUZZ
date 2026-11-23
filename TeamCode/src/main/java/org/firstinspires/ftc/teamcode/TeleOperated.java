@@ -225,20 +225,20 @@ public class TeleOperated extends LinearOpMode {
         // Estimate chassis velocity along the goal line. Freeze this adjustment
         // throughout a volley so the target does not change between fed balls.
         if (!launcher.isBusy()) {
-            double desiredAdjustment = 0.0;
+            double desiredAdjustment = 0;
             if (MOVING_SHOT_COMPENSATION_ENABLED
                     && visionVelocity.getCalibratedTagsSeen() > 0) {
                 measuredTowardGoalVelocityMps =
                         drivetrain.getVelocityTowardTargetMps(angleDegrees);
-                double limit = Math.max(0.0, MAX_MOVING_SHOT_ADJUSTMENT_TICKS);
+                double limit = Math.max(0, MAX_MOVING_SHOT_ADJUSTMENT_TICKS);
                 desiredAdjustment = -measuredTowardGoalVelocityMps
                         * MOVING_SHOT_GAIN_TICKS_PER_MPS;
                 desiredAdjustment = Math.max(-limit, Math.min(limit, desiredAdjustment));
             } else {
-                measuredTowardGoalVelocityMps = 0.0;
+                measuredTowardGoalVelocityMps = 0;
             }
 
-            double alpha = Math.max(0.0, Math.min(1.0, MOVING_SHOT_SMOOTHING));
+            double alpha = Math.max(10, Math.min(1.5, MOVING_SHOT_SMOOTHING));
             filteredMovingShotAdjustment += alpha
                     * (desiredAdjustment - filteredMovingShotAdjustment);
         }

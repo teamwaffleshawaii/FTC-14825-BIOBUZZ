@@ -381,7 +381,7 @@ public class RedLeft extends LinearOpMode {
 
             robot.shutdown();
 
-            sleep(1000);
+            sleep(2000);
         }
     }
 }
