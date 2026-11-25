@@ -25,13 +25,16 @@ public class TeleOpRed extends TeleOperated {
         super.limelightTelemetry(); // Keep original TeleOp RED telemetry.
 
         LLResult frame = getTurretAprilTagFrame();
-        Double targetServo = TurretAimController.calculateTurretServoPosition(frame, isRedAlliance());
+        double angleDegrees = TurretAimController.getHorizontalAngleDegrees(frame, isRedAlliance());
+        double tangentialVelMps = drivetrain.getTangentialVelocityMps(angleDegrees);
+        Double targetServo = TurretAimController.calculateTurretServoPosition(frame, isRedAlliance(), tangentialVelMps);
 
         telemetry.addData("Turret Mode", AUTO_AIM_ENABLED ? "AUTO AIM" : "TELEMETRY ONLY");
 
         if (targetServo != null) {
             telemetry.addData("Turret Suggested Servo", targetServo);
             telemetry.addData("Turret Actual Servo", actuator.turretServo.getPosition());
+            telemetry.addData("Turret Cross Lead (m/s)", String.format(java.util.Locale.US, "%.2f", tangentialVelMps));
 
             if (AUTO_AIM_ENABLED && !launcher.isBusy()) {
                 actuator.turretServo.setPosition(targetServo);

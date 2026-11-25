@@ -32,6 +32,11 @@ public class TurretAimController {
     public static double ANGLE_VELOCITY_PER_DEGREE = 0.5; // slight extra speed boost per degree off-center (ticks/sec)
     public static double MAX_ANGLE_VELOCITY_BOOST = 50.0; // cap on velocity boost from angled shots
 
+    // Moving-shot turret lead parameters (Dashboard tunable)
+    public static boolean TURRET_MOVING_LEAD_ENABLED = true;
+    public static double TURRET_MOVING_LEAD_GAIN_DEG_PER_MPS = 7.5; // degrees turret lead per m/s cross-field velocity
+    public static double MAX_TURRET_LEAD_DEGREES = 20.0; // cap on lead angle correction (degrees)
+
     // Calibrated relative TX offsets for four adjacent tags; reused across RED and BLUE tag groups.
     public static double[] TAG_TX_OFFSETS = {-7.04, -3.02, 2.96, 7.02};
 
@@ -42,6 +47,19 @@ public class TurretAimController {
      * Returns null if no valid alliance AprilTags are found in the frame.
      */
     public static Double calculateTurretServoPosition(LLResult frame, boolean redAlliance) {
+        return calculateTurretServoPosition(frame, redAlliance, 0.0);
+    }
+
+    /**
+     * Calculates required turret servo position based on fresh Limelight AprilTag frame,
+     * incorporating moving-shot tangential velocity lead compensation.
+     *
+     * @param frame Fresh Limelight frame
+     * @param redAlliance True for RED alliance, false for BLUE
+     * @param tangentialVelocityMps Robot cross-field velocity perpendicular to goal (positive = moving right)
+     * @return Servo position target (0.0 to 1.0) or null if no tags detected
+     */
+    public static Double calculateTurretServoPosition(LLResult frame, boolean redAlliance, double tangentialVelocityMps) {
         if (frame == null || !frame.isValid()) {
             return null;
         }
@@ -69,6 +87,16 @@ public class TurretAimController {
                 : (estimates[count / 2 - 1] + estimates[count / 2]) / 2.0;
 
         double error = centerTx - TX_CENTER_OFFSET_DEGREES;
+
+        // Apply moving-shot tangential lead compensation
+        if (TURRET_MOVING_LEAD_ENABLED && Double.isFinite(tangentialVelocityMps)) {
+            double leadDegrees = tangentialVelocityMps * TURRET_MOVING_LEAD_GAIN_DEG_PER_MPS;
+            double maxLead = Math.max(0.0, MAX_TURRET_LEAD_DEGREES);
+            leadDegrees = Math.max(-maxLead, Math.min(maxLead, leadDegrees));
+            // Subtract lead so positive cross-velocity leads left into the motion
+            error -= leadDegrees;
+        }
+
         double correction = Math.abs(error) <= TX_DEADBAND_DEGREES ? 0.0 : error;
         double min = Math.max(0.0, Math.min(1.0, SERVO_MIN));
         double max = Math.max(min, Math.min(1.0, SERVO_MAX));

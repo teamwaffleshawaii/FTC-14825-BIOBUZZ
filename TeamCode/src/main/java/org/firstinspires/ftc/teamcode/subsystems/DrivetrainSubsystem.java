@@ -135,8 +135,8 @@ public class DrivetrainSubsystem {
         double strafe = (-lfMps + rfMps + lbMps - rbMps) * 0.25;
 
         // Light filtering reduces encoder quantization without adding much lag.
-        robotForwardVelocityMps += 0.35 * (forward - robotForwardVelocityMps);
-        robotStrafeVelocityMps += 0.35 * (strafe - robotStrafeVelocityMps);
+        robotForwardVelocityMps += 0.55 * (forward - robotForwardVelocityMps);
+        robotStrafeVelocityMps += 0.55 * (strafe - robotStrafeVelocityMps);
     }
 
     public double getRobotForwardVelocityMps() {
@@ -155,6 +155,16 @@ public class DrivetrainSubsystem {
         double angle = Math.toRadians(targetTxDegrees);
         return robotForwardVelocityMps * Math.cos(angle)
                 + robotStrafeVelocityMps * Math.sin(angle);
+    }
+
+    /**
+     * Positive result means robot translation is toward the right relative to the target vector.
+     * Limelight TX is relative to the chassis because the camera is fixed.
+     */
+    public double getTangentialVelocityMps(double targetTxDegrees) {
+        double angle = Math.toRadians(targetTxDegrees);
+        return -robotForwardVelocityMps * Math.sin(angle)
+                + robotStrafeVelocityMps * Math.cos(angle);
     }
 
     /** Preserve the existing driver's heading-reset behavior. */
