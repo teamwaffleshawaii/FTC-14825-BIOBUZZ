@@ -60,7 +60,7 @@ public class RedRight extends LinearOpMode {
         ));
 
         AccelConstraint fastAccel =
-                new ProfileAccelConstraint(-75, 90);
+                new ProfileAccelConstraint(-70, 75);
 
         // FIRST LAUNCH POSITION
         Action launchPositionRight =
@@ -154,7 +154,7 @@ public class RedRight extends LinearOpMode {
                                 fastAccel
                         )
                         .strafeToLinearHeading(
-                                new Vector2d(-55, -25),
+                                new Vector2d(-50, -23),
                                 Math.toRadians(17),
                                 fastVel,
                                 fastAccel
@@ -164,18 +164,18 @@ public class RedRight extends LinearOpMode {
         // LEFT-SIDE FLOWER PICKUP
         Action flowerPositionLeft =
                 drive.actionBuilder(
-                                new Pose2d(-55, -25, Math.toRadians(17))
+                                new Pose2d(-45, -25, Math.toRadians(17))
                         )
                         .splineTo(
                                 new Vector2d(-38, -30),
                                 Math.toRadians(180)
                         )
-                        .strafeTo(new Vector2d(-66, -21))
+                        .strafeTo(new Vector2d(-66, -10))
                         .build();
 
         Action moveBackLeft =
                 drive.actionBuilder(
-                                new Pose2d(-66, -21, Math.toRadians(180))
+                                new Pose2d(-66, -10, Math.toRadians(180))
                         )
                         .strafeToLinearHeading(
                                 new Vector2d(-40, -30),
@@ -189,11 +189,11 @@ public class RedRight extends LinearOpMode {
                                 new Pose2d(-40, -30, Math.toRadians(180))
                         )
                         .strafeToLinearHeading(
-                                new Vector2d(-45, -10),
+                                new Vector2d(-45, -15),
                                 Math.toRadians(-1)
                         )
                         .strafeToLinearHeading(
-                                new Vector2d(-55, -25),
+                                new Vector2d(-45, -25),
                                 Math.toRadians(17)
                         )
                         .build();
@@ -201,7 +201,7 @@ public class RedRight extends LinearOpMode {
         // NORMAL PARK PATH
         Action park =
                 drive.actionBuilder(
-                                new Pose2d(-55, -25, Math.toRadians(17))
+                                new Pose2d(-45, -25, Math.toRadians(17))
                         )
                         .strafeToLinearHeading(
                                 new Vector2d(-30, -40),
@@ -224,7 +224,7 @@ public class RedRight extends LinearOpMode {
                                 Math.toRadians(90)
                         )
                         .strafeToLinearHeading(
-                                new Vector2d(-25, -51),
+                                new Vector2d(-25, -55),
                                 Math.toRadians(90)
                         )
                         .build();

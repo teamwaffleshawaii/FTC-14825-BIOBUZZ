@@ -52,9 +52,9 @@ public class TeleOperated extends LinearOpMode {
     private boolean flywheelReadyRumbled = false;
     // Moving-shot compensation is Dashboard-tunable.
     public static boolean MOVING_SHOT_COMPENSATION_ENABLED = true;
-    public static double MOVING_SHOT_GAIN_TICKS_PER_MPS = 40.0;
-    public static double MAX_MOVING_SHOT_ADJUSTMENT_TICKS = 100.0;
-    public static double MOVING_SHOT_SMOOTHING = 0.40;
+    public static double MOVING_SHOT_GAIN_TICKS_PER_MPS = 20.0;
+    public static double MAX_MOVING_SHOT_ADJUSTMENT_TICKS = 50.0;
+    public static double MOVING_SHOT_SMOOTHING = 0.25;
     private double filteredMovingShotAdjustment = 0.0;
     private double measuredTowardGoalVelocityMps = 0.0;
 
@@ -220,6 +220,13 @@ public class TeleOperated extends LinearOpMode {
         // The fixed Limelight reports target direction relative to the chassis.
         double angleDegrees = TurretAimController.getHorizontalAngleDegrees(
                 currentAprilTagFrame, isRedAlliance());
+        if (Math.abs(angleDegrees) < 0.5 && actuator != null && actuator.turretServo != null) {
+            // Fall back to turret servo position if no fresh AprilTag frame is actively yielding an angle
+            double servoAngle = TurretAimController.getAngleFromServoPosition(actuator.turretServo.getPosition());
+            if (Math.abs(servoAngle) > 0.5) {
+                angleDegrees = servoAngle;
+            }
+        }
         targetVelocity = TurretAimController.compensateLaunchVelocity(
                 targetVelocity, angleDegrees);
 

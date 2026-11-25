@@ -19,7 +19,7 @@ public class TurretAimController {
     public static double SERVO_CENTER = 0.48;
     // Servo position change per degree of horizontal aiming correction.
     public static double SERVO_PER_DEGREE = 0.010; //adjust this as needed if turret is not aligned center at all positions
-    public static double TX_DEADBAND_DEGREES = 0.5;
+    public static double TX_DEADBAND_DEGREES = 0.1;
     public static double SERVO_MIN = 0.00;
     public static double SERVO_MAX = 1.00;
     // Field-tested TX center bias for the current Limelight mounting position.
@@ -28,14 +28,14 @@ public class TurretAimController {
 
     // Angle and Hypotenuse velocity compensation parameters
     public static boolean HYPOTENUSE_COMPENSATION_ENABLED = true;
-    public static double HYPOTENUSE_SCALE = 0.5; // gentle factor for 1/cos(theta) distance increase
-    public static double ANGLE_VELOCITY_PER_DEGREE = 0.5; // slight extra speed boost per degree off-center (ticks/sec)
-    public static double MAX_ANGLE_VELOCITY_BOOST = 50.0; // cap on velocity boost from angled shots
+    public static double HYPOTENUSE_SCALE = 0.58; // factor for 1/cos(theta) hypotenuse distance scaling (tuned down slightly to eliminate overshooting)
+    public static double ANGLE_VELOCITY_PER_DEGREE = 0.6; // extra speed boost per degree off-center (ticks/sec)
+    public static double MAX_ANGLE_VELOCITY_BOOST = 45.0; // cap on velocity boost from angled shots (ticks/sec)
 
     // Moving-shot turret lead parameters (Dashboard tunable)
     public static boolean TURRET_MOVING_LEAD_ENABLED = true;
-    public static double TURRET_MOVING_LEAD_GAIN_DEG_PER_MPS = 7.5; // degrees turret lead per m/s cross-field velocity
-    public static double MAX_TURRET_LEAD_DEGREES = 20.0; // cap on lead angle correction (degrees)
+    public static double TURRET_MOVING_LEAD_GAIN_DEG_PER_MPS = 5.5; // degrees turret lead per m/s cross-field velocity
+    public static double MAX_TURRET_LEAD_DEGREES = 15.0; // cap on lead angle correction (degrees)
 
     // Calibrated relative TX offsets for four adjacent tags; reused across RED and BLUE tag groups.
     public static double[] TAG_TX_OFFSETS = {-7.04, -3.02, 2.96, 7.02};

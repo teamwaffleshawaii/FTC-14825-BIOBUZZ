@@ -59,7 +59,7 @@ public class BlueRight extends LinearOpMode {
         ));
 
         AccelConstraint fastAccel =
-                new ProfileAccelConstraint(-75, 90);
+                new ProfileAccelConstraint(-70, 75);
 
         // FIRST LAUNCH POSITION
         Action launchPositionRight = drive.actionBuilder(startPose)
@@ -127,7 +127,7 @@ public class BlueRight extends LinearOpMode {
                                 fastAccel
                         )
                         .splineToLinearHeading(
-                                new Pose2d(46, 20, Math.toRadians(200)),
+                                new Pose2d(38, 20, Math.toRadians(200)),
                                 Math.toRadians(-10),
                                 fastVel,
                                 fastAccel
@@ -146,7 +146,7 @@ public class BlueRight extends LinearOpMode {
                                 fastAccel
                         )
                         .splineToLinearHeading(
-                                new Pose2d(46, 20, Math.toRadians(200)),
+                                new Pose2d(38, 20, Math.toRadians(200)),
                                 Math.toRadians(-10),
                                 fastVel,
                                 fastAccel
@@ -156,7 +156,7 @@ public class BlueRight extends LinearOpMode {
         // LEFT FLOWER PICKUP
         Action flowerPositionLeft =
                 drive.actionBuilder(
-                                new Pose2d(46, 20, Math.toRadians(200))
+                                new Pose2d(38, 20, Math.toRadians(200))
                         )
                         .splineTo(
                                 new Vector2d(38, 36),
@@ -186,7 +186,7 @@ public class BlueRight extends LinearOpMode {
                                 Math.toRadians(-90)
                         )
                         .splineToLinearHeading(
-                                new Pose2d(46, 23, Math.toRadians(200)),
+                                new Pose2d(38, 23, Math.toRadians(200)),
                                 Math.toRadians(90)
                         )
                         .build();
@@ -194,7 +194,7 @@ public class BlueRight extends LinearOpMode {
         // NORMAL PARK
         Action park =
                 drive.actionBuilder(
-                                new Pose2d(46, 23, Math.toRadians(200))
+                                new Pose2d(38, 23, Math.toRadians(200))
                         )
                         .splineToLinearHeading(
                                 new Pose2d(50, 50, Math.toRadians(270)),

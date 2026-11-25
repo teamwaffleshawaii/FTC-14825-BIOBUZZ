@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class AutoVisionLaunchAction implements Action {
     public static double SAMPLE_SECONDS = 0.5;
     public static double SETTLE_SECONDS = 0.5;
+    public static double AUTO_LAUNCH_SPEED_TRIM = -15.0; // Trim flywheel target speed in auto to prevent overshooting (ticks/sec)
 
     private final Sensors sensors;
     private final LauncherSubsystem launcher;
@@ -68,7 +69,13 @@ public class AutoVisionLaunchAction implements Action {
 
             // 3. Apply angle & hypotenuse velocity compensation
             double angleDegrees = TurretAimController.getHorizontalAngleDegrees(freshFrame, redAlliance);
-            double finalVelocity = TurretAimController.compensateLaunchVelocity(selectedVelocity, angleDegrees);
+            if (Math.abs(angleDegrees) < 0.5 && actuators != null && actuators.turretServo != null) {
+                double servoAngle = TurretAimController.getAngleFromServoPosition(actuators.turretServo.getPosition());
+                if (Math.abs(servoAngle) > 0.5) {
+                    angleDegrees = servoAngle;
+                }
+            }
+            double finalVelocity = TurretAimController.compensateLaunchVelocity(selectedVelocity, angleDegrees) + AUTO_LAUNCH_SPEED_TRIM;
 
             launcher.setFlywheelVelocity(finalVelocity);
 

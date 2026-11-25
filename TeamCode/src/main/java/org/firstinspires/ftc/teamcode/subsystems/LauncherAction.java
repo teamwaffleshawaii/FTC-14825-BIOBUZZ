@@ -26,6 +26,11 @@ public class LauncherAction implements Action {
     @Override
     public boolean run(TelemetryPacket packet) {
         if (!started) {
+            // Wait up to 1 second for flywheel to reach target velocity before starting auto feed sequence
+            if (!launcher.isFlywheelReady() && timeout.seconds() < 1.0) {
+                packet.put("Waiting for Flywheel Ready", true);
+                return true;
+            }
             launcher.startAuto();
             started = true;
             timeout.reset();

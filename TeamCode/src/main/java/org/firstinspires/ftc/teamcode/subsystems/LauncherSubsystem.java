@@ -52,15 +52,14 @@ public class LauncherSubsystem {
     private final ElapsedTime kickerTimer = new ElapsedTime();
 
     // Timing values are in SECONDS. Tune cautiously on the actual robot.
-    public double emptyDelay = 0.02; // TeleOp: 20 ms
-    public double emptyDelayAutoOnly = 0.04; // Autonomous: 40 ms
+    public double emptyDelay = 0.01; // TeleOp: 10 ms
+    public double emptyDelayAutoOnly = 0.015; // Autonomous: 15 ms
     public double kickerUpDelay = 0.7;
     public double kickerResetDelay = 0.3;
     private State state = State.IDLE;
     private boolean detectingEmpty = false;
-    // Optional protection for a volley that starts with an empty sensor view.
-    // Disabled by default so Blue Right and TeleOp keep their tested behavior.
-    public boolean requireBallBeforeKicker = false;
+    // Enabled by default to protect launch accuracy and prevent dry kicking.
+    public boolean requireBallBeforeKicker = true;
     private boolean sawBallThisVolley = false;
     private double activeEmptyDelay = emptyDelay;
     private boolean completed = false;
@@ -136,7 +135,7 @@ public class LauncherSubsystem {
                         detectingEmpty = true;
                         distanceTimer.reset();
                     }
-                    if (distanceTimer.seconds() >= activeEmptyDelay) {
+                    if (distanceTimer.seconds() >= activeEmptyDelay && isFlywheelReady()) {
                         actuator.kickerUp();
                         kickerTimer.reset();
                         state = State.KICKER_UP;
@@ -197,6 +196,7 @@ public class LauncherSubsystem {
     }
     /** True when actual flywheel speed is within the hardware readiness band. */
     public boolean isFlywheelReady() {
-        return actuator.isLaunchReady(TARGET_VELOCITY);
+        double target = commandedFlywheelVelocity > 0 ? commandedFlywheelVelocity : TARGET_VELOCITY;
+        return actuator.isLaunchReady(target);
     }
 }

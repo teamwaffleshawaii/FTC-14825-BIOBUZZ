@@ -24,8 +24,9 @@ public class DrivetrainSubsystem {
     private static final double DRIVE_METERS_PER_TICK =
             Math.PI * DRIVE_WHEEL_DIAMETER_METERS / DRIVE_ENCODER_TICKS_PER_REV;
 
-    // Full commanded power for D-pad left/right strafing.
-    private static final double DPAD_STRAFE_POWER = 0.65;
+    // Commanded power for D-pad translation micro-adjustments.
+    public static double DPAD_STRAFE_POWER = 0.80;
+    public static double DPAD_FORWARD_POWER = 0.75;
 
     private final ElapsedTime driveVelocityTimer = new ElapsedTime();
     private boolean driveVelocityInitialized = false;
@@ -75,9 +76,9 @@ public class DrivetrainSubsystem {
             stickX = DPAD_STRAFE_POWER;
         }
         if (dpadUp) {
-            stickY = 0.5;
+            stickY = DPAD_FORWARD_POWER;
         } else if (dpadDown) {
-            stickY = -0.5;
+            stickY = -DPAD_FORWARD_POWER;
         }
 
         // Rotate the desired translation vector and mix it with rotation.
